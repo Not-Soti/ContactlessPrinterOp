@@ -8,10 +8,20 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <SurfaceView
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:id="@+id/act_readQR_cameraPreview"
+        />
 
-    <Button
-        android:id="@+id/act_main_readQrButton"
+    <TextView
+        android:id="@+id/act_readQR_texto_qr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Leer código QR" />
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="Resultado"
+        android:textSize="24sp"
+        android:textColor="#000000"/>
+
 </LinearLayout>

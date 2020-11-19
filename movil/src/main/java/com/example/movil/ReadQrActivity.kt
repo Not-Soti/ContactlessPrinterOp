@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Vibrator
@@ -26,10 +28,14 @@ class ReadQrActivity : AppCompatActivity() {
     lateinit var textoQr: TextView
     lateinit var cameraSource: CameraSource
     lateinit var barcodeDetector: BarcodeDetector
-    val requestCameraPermissionCode = 1 //Codigo usado al solicitar los permisos de la camara y en la respuesta
+
+    val requestCameraPermissionCode =
+        1 //Codigo usado al solicitar los permisos de la camara y en la respuesta
+    val requestWifiPermissionCode = 2
+
     val detectorHeight = 640
     val detectorWidth = 640
-    var vibrar: Boolean = true
+    var codigoLeido: Boolean = false //Indica si ya se ha leido un QR
 
     val TAG = "ReadQrActivity"
 
@@ -72,6 +78,7 @@ class ReadQrActivity : AppCompatActivity() {
                     Log.d(TAG, "No se tienen permisos sobre la camara")
                     return
                 }
+                //Se tienen permisos sobre la camara
                 Log.d(TAG, "Se tienen permisos sobre la camara")
                 cameraSource.start(holder)
             }
@@ -90,31 +97,64 @@ class ReadQrActivity : AppCompatActivity() {
             }
 
             override fun receiveDetections(detections: Detector.Detections<Barcode>?) {
-                var qrCodes: SparseArray<Barcode> =
-                    detections?.detectedItems ?: throw Exception("No se encontraron codigos qr")
-                if (qrCodes.size() != 0) {
-                    //Si se detecta un codigo QR el movil vibra
-                    textoQr.post {
-                        var vibrator: Vibrator =
-                            applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                        if (vibrar) {
+                if (!codigoLeido) {
+
+                    var qrCodes: SparseArray<Barcode> =
+                        detections?.detectedItems ?: throw Exception("No se encontraron codigos qr")
+                    if (qrCodes.size() != 0) {
+                        codigoLeido=true;
+                        //Si se detecta un codigo QR el movil vibra
+                        textoQr.post {
+                            var vibrator: Vibrator =
+                                applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
                             vibrator.vibrate(500) //No deprecado hasta api 26
-                            vibrar = false //Si vibra una vez que no siga vibrando
-                        }
-                        textoQr.text = qrCodes.valueAt(0).displayValue
 
-                        /*
-                        for(i in 0 until qrCodes.size()){
-                            Log.d("---QR---", qrCodes.valueAt(i).displayValue)
-                        }
-                        */
-                        Log.d(TAG, qrCodes.valueAt(0).displayValue)
+                            //Se obtiene el mensaje del QR
+                            textoQr.text = qrCodes.valueAt(0).displayValue
+                            Log.d(TAG, qrCodes.valueAt(0).displayValue)
 
+                            val infoWiFi = qrCodes.valueAt(0).displayValue.split(" ")
+                            connectToWifi(infoWiFi[0], infoWiFi[1]);
+                        }
                     }
                 }
             }
 
         })
+    }
+
+
+    /**
+     * Funcion usada para conectarse al wifi con los parámetros dados
+     */
+    private fun connectToWifi(networkSSID: String, networkPass: String) {
+
+        //No hace falta comprobar los permisos de acceso y cambio del wifi
+        //ya que los comprueba el sistema por si mismo
+
+        Log.d(TAG, "Connectando al wifi")
+
+        var wifiConfig = WifiConfiguration() //Deprecado en API 29
+        wifiConfig.SSID = "\"" + networkSSID + "\""
+        wifiConfig.preSharedKey = "\"" + networkPass + "\""
+        Log.d(TAG, "SSID: " + wifiConfig.SSID)
+        Log.d(TAG, "Pass: " + wifiConfig.preSharedKey)
+
+        Log.d(TAG, "Intentando conectarse al wifi")
+
+        val wifiManager = getApplicationContext().getSystemService(WIFI_SERVICE) as WifiManager
+
+        if(!wifiManager.isWifiEnabled){
+            wifiManager.isWifiEnabled = true
+        }
+
+        var netId = wifiManager.addNetwork(wifiConfig) //necesario para enableNetwork.
+        wifiManager.disconnect()
+        wifiManager.enableNetwork(netId, true)
+        wifiManager.reconnect()
+
+        Log.d(TAG, "Wifi conectado")
+
     }
 
     /**
@@ -144,4 +184,6 @@ class ReadQrActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this@ReadQrActivity, arrayOf(name), code)
         recreate()
     }
+
+
 }

@@ -1,9 +1,9 @@
 package com.example.movil
 
 import android.Manifest
-import android.content.Context
-import android.content.DialogInterface
+import android.content.*
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +14,7 @@ import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,26 +26,32 @@ import java.lang.Exception
 
 class ReadQrActivity : AppCompatActivity() {
     lateinit var surfaceView: SurfaceView //lateinit hace que no tenga que inicializarse ahora
-    lateinit var textoQr: TextView
+
+    //lateinit var textoQr: TextView
     lateinit var cameraSource: CameraSource
     lateinit var barcodeDetector: BarcodeDetector
 
-    val requestCameraPermissionCode =
-        1 //Codigo usado al solicitar los permisos de la camara y en la respuesta
-    val requestWifiPermissionCode = 2
+    val requestCameraPermissionCode = 1 //Codigo usado al solicitar los permisos de la camara
+    //val requestWifiPermissionCode = 2
 
     val detectorHeight = 640
     val detectorWidth = 640
     var codigoLeido: Boolean = false //Indica si ya se ha leido un QR
 
-    val TAG = "ReadQrActivity"
+    val TAG = "---ReadQrActivity---"
+
+
+    //var wifiFilter = IntentFilter(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION) //Usado para mirar el estado del wifi
+    //Utilizado para ver cuando se conecta el dispositivo a la red
+    //val wifiReceiver = WifiReceiver()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qr_scanner)
 
         surfaceView = findViewById<SurfaceView>(R.id.act_readQR_cameraPreview)
-        textoQr = findViewById<TextView>(R.id.act_readQR_texto_qr)
+        //textoQr = findViewById<TextView>(R.id.act_readQR_texto_qr)
         barcodeDetector = BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.QR_CODE).build()
         cameraSource = CameraSource.Builder(this, barcodeDetector)
             .setRequestedPreviewSize(detectorHeight, detectorWidth).setAutoFocusEnabled(true)
@@ -58,12 +65,12 @@ class ReadQrActivity : AppCompatActivity() {
                 if (ContextCompat.checkSelfPermission(
                         this@ReadQrActivity,
                         Manifest.permission.CAMERA
-                    ) != PackageManager.PERMISSION_GRANTED
+                    )
+                    != PackageManager.PERMISSION_GRANTED
                 ) {
                     //Si no se tienen permisos, se comprueba si se necesita un mensaje explicatorio
                     if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this@ReadQrActivity,
-                            Manifest.permission.CAMERA
+                            this@ReadQrActivity, Manifest.permission.CAMERA
                         )
                     ) {
                         showExplanation(
@@ -102,24 +109,29 @@ class ReadQrActivity : AppCompatActivity() {
                     var qrCodes: SparseArray<Barcode> =
                         detections?.detectedItems ?: throw Exception("No se encontraron codigos qr")
                     if (qrCodes.size() != 0) {
-                        codigoLeido=true;
+
+                        codigoLeido = true;
+
                         //Si se detecta un codigo QR el movil vibra
-                        textoQr.post {
-                            var vibrator: Vibrator =
-                                applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(500) //No deprecado hasta api 26
 
-                            //Se obtiene el mensaje del QR
-                            textoQr.text = qrCodes.valueAt(0).displayValue
-                            Log.d(TAG, qrCodes.valueAt(0).displayValue)
+                        var vibrator: Vibrator =
+                            applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                        vibrator.vibrate(500) //No deprecado hasta api 26
 
-                            val infoWiFi = qrCodes.valueAt(0).displayValue.split(" ")
-                            connectToWifi(infoWiFi[0], infoWiFi[1]);
+                        //Se obtiene el mensaje del QR
+                        val infoWiFi = qrCodes.valueAt(0).displayValue.split(" ")
+
+                        if (connectToWifi(infoWiFi[0], infoWiFi[1])) {
+                            //Si se conecta al wifi, va a la pantalla de inicio
+                           // cameraSource.release()
+                           // startActivity(Intent(this@ReadQrActivity, MainActivity::class.java))
+                        } else {
+                            //Si no, se reinicia la actividad
+                          //  recreate()
                         }
                     }
                 }
             }
-
         })
     }
 
@@ -127,7 +139,7 @@ class ReadQrActivity : AppCompatActivity() {
     /**
      * Funcion usada para conectarse al wifi con los parámetros dados
      */
-    private fun connectToWifi(networkSSID: String, networkPass: String) {
+    private fun connectToWifi(networkSSID: String, networkPass: String): Boolean {
 
         //No hace falta comprobar los permisos de acceso y cambio del wifi
         //ya que los comprueba el sistema por si mismo
@@ -137,6 +149,7 @@ class ReadQrActivity : AppCompatActivity() {
         var wifiConfig = WifiConfiguration() //Deprecado en API 29
         wifiConfig.SSID = "\"" + networkSSID + "\""
         wifiConfig.preSharedKey = "\"" + networkPass + "\""
+        wifiConfig.priority = 4000 //Asi se intenta conectar a esta red y no a otra disponible
         Log.d(TAG, "SSID: " + wifiConfig.SSID)
         Log.d(TAG, "Pass: " + wifiConfig.preSharedKey)
 
@@ -144,17 +157,33 @@ class ReadQrActivity : AppCompatActivity() {
 
         val wifiManager = getApplicationContext().getSystemService(WIFI_SERVICE) as WifiManager
 
-        if(!wifiManager.isWifiEnabled){
+        if (!wifiManager.isWifiEnabled) {
             wifiManager.isWifiEnabled = true
         }
 
+        if (!wifiManager.disconnect()) {
+            muestraToast("No se ha podido desconectar de la red actual", Toast.LENGTH_LONG)
+            return false
+        }
+
+        //registerReceiver(wifiReceiver, wifiFilter)
+
+
         var netId = wifiManager.addNetwork(wifiConfig) //necesario para enableNetwork.
-        wifiManager.disconnect()
-        wifiManager.enableNetwork(netId, true)
-        wifiManager.reconnect()
-
-        Log.d(TAG, "Wifi conectado")
-
+        if(netId == -1){
+            Log.d(TAG, "La red ya estaba guardada previamente")
+        }else {
+            Log.d(TAG, "La red se ha guardado")
+            wifiManager.enableNetwork(netId, true)
+        }
+        if (wifiManager.reconnect()) {
+            //var conectado = wifiManager.reconnect()
+            return true;
+        } else {
+            muestraToast("No se ha podido conectar a la red", Toast.LENGTH_SHORT)
+            Log.d(TAG, "Fallo en wifiManager.reconnect()")
+            return false
+        }
     }
 
     /**
@@ -185,5 +214,22 @@ class ReadQrActivity : AppCompatActivity() {
         recreate()
     }
 
+    //On back pressed go to main activity
+    override fun onBackPressed() {
+        super.onBackPressed()
+        startActivity(Intent(this, MainActivity::class.java))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraSource.release()
+    }
+
+    /**
+     * Funcion usada par amostrar Toasts
+     */
+    private fun muestraToast(mensaje: String, duracion: Int) {
+        runOnUiThread { Toast.makeText(this@ReadQrActivity, mensaje, duracion).show() }
+    }
 
 }

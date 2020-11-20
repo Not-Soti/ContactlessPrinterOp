@@ -40,7 +40,11 @@ class MainActivity : AppCompatActivity(){
                 val i = Intent(this@MainActivity, ReadQrActivity::class.java)
                 startActivity(i)
             }
-
         })
+    }
+
+    //Se cierra la app
+    override fun onBackPressed() {
+        System.exit(0)
     }
 }

@@ -174,6 +174,8 @@ class ReadQrActivity : AppCompatActivity() {
             Log.d(TAG, "La red ya estaba guardada previamente")
         }else {
             Log.d(TAG, "La red se ha guardado")
+            var wifiInfo = wifiManager.connectionInfo
+            wifiManager.disableNetwork(wifiInfo.networkId)
             wifiManager.enableNetwork(netId, true)
         }
         if (wifiManager.reconnect()) {

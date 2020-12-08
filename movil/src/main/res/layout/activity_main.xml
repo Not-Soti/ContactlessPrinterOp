@@ -14,4 +14,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Leer código QR" />
+
+    <Button
+        android:id="@+id/act_main_printButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="imprimir" />
 </LinearLayout>

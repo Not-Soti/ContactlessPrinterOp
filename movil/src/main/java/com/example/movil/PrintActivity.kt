@@ -24,6 +24,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -137,6 +138,9 @@ class PrintActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        //Remove a image from the imagePreview if there was any
+        imagePreview.setImageDrawable(null)
+
         when (requestCode) {
             chooseImageRequestCode -> if (data != null) {
                 resourceType = ResourceTypeEnum.IMAGE
@@ -146,53 +150,63 @@ class PrintActivity : AppCompatActivity() {
             }
 
             chooseFileRequestCode -> if (data != null) {
-                resourceType = ResourceTypeEnum.PDF
                 val fileUri = data.data
 
                 Log.d(TAG, "file uri: " + fileUri)
 
-                //Get the path from the uri
+                //Get the file path from the uri
                 val pathUtils = RealPathUtils(this, fileUri!!)
                 resourcePath = pathUtils.getRealPath(this@PrintActivity, fileUri!!)
-
-
-                /* Render the first page of the document */
-                //Get the PDF path from the uri
-
-
                 Log.d(TAG, "file path: $resourcePath")
-
 
                 val file = File(resourcePath)
                 val extension = file.extension
                 Log.d(TAG,"extension  $extension")
 
-
-                // This is the PdfRenderer we use to render the PDF.
-                val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
-                    file,
-                    ParcelFileDescriptor.MODE_READ_ONLY
-                )
-
-                val pdfRenderer = PdfRenderer(fileDescriptor)
-                val pageToRender: PdfRenderer.Page = pdfRenderer.openPage(0)
-                val bitmap = Bitmap.createBitmap(
-                    pageToRender.width,
-                    pageToRender.height,
-                    Bitmap.Config.ARGB_8888
-                )
-                pageToRender.render(
-                    bitmap,
-                    null,
-                    null,
-                    PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
-                )
-
-                //Set the page on the imageView
-                imagePreview.setImageBitmap(bitmap)
-
+                //Continue depending on the file extension
+                when(extension.toLowerCase()){
+                    "pdf" -> {
+                        resourceType = ResourceTypeEnum.PDF
+                        processPdf(file)
+                    }
+                    else -> {
+                        Log.d(TAG, "Extension no soportada")
+                        Toast.makeText(this@PrintActivity, "Extension no soportada", Toast.LENGTH_LONG)//TODO crear dialogo de extensiones soportada
+                    }
+                }
             }
         }
+    }
+
+    /**
+     * Function to operate when a pdf is selected
+     */
+    private fun processPdf(file : File){
+
+        /* Render the first page of the document */
+
+        // This is the PdfRenderer we use to render the PDF.
+        val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
+            file,
+            ParcelFileDescriptor.MODE_READ_ONLY
+        )
+
+        val pdfRenderer = PdfRenderer(fileDescriptor)
+        val pageToRender: PdfRenderer.Page = pdfRenderer.openPage(0)
+        val bitmap = Bitmap.createBitmap(
+            pageToRender.width,
+            pageToRender.height,
+            Bitmap.Config.ARGB_8888
+        )
+        pageToRender.render(
+            bitmap,
+            null,
+            null,
+            PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
+        )
+
+        //Set the page on the imageView
+        imagePreview.setImageBitmap(bitmap)
     }
 
     //On back pressed go to main activity

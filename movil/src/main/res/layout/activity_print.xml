@@ -8,12 +8,6 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/act_print_chooseImageButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Seleccionar imagen" />
-
-    <Button
         android:id="@+id/act_print_chooseFileButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

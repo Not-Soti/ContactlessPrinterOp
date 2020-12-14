@@ -2,42 +2,31 @@ package com.example.movil
 
 
 import android.Manifest
-import android.content.ContentUris
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.print.PrintAttributes
 import android.print.PrintManager
-import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.print.PrintHelper
 import java.io.File
 
 
 class PrintActivity : AppCompatActivity() {
 
-    private val TAG = "--- PrintActivity ---"
+    private val tag = "--- PrintActivity ---"
 
-    lateinit var buttonChooseImage: Button
+    //lateinit var buttonChooseImage: Button
     lateinit var buttonChooseFile: Button
     lateinit var buttonSendEmail: Button
     lateinit var buttonPrint: Button
@@ -67,7 +56,7 @@ class PrintActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_print)
 
-        buttonChooseImage = findViewById(R.id.act_print_chooseImageButton)
+        //buttonChooseImage = findViewById(R.id.act_print_chooseImageButton)
         buttonChooseFile = findViewById(R.id.act_print_chooseFileButton)
         buttonSendEmail = findViewById(R.id.act_print_sendEmailButton)
         buttonPrint = findViewById(R.id.act_print_printButton)
@@ -75,6 +64,7 @@ class PrintActivity : AppCompatActivity() {
 
 
         //ChooseImage button listener
+        /*
         buttonChooseImage.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
                 val intent = Intent(Intent.ACTION_PICK)
@@ -82,6 +72,7 @@ class PrintActivity : AppCompatActivity() {
                 startActivityForResult(intent, chooseImageRequestCode)
             }
         })
+        */ */
 
         buttonChooseFile.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
@@ -142,35 +133,45 @@ class PrintActivity : AppCompatActivity() {
         imagePreview.setImageDrawable(null)
 
         when (requestCode) {
+            //Image selected
+                /*
             chooseImageRequestCode -> if (data != null) {
                 resourceType = ResourceTypeEnum.IMAGE
                 imageUri = data.data
-                Log.d(TAG, "image uri $imageUri")
+                Log.d(tag, "image uri $imageUri")
                 imagePreview.setImageURI(imageUri)
             }
+            */
 
+            //Document selected
             chooseFileRequestCode -> if (data != null) {
                 val fileUri = data.data
 
-                Log.d(TAG, "file uri: " + fileUri)
+                Log.d(tag, "file uri: " + fileUri)
 
                 //Get the file path from the uri
                 val pathUtils = RealPathUtils(this, fileUri!!)
                 resourcePath = pathUtils.getRealPath(this@PrintActivity, fileUri!!)
-                Log.d(TAG, "file path: $resourcePath")
+                Log.d(tag, "file path: $resourcePath")
 
                 val file = File(resourcePath)
                 val extension = file.extension
-                Log.d(TAG,"extension  $extension")
+                Log.d(tag,"extension  $extension")
 
                 //Continue depending on the file extension
                 when(extension.toLowerCase()){
+                    "jpg","jpeg", "jpe", "png","bmp", "gif", "webp" -> {
+                        resourceType = ResourceTypeEnum.IMAGE
+                        imageUri = data.data
+                        Log.d(tag, "image uri $imageUri")
+                        imagePreview.setImageURI(imageUri)
+                    }
                     "pdf" -> {
                         resourceType = ResourceTypeEnum.PDF
                         processPdf(file)
                     }
                     else -> {
-                        Log.d(TAG, "Extension no soportada")
+                        Log.d(tag, "Extension no soportada")
                         Toast.makeText(this@PrintActivity, "Extension no soportada", Toast.LENGTH_LONG)//TODO crear dialogo de extensiones soportada
                     }
                 }

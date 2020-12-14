@@ -21,17 +21,4 @@
         android:layout_height="wrap_content"
         android:text="ir a la pantalla de imprimir" />
 
-    <Button
-        android:id="@+id/act_main_sendEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enviar email" />
-
-    <EditText
-        android:id="@+id/act_main_emailTextArea"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Email" />
 </LinearLayout>

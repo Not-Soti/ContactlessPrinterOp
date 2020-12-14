@@ -2,38 +2,27 @@ package com.example.movil
 
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 
-import androidx.print.PrintHelper
-
 
 class MainActivity : AppCompatActivity(){
 
     lateinit var buttonReadQr: Button
-    lateinit var buttonSendEmail: Button
-    lateinit var textAreaEmail: TextView
-
-    lateinit var buttonGoToPrint: Button //TODO cambiar
-
+    lateinit var buttonPrint: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         buttonReadQr = findViewById(R.id.act_main_readQrButton)
-        buttonSendEmail = findViewById(R.id.act_main_sendEmail)
-        textAreaEmail = findViewById(R.id.act_main_emailTextArea)
-        buttonGoToPrint = findViewById(R.id.act_main_goPrintActivity)
+        buttonPrint = findViewById(R.id.act_main_goPrintActivity)
 
-        buttonGoToPrint.setOnClickListener(object : View.OnClickListener{
+        buttonPrint.setOnClickListener(object : View.OnClickListener{
             override fun onClick(p0: View?) {
                 startActivity(Intent(this@MainActivity, PrintActivity::class.java))
             }
@@ -46,27 +35,6 @@ class MainActivity : AppCompatActivity(){
                 val i = Intent(this@MainActivity, ReadQrActivity::class.java)
                 startActivity(i)
             }
-        })
-
-        //Send email button listener
-        buttonSendEmail.setOnClickListener(object : View.OnClickListener{
-            override fun onClick(p0: View?) {
-                val intent = Intent(Intent.ACTION_SENDTO)
-
-                intent.putExtra(Intent.EXTRA_EMAIL, Array(1){textAreaEmail.text})
-                intent.putExtra(Intent.EXTRA_SUBJECT, "email de prueba")
-                intent.putExtra(Intent.EXTRA_TEXT,"Email de prueba")
-
-                var uriPhoto = ("android.resource://com.example.movil/" + R.mipmap.foto_prueba)
-                intent.putExtra(Intent.EXTRA_STREAM, uriPhoto)
-
-                intent.setType("text/plain")
-                intent.setType("image/png")
-
-                startActivityForResult(Intent.createChooser(intent, "Cliente de email"),77)
-                Log.d("---Email---", "email enviado")
-            }
-
         })
     }
 

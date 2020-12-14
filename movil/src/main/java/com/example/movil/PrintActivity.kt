@@ -37,15 +37,16 @@ class PrintActivity : AppCompatActivity() {
     val chooseImageRequestCode = 0
     val chooseFileRequestCode = 1
 
-    var imageUri: Uri? = null //selected image uri
-    var resourcePath : String? = "" //using the uri does not work when using documents
-    var resourceType = ResourceTypeEnum.NOT_DETERMINED
+    //var imageUri: Uri? = null //selected image uri
+    var resourceUri: Uri? = null //selected image uri
+    var resourcePath : String? = null //using the uri does not work when trying to print documents
+    var resourceType = ResourceTypeEnum.NOT_DEFINED
 
     val requestExternalStoragePermissionCode = 10 //Code uses when asking for permissions
 
     //Enum needed to check the extension of the selected file to print
     enum class ResourceTypeEnum {
-        NOT_DETERMINED,
+        NOT_DEFINED,
         IMAGE,
         PDF,
         DOCUMENT
@@ -62,18 +63,7 @@ class PrintActivity : AppCompatActivity() {
         buttonPrint = findViewById(R.id.act_print_printButton)
         imagePreview = findViewById(R.id.act_print_imagePreview)
 
-
-        //ChooseImage button listener
-        /*
-        buttonChooseImage.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(p0: View?) {
-                val intent = Intent(Intent.ACTION_PICK)
-                intent.type = "image/*"
-                startActivityForResult(intent, chooseImageRequestCode)
-            }
-        })
-        */ */
-
+        //ChooseFile button listener
         buttonChooseFile.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
                 //Check for permission
@@ -93,6 +83,36 @@ class PrintActivity : AppCompatActivity() {
             }
         })
 
+        //SendEmail button listener
+        buttonSendEmail.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(p0: View?) {
+
+                //Nothing was selected
+                if(resourceType == ResourceTypeEnum.NOT_DEFINED){
+                    Toast.makeText(this@PrintActivity, "Selecciona algún archivo", Toast.LENGTH_LONG)
+                }else{
+
+                    //Open email app and load info
+                    val emailIntent = Intent(Intent.ACTION_SEND)
+                    //emailIntent.type = "message/rfc822" //Shows only email clients
+                    emailIntent.type="*/*"
+
+                    val to : Array<String> = emptyArray()
+                    emailIntent.putExtra(Intent.EXTRA_EMAIL, to)
+
+                    if(resourceType == ResourceTypeEnum.IMAGE){
+                        emailIntent.putExtra(Intent.EXTRA_STREAM, resourceUri)
+                    }else if(resourceType == ResourceTypeEnum.PDF){
+                        emailIntent.putExtra(Intent.EXTRA_STREAM, resourceUri)
+                    }
+
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Sujeto")
+                    startActivity(Intent.createChooser(emailIntent, "Enviar email"))
+                }
+            }
+
+        })
+
         //Print button listener
         buttonPrint.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
@@ -106,7 +126,7 @@ class PrintActivity : AppCompatActivity() {
                         printHelper.scaleMode = PrintHelper.SCALE_MODE_FILL
                         var photo: Bitmap = MediaStore.Images.Media.getBitmap(
                             this@PrintActivity.contentResolver,
-                            imageUri
+                            resourceUri
                         );
                         printHelper.printBitmap("Imagen", photo)
                     }
@@ -121,7 +141,6 @@ class PrintActivity : AppCompatActivity() {
                     }
                 }
             }
-
         })
     }
 
@@ -145,13 +164,13 @@ class PrintActivity : AppCompatActivity() {
 
             //Document selected
             chooseFileRequestCode -> if (data != null) {
-                val fileUri = data.data
+                resourceUri = data.data
 
-                Log.d(tag, "file uri: " + fileUri)
+                Log.d(tag, "file uri: " + resourceUri)
 
                 //Get the file path from the uri
-                val pathUtils = RealPathUtils(this, fileUri!!)
-                resourcePath = pathUtils.getRealPath(this@PrintActivity, fileUri!!)
+                val pathUtils = RealPathUtils(this, resourceUri!!)
+                resourcePath = pathUtils.getRealPath(this@PrintActivity, resourceUri!!)
                 Log.d(tag, "file path: $resourcePath")
 
                 val file = File(resourcePath)
@@ -162,13 +181,12 @@ class PrintActivity : AppCompatActivity() {
                 when(extension.toLowerCase()){
                     "jpg","jpeg", "jpe", "png","bmp", "gif", "webp" -> {
                         resourceType = ResourceTypeEnum.IMAGE
-                        imageUri = data.data
-                        Log.d(tag, "image uri $imageUri")
-                        imagePreview.setImageURI(imageUri)
+                        Log.d(tag, "image uri $resourceUri")
+                        imagePreview.setImageURI(resourceUri)
                     }
                     "pdf" -> {
                         resourceType = ResourceTypeEnum.PDF
-                        processPdf(file)
+                        previewPdf(file)
                     }
                     else -> {
                         Log.d(tag, "Extension no soportada")
@@ -182,7 +200,7 @@ class PrintActivity : AppCompatActivity() {
     /**
      * Function to operate when a pdf is selected
      */
-    private fun processPdf(file : File){
+    private fun previewPdf(file : File){
 
         /* Render the first page of the document */
 
@@ -208,6 +226,11 @@ class PrintActivity : AppCompatActivity() {
 
         //Set the page on the imageView
         imagePreview.setImageBitmap(bitmap)
+
+        pageToRender.close()
+        pdfRenderer.close()
+        fileDescriptor.close()
+
     }
 
     //On back pressed go to main activity

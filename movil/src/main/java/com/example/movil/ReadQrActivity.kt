@@ -38,6 +38,8 @@ class ReadQrActivity : AppCompatActivity() {
     val detectorWidth = 640
     var codigoLeido: Boolean = false //Indica si ya se ha leido un QR
 
+
+
     val TAG = "---ReadQrActivity---"
 
 

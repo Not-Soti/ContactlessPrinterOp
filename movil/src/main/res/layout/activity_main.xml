@@ -16,8 +16,28 @@
         android:text="Leer código QR" />
 
     <Button
+        android:id="@+id/act_main_goPrintActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ir a la pantalla de imprimir" />
+
+    <Button
         android:id="@+id/act_main_printButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="imprimir" />
+
+    <Button
+        android:id="@+id/act_main_sendEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enviar email" />
+
+    <EditText
+        android:id="@+id/act_main_emailTextArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Email" />
 </LinearLayout>

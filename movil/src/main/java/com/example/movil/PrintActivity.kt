@@ -84,28 +84,16 @@ class PrintActivity : AppCompatActivity() {
 
         buttonChooseFile.setOnClickListener(object : View.OnClickListener {
             override fun onClick(p0: View?) {
-                if(ContextCompat.checkSelfPermission(
-                        this@PrintActivity,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
-                 != PackageManager.PERMISSION_GRANTED)
-                 {
-                    //Check if we need to show a message
-                     if (ActivityCompat.shouldShowRequestPermissionRationale(
-                             this@PrintActivity, Manifest.permission.READ_EXTERNAL_STORAGE
-                         )
-                     ) {
-                         showExplanation(
-                             "Acceso al almacenamiento exteno denegado",
-                             "Se necesita acceso al almacenamiento exteno",
-                             Manifest.permission.READ_EXTERNAL_STORAGE,
-                             requestExternalStoragePermissionCode
-                         )
-                     } else {
-                         requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, requestExternalStoragePermissionCode)
-                     }
-                     Log.d(TAG, "No se tienen permisos sobre el almacenamiento externo")
-                     return
-                 }
+                //Check for permission
+                val permissionHelper = PermissionHelper(
+                    this@PrintActivity,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    requestExternalStoragePermissionCode,
+                    "Acceso al almacenamiento externo denegado",
+                    "Se necesita acceso al almacenamiento exteno"
+                )
+                permissionHelper.checkAndAskForPermission()
+
                 //Storage access is granted
                 val intent = Intent(Intent.ACTION_PICK)
                 intent.type = "*/*"
@@ -153,6 +141,7 @@ class PrintActivity : AppCompatActivity() {
             chooseImageRequestCode -> if (data != null) {
                 resourceType = ResourceTypeEnum.IMAGE
                 imageUri = data.data
+                Log.d(TAG, "image uri $imageUri")
                 imagePreview.setImageURI(imageUri)
             }
 
@@ -162,14 +151,22 @@ class PrintActivity : AppCompatActivity() {
 
                 Log.d(TAG, "file uri: " + fileUri)
 
+                //Get the path from the uri
+                val pathUtils = RealPathUtils(this, fileUri!!)
+                resourcePath = pathUtils.getRealPath(this@PrintActivity, fileUri!!)
+
+
                 /* Render the first page of the document */
                 //Get the PDF path from the uri
 
-                resourcePath = getRealPath(this@PrintActivity, fileUri!!)
+
                 Log.d(TAG, "file path: $resourcePath")
 
 
                 val file = File(resourcePath)
+                val extension = file.extension
+                Log.d(TAG,"extension  $extension")
+
 
                 // This is the PdfRenderer we use to render the PDF.
                 val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
@@ -198,180 +195,10 @@ class PrintActivity : AppCompatActivity() {
         }
     }
 
-    private fun showExplanation(
-        title: String,
-        message: String,
-        permissionName: String,
-        permissionCode: Int
-    ) {
-        var builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle(title).setMessage(message)
-            .setPositiveButton(android.R.string.ok, object : DialogInterface.OnClickListener {
-                override fun onClick(p0: DialogInterface?, p1: Int) {
-                    requestPermission(permissionName, permissionCode)
-                }
-            })
-        builder.create().show()
+    //On back pressed go to main activity
+    override fun onBackPressed() {
+        super.onBackPressed()
+        startActivity(Intent(this, MainActivity::class.java))
     }
-
-    /**
-     * Funcion que solicita los permisos al usuario y reinicia la actividad
-     */
-    private fun requestPermission(name: String, code: Int) {
-        ActivityCompat.requestPermissions(this@PrintActivity, arrayOf(name), code)
-        recreate()
-    }
-
-    fun getRealPath(context: Context, uri: Uri): String? {
-
-        val isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-
-        // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
-            // ExternalStorageProvider
-            if (isExternalStorageDocument(uri)) {
-                val docId = DocumentsContract.getDocumentId(uri)
-                val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val type = split[0]
-
-                if ("primary".equals(type, ignoreCase = true)) {
-                    return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
-                }
-            } else if (isDownloadsDocument(uri)) {
-                var cursor: Cursor? = null
-                try {
-                    cursor = context.contentResolver.query(
-                        uri,
-                        arrayOf(MediaStore.MediaColumns.DISPLAY_NAME),
-                        null,
-                        null,
-                        null
-                    )
-                    cursor!!.moveToNext()
-                    val fileName = cursor.getString(0)
-                    val path = Environment.getExternalStorageDirectory()
-                        .toString() + "/Download/" + fileName
-                    if (!TextUtils.isEmpty(path)) {
-                        return path
-                    }
-                } finally {
-                    cursor?.close()
-                }
-                val id = DocumentsContract.getDocumentId(uri)
-                if (id.startsWith("raw:")) {
-                    return id.replaceFirst("raw:".toRegex(), "")
-                }
-                val contentUri = ContentUris.withAppendedId(
-                    Uri.parse("content://downloads"), java.lang.Long.valueOf(
-                        id
-                    )
-                )
-
-                return getDataColumn(context, contentUri, null, null)
-            } else if (isMediaDocument(uri)) {
-                val docId = DocumentsContract.getDocumentId(uri)
-                val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val type = split[0]
-
-                var contentUri: Uri? = null
-                when (type) {
-                    "image" -> contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                    "video" -> contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                    "audio" -> contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                }
-
-                val selection = "_id=?"
-                val selectionArgs = arrayOf(split[1])
-
-                return getDataColumn(context, contentUri, selection, selectionArgs)
-            }// MediaProvider
-            // DownloadsProvider
-        } else if ("content".equals(uri.scheme!!, ignoreCase = true)) {
-
-            // Return the remote address
-            return if (isGooglePhotosUri(uri)) uri.lastPathSegment else getDataColumn(
-                context,
-                uri,
-                null,
-                null
-            )
-        } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
-            return uri.path
-        }// File
-        // MediaStore (and general)
-
-        return null
-    }
-
-    /**
-     * Get the value of the data column for this Uri. This is useful for
-     * MediaStore Uris, and other file-based ContentProviders.
-     *
-     * @param context       The context.
-     * @param uri           The Uri to query.
-     * @param selection     (Optional) Filter used in the query.
-     * @param selectionArgs (Optional) Selection arguments used in the query.
-     * @return The value of the _data column, which is typically a file path.
-     * @author Niks
-     */
-    private fun getDataColumn(
-        context: Context, uri: Uri?, selection: String?,
-        selectionArgs: Array<String>?
-    ): String? {
-
-        var cursor: Cursor? = null
-        val column = "_data"
-        val projection = arrayOf(column)
-
-        try {
-            cursor = context.contentResolver.query(
-                uri!!,
-                projection,
-                selection,
-                selectionArgs,
-                null
-            )
-            if (cursor != null && cursor.moveToFirst()) {
-                val index = cursor.getColumnIndexOrThrow(column)
-                return cursor.getString(index)
-            }
-        } finally {
-            cursor?.close()
-        }
-        return null
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is ExternalStorageProvider.
-     */
-    private fun isExternalStorageDocument(uri: Uri): Boolean {
-        return "com.android.externalstorage.documents" == uri.authority
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is DownloadsProvider.
-     */
-    private fun isDownloadsDocument(uri: Uri): Boolean {
-        return "com.android.providers.downloads.documents" == uri.authority
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    private fun isMediaDocument(uri: Uri): Boolean {
-        return "com.android.providers.media.documents" == uri.authority
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is Google Photos.
-     */
-    private fun isGooglePhotosUri(uri: Uri): Boolean {
-        return "com.google.android.apps.photos.content" == uri.authority
-    }
-
 
 }

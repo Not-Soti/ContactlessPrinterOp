@@ -63,30 +63,16 @@ class ReadQrActivity : AppCompatActivity() {
         surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
 
-                //Se comprueba si se tienen los permisos sobre la cámara
-                if (ContextCompat.checkSelfPermission(
-                        this@ReadQrActivity,
-                        Manifest.permission.CAMERA
-                    )
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
-                    //Si no se tienen permisos, se comprueba si se necesita un mensaje explicatorio
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this@ReadQrActivity, Manifest.permission.CAMERA
-                        )
-                    ) {
-                        showExplanation(
-                            "Camara denegada",
-                            "Se necesita acceso a la cámara para escanear el codigo QR",
-                            Manifest.permission.CAMERA,
-                            requestCameraPermissionCode
-                        )
-                    } else {
-                        requestPermission(Manifest.permission.CAMERA, requestCameraPermissionCode)
-                    }
-                    Log.d(TAG, "No se tienen permisos sobre la camara")
-                    return
-                }
+                //Check for camera permission
+                val permissionHelper = PermissionHelper(
+                    this@ReadQrActivity,
+                    Manifest.permission.CAMERA,
+                    requestCameraPermissionCode,
+                    "Camara denegada",
+                    "Se necesita acceso a la cámara para escanear el codigo QR")
+                permissionHelper.checkAndAskForPermission()
+
+
                 //Se tienen permisos sobre la camara
                 Log.d(TAG, "Se tienen permisos sobre la camara")
                 cameraSource.start(holder)
@@ -188,34 +174,6 @@ class ReadQrActivity : AppCompatActivity() {
             Log.d(TAG, "Fallo en wifiManager.reconnect()")
             return false
         }
-    }
-
-    /**
-     * Funcion utilizada para mostrar la explicacion de por que se solicitan
-     * los permisos dados
-     */
-    private fun showExplanation(
-        title: String,
-        message: String,
-        permissionName: String,
-        permissionCode: Int
-    ) {
-        var builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle(title).setMessage(message)
-            .setPositiveButton(android.R.string.ok, object : DialogInterface.OnClickListener {
-                override fun onClick(p0: DialogInterface?, p1: Int) {
-                    requestPermission(permissionName, permissionCode)
-                }
-            })
-        builder.create().show()
-    }
-
-    /**
-     * Funcion que solicita los permisos al usuario y reinicia la actividad
-     */
-    private fun requestPermission(name: String, code: Int) {
-        ActivityCompat.requestPermissions(this@ReadQrActivity, arrayOf(name), code)
-        recreate()
     }
 
     //On back pressed go to main activity

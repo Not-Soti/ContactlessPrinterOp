@@ -35,6 +35,9 @@ dependencies {
     //Lector de QR usando MLKit de Google
     implementation 'com.google.mlkit:barcode-scanning:16.0.3'
 
+    //HTML to bitmap
+    implementation 'com.izettle:html2bitmap:1.9'
+
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

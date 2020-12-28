@@ -220,6 +220,7 @@ class PrintActivity : AppCompatActivity() {
                     }
                     "html" ->{
                         resourceType = ResourceTypeEnum.HTML
+                        webPreview.loadUrl(resourceUri.toString())
                         Toast.makeText(this@PrintActivity,"Seleccionado HTML", Toast.LENGTH_LONG).show()
                     }
                     else -> {

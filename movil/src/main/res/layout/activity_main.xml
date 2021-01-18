@@ -16,9 +16,15 @@
         android:text="Leer código QR" />
 
     <Button
-        android:id="@+id/act_main_goPrintActivity"
+        android:id="@+id/act_main_startPrintActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ir a la pantalla de imprimir" />
+        android:text="Imprimir" />
+
+    <Button
+        android:id="@+id/act_main_startScanActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Escanear" />
 
 </LinearLayout>

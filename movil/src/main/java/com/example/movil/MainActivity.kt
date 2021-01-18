@@ -14,13 +14,15 @@ class MainActivity : AppCompatActivity(){
 
     lateinit var buttonReadQr: Button
     lateinit var buttonPrint: Button
+    lateinit var buttonScan: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         buttonReadQr = findViewById(R.id.act_main_readQrButton)
-        buttonPrint = findViewById(R.id.act_main_goPrintActivity)
+        buttonPrint = findViewById(R.id.act_main_startPrintActivity)
+        buttonScan = findViewById(R.id.act_main_startScanActivity)
 
         buttonPrint.setOnClickListener(object : View.OnClickListener{
             override fun onClick(p0: View?) {
@@ -35,6 +37,14 @@ class MainActivity : AppCompatActivity(){
                 val i = Intent(this@MainActivity, ReadQrActivity::class.java)
                 startActivity(i)
             }
+        })
+
+        //Scan activity
+        buttonScan.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(v: View?) {
+                startActivity(Intent(this@MainActivity, ScanActivity::class.java))
+            }
+
         })
     }
 

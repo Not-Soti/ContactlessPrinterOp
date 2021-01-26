@@ -52,6 +52,8 @@ class ReadQrActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qr_scanner)
 
+
+
         surfaceView = findViewById<SurfaceView>(R.id.act_readQR_cameraPreview)
         //textoQr = findViewById<TextView>(R.id.act_readQR_texto_qr)
         barcodeDetector = BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.QR_CODE).build()
@@ -73,9 +75,9 @@ class ReadQrActivity : AppCompatActivity() {
                 permissionHelper.checkAndAskForPermission()
 
 
-                //Se tienen permisos sobre la camara
                 Log.d(TAG, "Se tienen permisos sobre la camara")
                 cameraSource.start(holder)
+
             }
 
             override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
@@ -188,10 +190,40 @@ class ReadQrActivity : AppCompatActivity() {
     }
 
     /**
-     * Funcion usada par amostrar Toasts
+     * Funcion usada para mostrar Toasts
      */
     private fun muestraToast(mensaje: String, duracion: Int) {
         runOnUiThread { Toast.makeText(this@ReadQrActivity, mensaje, duracion).show() }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode){
+            requestCameraPermissionCode -> {
+
+                var hasPermission = PackageManager.PERMISSION_DENIED
+
+                //Check for camera permission
+                for (i in 0..permissions.size){
+                    if (permissions[i] == Manifest.permission.CAMERA){
+                        hasPermission = grantResults[i]
+                        break
+                    }
+                }
+
+                if(hasPermission == PackageManager.PERMISSION_GRANTED){
+                    this.recreate()
+                }else{
+                    Toast.makeText(this@ReadQrActivity, "Se necesitan permisos para acceder a la camara", Toast.LENGTH_LONG).show()
+                }
+
+            }
+        }
     }
 
 }

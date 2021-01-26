@@ -63,7 +63,6 @@ class PermissionHelper(
      */
     private fun requestPermission(name: String, code: Int) {
         ActivityCompat.requestPermissions(activity, arrayOf(name), code)
-        activity.recreate() //usado en ReadQrActivity
     }
 
 

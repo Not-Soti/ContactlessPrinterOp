@@ -39,8 +39,11 @@ dependencies {
     //HTML to bitmap
     implementation 'com.izettle:html2bitmap:1.9'
 
+    //WifiUtils
+    implementation 'com.thanosfisherman.wifiutils:wifiutils:1.6.4'
+
     implementation "androidx.core:core-ktx:+"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 repositories {
     mavenCentral()

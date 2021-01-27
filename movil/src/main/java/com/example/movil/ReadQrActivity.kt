@@ -3,26 +3,23 @@ package com.example.movil
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
-import androidx.appcompat.app.AppCompatActivity
+import android.net.wifi.WifiNetworkSuggestion
+import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
 import android.util.Log
 import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
-import java.lang.Exception
 
 class ReadQrActivity : AppCompatActivity() {
     lateinit var surfaceView: SurfaceView //lateinit hace que no tenga que inicializarse ahora
@@ -40,7 +37,7 @@ class ReadQrActivity : AppCompatActivity() {
 
 
 
-    val TAG = "---ReadQrActivity---"
+    val tag = "---ReadQrActivity---"
 
 
     //var wifiFilter = IntentFilter(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION) //Usado para mirar el estado del wifi
@@ -71,11 +68,12 @@ class ReadQrActivity : AppCompatActivity() {
                     Manifest.permission.CAMERA,
                     requestCameraPermissionCode,
                     "Camara denegada",
-                    "Se necesita acceso a la cámara para escanear el codigo QR")
+                    "Se necesita acceso a la cámara para escanear el codigo QR"
+                )
                 permissionHelper.checkAndAskForPermission()
 
 
-                Log.d(TAG, "Se tienen permisos sobre la camara")
+                Log.d(tag, "Se tienen permisos sobre la camara")
                 cameraSource.start(holder)
 
             }
@@ -111,20 +109,49 @@ class ReadQrActivity : AppCompatActivity() {
                         //Se obtiene el mensaje del QR
                         val infoWiFi = qrCodes.valueAt(0).displayValue.split(" ")
 
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q){
+                            connectToWifiQ(infoWiFi[0], infoWiFi[1])
+                        } else{
+                            //Android 9 or less
+                            if (connectToWifi(infoWiFi[0], infoWiFi[1])) {
+                                //Si se conecta al wifi, va a la pantalla de inicio
+                                // cameraSource.release()
+                                // startActivity(Intent(this@ReadQrActivity, MainActivity::class.java))
+                            } else {
+                                //Si no, se reinicia la actividad
+                                //  recreate()
+                            }
+                        }
+
+                        /*
                         if (connectToWifi(infoWiFi[0], infoWiFi[1])) {
                             //Si se conecta al wifi, va a la pantalla de inicio
-                           // cameraSource.release()
-                           // startActivity(Intent(this@ReadQrActivity, MainActivity::class.java))
+                            // cameraSource.release()
+                            // startActivity(Intent(this@ReadQrActivity, MainActivity::class.java))
                         } else {
                             //Si no, se reinicia la actividad
-                          //  recreate()
+                            //  recreate()
                         }
+                        */
                     }
                 }
             }
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun connectToWifiQ(networkSSID: String, networkPass: String){
+        Log.d(tag, "Connecting to wifi on Android Q+")
+
+        val wifiBuilder = WifiNetworkSuggestion.Builder().setSsid(networkSSID).setWpa2Passphrase(networkPass)
+        val suggestion = wifiBuilder.build()
+
+        var wifiList = mutableListOf<WifiNetworkSuggestion>()
+        wifiList.add(suggestion)
+
+        val wifiManager = getApplicationContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val status = wifiManager.addNetworkSuggestions(wifiList)
+    }
 
     /**
      * Funcion usada para conectarse al wifi con los parámetros dados
@@ -134,18 +161,19 @@ class ReadQrActivity : AppCompatActivity() {
         //No hace falta comprobar los permisos de acceso y cambio del wifi
         //ya que los comprueba el sistema por si mismo
 
-        Log.d(TAG, "Connectando al wifi")
+        Log.d(tag, "Connectando al wifi")
 
         var wifiConfig = WifiConfiguration() //Deprecado en API 29
         wifiConfig.SSID = "\"" + networkSSID + "\""
         wifiConfig.preSharedKey = "\"" + networkPass + "\""
         wifiConfig.priority = 4000 //Asi se intenta conectar a esta red y no a otra disponible
-        Log.d(TAG, "SSID: " + wifiConfig.SSID)
-        Log.d(TAG, "Pass: " + wifiConfig.preSharedKey)
+        Log.d(tag, "SSID: " + wifiConfig.SSID)
+        Log.d(tag, "Pass: " + wifiConfig.preSharedKey)
 
-        Log.d(TAG, "Intentando conectarse al wifi")
+        Log.d(tag, "Intentando conectarse al wifi")
 
         val wifiManager = getApplicationContext().getSystemService(WIFI_SERVICE) as WifiManager
+
 
         if (!wifiManager.isWifiEnabled) {
             wifiManager.isWifiEnabled = true
@@ -153,7 +181,7 @@ class ReadQrActivity : AppCompatActivity() {
 
         if (!wifiManager.disconnect()) {
             muestraToast("No se ha podido desconectar de la red actual", Toast.LENGTH_LONG)
-            return false
+            //return false
         }
 
         //registerReceiver(wifiReceiver, wifiFilter)
@@ -161,9 +189,9 @@ class ReadQrActivity : AppCompatActivity() {
 
         var netId = wifiManager.addNetwork(wifiConfig) //necesario para enableNetwork.
         if(netId == -1){
-            Log.d(TAG, "La red ya estaba guardada previamente")
+            Log.d(tag, "La red ya estaba guardada previamente")
         }else {
-            Log.d(TAG, "La red se ha guardado")
+            Log.d(tag, "La red se ha guardado")
             var wifiInfo = wifiManager.connectionInfo
             wifiManager.disableNetwork(wifiInfo.networkId)
             wifiManager.enableNetwork(netId, true)
@@ -173,7 +201,7 @@ class ReadQrActivity : AppCompatActivity() {
             return true;
         } else {
             muestraToast("No se ha podido conectar a la red", Toast.LENGTH_SHORT)
-            Log.d(TAG, "Fallo en wifiManager.reconnect()")
+            Log.d(tag, "Fallo en wifiManager.reconnect()")
             return false
         }
     }
@@ -209,17 +237,21 @@ class ReadQrActivity : AppCompatActivity() {
                 var hasPermission = PackageManager.PERMISSION_DENIED
 
                 //Check for camera permission
-                for (i in 0..permissions.size){
-                    if (permissions[i] == Manifest.permission.CAMERA){
+                for (i in 0..permissions.size) {
+                    if (permissions[i] == Manifest.permission.CAMERA) {
                         hasPermission = grantResults[i]
                         break
                     }
                 }
 
-                if(hasPermission == PackageManager.PERMISSION_GRANTED){
+                if (hasPermission == PackageManager.PERMISSION_GRANTED) {
                     this.recreate()
-                }else{
-                    Toast.makeText(this@ReadQrActivity, "Se necesitan permisos para acceder a la camara", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(
+                        this@ReadQrActivity,
+                        "Se necesitan permisos para acceder a la camara",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
 
             }

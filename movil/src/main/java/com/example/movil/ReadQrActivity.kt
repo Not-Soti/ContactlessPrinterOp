@@ -3,6 +3,7 @@ package com.example.movil
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSuggestion
@@ -107,20 +108,29 @@ class ReadQrActivity : AppCompatActivity() {
                         vibrator.vibrate(500) //No deprecado hasta api 26
 
                         //Se obtiene el mensaje del QR
-                        val infoWiFi = qrCodes.valueAt(0).displayValue.split(" ")
+                        //val infoWiFi = qrCodes.valueAt(0).displayValue.split(" ")
+                        val infoWifi = qrCodes.valueAt(0).rawValue
+                        Log.d(tag, "Mensaje QR: $infoWifi")
 
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q){
-                            connectToWifiQ(infoWiFi[0], infoWiFi[1])
-                        } else{
-                            //Android 9 or less
-                            if (connectToWifi(infoWiFi[0], infoWiFi[1])) {
-                                //Si se conecta al wifi, va a la pantalla de inicio
-                                // cameraSource.release()
-                                // startActivity(Intent(this@ReadQrActivity, MainActivity::class.java))
+                        if(infoWifi.startsWith("WIFI", true)) {
+                            //QR code contains wifi configuration
+
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                                connectToWifiPastQ(infoWifi)
                             } else {
-                                //Si no, se reinicia la actividad
-                                //  recreate()
+                                //Android 9 or less
+                                //if (connectToWifiPreQ(infoWiFi[0], infoWiFi[1])) {
+                                if (connectToWifiPreQ(infoWifi)) {
+                                    //Si se conecta al wifi, va a la pantalla de inicio
+                                    // cameraSource.release()
+                                    // startActivity(Intent(this@ReadQrActivity, MainActivity::class.java))
+                                } else {
+                                    //Si no, se reinicia la actividad
+                                    //  recreate()
+                                }
                             }
+                        }else{
+                            //Read code is not a WIFI configuration
                         }
 
                         /*
@@ -140,8 +150,27 @@ class ReadQrActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun connectToWifiQ(networkSSID: String, networkPass: String){
+    private fun connectToWifiPastQ(infoWifi: String){
+        var networkSSID = ""
+        var networkPass = ""
+        var networkType = ""
+
+        val infoWifiArr = infoWifi.split(";")
+
+        //Getting configuration parameters
+        for (i in infoWifiArr){
+            if(i.startsWith("WIFI", false)){
+                networkType = i.split(":")[2]
+            }else if (i.startsWith("S:")){
+                networkSSID = i.split(":")[1]
+            }else if (i.startsWith("P:")){
+                networkPass = i.split(":")[1]
+            }
+        }
+        Log.d(tag, "Network type: $networkType, SSID: $networkSSID, passwd = $networkPass");
+
         Log.d(tag, "Connecting to wifi on Android Q+")
+
 
         val wifiBuilder = WifiNetworkSuggestion.Builder().setSsid(networkSSID).setWpa2Passphrase(networkPass)
         val suggestion = wifiBuilder.build()
@@ -150,16 +179,38 @@ class ReadQrActivity : AppCompatActivity() {
         wifiList.add(suggestion)
 
         val wifiManager = getApplicationContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+        //Checking if Wifi is enabled
+        if(!wifiManager.isWifiEnabled){
+            muestraToast("Por favor, enciende el wifi manualmente", Toast.LENGTH_LONG)
+        }
+
         val status = wifiManager.addNetworkSuggestions(wifiList)
     }
 
     /**
      * Funcion usada para conectarse al wifi con los parámetros dados
      */
-    private fun connectToWifi(networkSSID: String, networkPass: String): Boolean {
+    //private fun connectToWifiPreQ(networkSSID: String, networkPass: String): Boolean {
+    private fun connectToWifiPreQ(infoWifi: String): Boolean {
 
-        //No hace falta comprobar los permisos de acceso y cambio del wifi
-        //ya que los comprueba el sistema por si mismo
+        var networkSSID = ""
+        var networkPass = ""
+        var networkType = ""
+
+        val infoWifiArr = infoWifi.split(";")
+
+        //Getting configuration parameters
+        for (i in infoWifiArr){
+            if(i.startsWith("WIFI", false)){
+                networkType = i.split(":")[2]
+            }else if (i.startsWith("S:")){
+                networkSSID = i.split(":")[1]
+            }else if (i.startsWith("P:")){
+                networkPass = i.split(":")[1]
+            }
+        }
+        Log.d(tag, "Network type: $networkType, SSID: $networkSSID, passwd = $networkPass");
 
         Log.d(tag, "Connectando al wifi")
 

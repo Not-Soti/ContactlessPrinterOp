@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ContactlessPrinterOp</string>
+
+    <string name="dialog_qr_scanner_help">Ayuda</string>
 </resources>

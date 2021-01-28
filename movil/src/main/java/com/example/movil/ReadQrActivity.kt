@@ -14,8 +14,11 @@ import android.util.Log
 import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.view.View
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
@@ -28,6 +31,7 @@ class ReadQrActivity : AppCompatActivity() {
     //lateinit var textoQr: TextView
     lateinit var cameraSource: CameraSource
     lateinit var barcodeDetector: BarcodeDetector
+    lateinit var helpButton : ImageButton
 
     val requestCameraPermissionCode = 1 //Codigo usado al solicitar los permisos de la camara
     //val requestWifiPermissionCode = 2
@@ -54,11 +58,29 @@ class ReadQrActivity : AppCompatActivity() {
 
         surfaceView = findViewById<SurfaceView>(R.id.act_readQR_cameraPreview)
         //textoQr = findViewById<TextView>(R.id.act_readQR_texto_qr)
+        helpButton = findViewById(R.id.act_readQR_help_button)
         barcodeDetector = BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.QR_CODE).build()
         cameraSource = CameraSource.Builder(this, barcodeDetector)
             .setRequestedPreviewSize(detectorHeight, detectorWidth).setAutoFocusEnabled(true)
             .build()
 
+        helpButton.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(v: View?) {
+               // startActivity(Intent(this@ReadQrActivity, ReadQrHelpDialog::class.java))
+                //Create alert dialog
+                val builder: AlertDialog.Builder? = this@ReadQrActivity?.let {AlertDialog.Builder(it)}
+
+                builder?.apply { setNeutralButton(R.string.aceptar) { dialog, _ -> dialog.dismiss() } }
+
+                builder?.setMessage(R.string.dialog_qr_scanner_help)?.setTitle(R.string.help)
+
+                val dialog: AlertDialog? = builder?.create()
+                if (dialog != null) {
+                    dialog.show()
+                }
+            }
+
+        })
 
         surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {

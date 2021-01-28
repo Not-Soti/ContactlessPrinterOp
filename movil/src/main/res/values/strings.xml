@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">ContactlessPrinterOp</string>
 
-    <string name="dialog_qr_scanner_help">Ayuda</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="help">Ayuda</string>
+
+    <string name="dialog_qr_scanner_help">
+        En caso de estar utilizando Andriod Q (10) o superior, será necesario
+        encender el WiFi manualmente, y desconectarse de la red en caso de existir conexión con alguna.
+        Al leer un código  QR correcto, deberás aceptar la conexión al WiFi desde la pestaña de notificaciones.
+    </string>
 </resources>

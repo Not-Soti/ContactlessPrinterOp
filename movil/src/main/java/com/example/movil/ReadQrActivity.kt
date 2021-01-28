@@ -3,7 +3,6 @@ package com.example.movil
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSuggestion
@@ -26,38 +25,27 @@ import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 
 class ReadQrActivity : AppCompatActivity() {
-    lateinit var surfaceView: SurfaceView //lateinit hace que no tenga que inicializarse ahora
+    lateinit var surfaceView: SurfaceView
 
     //lateinit var textoQr: TextView
     lateinit var cameraSource: CameraSource
     lateinit var barcodeDetector: BarcodeDetector
     lateinit var helpButton : ImageButton
 
-    val requestCameraPermissionCode = 1 //Codigo usado al solicitar los permisos de la camara
+    val requestCameraPermissionCode = 1 //Code needed to ask for permissions
     //val requestWifiPermissionCode = 2
 
     val detectorHeight = 640
     val detectorWidth = 640
-    var codigoLeido: Boolean = false //Indica si ya se ha leido un QR
-
-
+    var qrCodeRead: Boolean = false //Checks if a QR code has been detected
 
     val tag = "---ReadQrActivity---"
-
-
-    //var wifiFilter = IntentFilter(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION) //Usado para mirar el estado del wifi
-    //Utilizado para ver cuando se conecta el dispositivo a la red
-    //val wifiReceiver = WifiReceiver()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qr_scanner)
 
-
-
         surfaceView = findViewById<SurfaceView>(R.id.act_readQR_cameraPreview)
-        //textoQr = findViewById<TextView>(R.id.act_readQR_texto_qr)
         helpButton = findViewById(R.id.act_readQR_help_button)
         barcodeDetector = BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.QR_CODE).build()
         cameraSource = CameraSource.Builder(this, barcodeDetector)
@@ -66,20 +54,17 @@ class ReadQrActivity : AppCompatActivity() {
 
         helpButton.setOnClickListener(object : View.OnClickListener{
             override fun onClick(v: View?) {
-               // startActivity(Intent(this@ReadQrActivity, ReadQrHelpDialog::class.java))
                 //Create alert dialog
                 val builder: AlertDialog.Builder? = this@ReadQrActivity?.let {AlertDialog.Builder(it)}
 
                 builder?.apply { setNeutralButton(R.string.aceptar) { dialog, _ -> dialog.dismiss() } }
 
-                builder?.setMessage(R.string.dialog_qr_scanner_help)?.setTitle(R.string.help)
-
+                builder?.setMessage(this@ReadQrActivity.getString(R.string.Dialog_qr_scanner_help))?.setTitle(R.string.help)
                 val dialog: AlertDialog? = builder?.create()
                 if (dialog != null) {
                     dialog.show()
                 }
             }
-
         })
 
         surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
@@ -90,24 +75,18 @@ class ReadQrActivity : AppCompatActivity() {
                     this@ReadQrActivity,
                     Manifest.permission.CAMERA,
                     requestCameraPermissionCode,
-                    "Camara denegada",
-                    "Se necesita acceso a la cámara para escanear el codigo QR"
+                    this@ReadQrActivity.getString(R.string.permission_camDeniedTitle),
+                    this@ReadQrActivity.getString(R.string.permission_camDeniedMsg)
                 )
                 permissionHelper.checkAndAskForPermission()
 
-
-                Log.d(tag, "Se tienen permisos sobre la camara")
+                Log.d(tag, "Camera permission granted")
                 cameraSource.start(holder)
-
             }
 
-            override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
-            }
+            override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {}
 
-            override fun surfaceDestroyed(p0: SurfaceHolder) {
-                cameraSource.stop()
-            }
-
+            override fun surfaceDestroyed(p0: SurfaceHolder) {cameraSource.stop()}
         })
 
         barcodeDetector.setProcessor(object : Detector.Processor<Barcode> {
@@ -115,64 +94,57 @@ class ReadQrActivity : AppCompatActivity() {
             }
 
             override fun receiveDetections(detections: Detector.Detections<Barcode>?) {
-                if (!codigoLeido) {
+                if (!qrCodeRead) {
 
                     var qrCodes: SparseArray<Barcode> =
-                        detections?.detectedItems ?: throw Exception("No se encontraron codigos qr")
+                        detections?.detectedItems ?: throw Exception("QR codes not found") //TODO
+
                     if (qrCodes.size() != 0) {
+                        qrCodeRead = true
 
-                        codigoLeido = true;
-
-                        //Si se detecta un codigo QR el movil vibra
-
+                        //The device vibrates if a code is detected
                         var vibrator: Vibrator =
                             applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                        vibrator.vibrate(500) //No deprecado hasta api 26
+                        vibrator.vibrate(500)
 
-                        //Se obtiene el mensaje del QR
-                        //val infoWiFi = qrCodes.valueAt(0).displayValue.split(" ")
+                        //Reading QR message
                         val infoWifi = qrCodes.valueAt(0).rawValue
                         Log.d(tag, "Mensaje QR: $infoWifi")
 
                         if(infoWifi.startsWith("WIFI", true)) {
                             //QR code contains wifi configuration
+                            connectToWifi(infoWifi)
 
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                                connectToWifiPastQ(infoWifi)
-                            } else {
-                                //Android 9 or less
-                                //if (connectToWifiPreQ(infoWiFi[0], infoWiFi[1])) {
-                                if (connectToWifiPreQ(infoWifi)) {
-                                    //Si se conecta al wifi, va a la pantalla de inicio
-                                    // cameraSource.release()
-                                    // startActivity(Intent(this@ReadQrActivity, MainActivity::class.java))
-                                } else {
-                                    //Si no, se reinicia la actividad
-                                    //  recreate()
-                                }
-                            }
                         }else{
-                            //Read code is not a WIFI configuration
+                            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_readQrFailed), Toast.LENGTH_LONG)
+                            qrCodeRead = false
                         }
-
-                        /*
-                        if (connectToWifi(infoWiFi[0], infoWiFi[1])) {
-                            //Si se conecta al wifi, va a la pantalla de inicio
-                            // cameraSource.release()
-                            // startActivity(Intent(this@ReadQrActivity, MainActivity::class.java))
-                        } else {
-                            //Si no, se reinicia la actividad
-                            //  recreate()
-                        }
-                        */
                     }
                 }
             }
         })
     }
 
+    /**
+     * Method used to connect to the specified WiFi on Android Q+
+     * @param infoWifi: WiFi configuration string following the pattern WIFI:T:WPA;S:mynetwork;P:mypass;;
+     */
+    private fun connectToWifi(infoWifi: String){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            //Android 10 or more
+            connectToWifiPostQ(infoWifi)
+        } else {
+            //Android 9 or less
+            //if (connectToWifiPreQ(infoWiFi[0], infoWiFi[1])) {
+            connectToWifiPreQ(infoWifi)
+        }
+    }
+
+    /**
+     * Method used to connect to the specified WiFi on Android Q+ (10+)
+     */
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun connectToWifiPastQ(infoWifi: String){
+    private fun connectToWifiPostQ(infoWifi: String){
         var networkSSID = ""
         var networkPass = ""
         var networkType = ""
@@ -204,14 +176,14 @@ class ReadQrActivity : AppCompatActivity() {
 
         //Checking if Wifi is enabled
         if(!wifiManager.isWifiEnabled){
-            muestraToast("Por favor, enciende el wifi manualmente", Toast.LENGTH_LONG)
+            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_powerOnWifi), Toast.LENGTH_LONG)
         }
 
         val status = wifiManager.addNetworkSuggestions(wifiList)
     }
 
     /**
-     * Funcion usada para conectarse al wifi con los parámetros dados
+     * Method used to connect to the specified WiFi on Android 9-
      */
     //private fun connectToWifiPreQ(networkSSID: String, networkPass: String): Boolean {
     private fun connectToWifiPreQ(infoWifi: String): Boolean {
@@ -253,7 +225,7 @@ class ReadQrActivity : AppCompatActivity() {
         }
 
         if (!wifiManager.disconnect()) {
-            muestraToast("No se ha podido desconectar de la red actual", Toast.LENGTH_LONG)
+            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableDisconnectNet), Toast.LENGTH_LONG)
             //return false
         }
 
@@ -273,7 +245,7 @@ class ReadQrActivity : AppCompatActivity() {
             //var conectado = wifiManager.reconnect()
             return true;
         } else {
-            muestraToast("No se ha podido conectar a la red", Toast.LENGTH_SHORT)
+            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableToConnect), Toast.LENGTH_SHORT)
             Log.d(tag, "Fallo en wifiManager.reconnect()")
             return false
         }
@@ -296,6 +268,7 @@ class ReadQrActivity : AppCompatActivity() {
     private fun muestraToast(mensaje: String, duracion: Int) {
         runOnUiThread { Toast.makeText(this@ReadQrActivity, mensaje, duracion).show() }
     }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -322,7 +295,7 @@ class ReadQrActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(
                         this@ReadQrActivity,
-                        "Se necesitan permisos para acceder a la camara",
+                        this@ReadQrActivity.getString(R.string.permission_camDeniedExp),
                         Toast.LENGTH_LONG
                     ).show()
                 }

@@ -11,5 +11,5 @@
         android:layout_height="match_parent"
         android:padding="20dp"
         android:layout_weight="1"
-        android:text="@string/dialog_qr_scanner_help" />
+        android:text="@string/Dialog_qr_scanner_help" />
 </LinearLayout>

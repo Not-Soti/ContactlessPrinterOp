@@ -11,6 +11,7 @@
     <string name="ReadQrAct_powerOnWifi">Por favor, enciende el wifi manualmente</string>
     <string name="ReadQrAct_unableDisconnectNet">No se ha podido desconectar de la red actual</string>
     <string name="ReadQrAct_unableToConnect">No se ha podido conectar a la red</string>
+    <string name="ReadQrAct_checkNotifications">Acepta la conexión en la barra de notificaciones</string>
 
 
    <!-- ReadQrHelpDialog -->
@@ -24,5 +25,8 @@
     <string name="permission_camDeniedTitle" >Camara denegada</string>
     <string name="permission_camDeniedMsg" >Se necesita acceso a la cámara para escanear el codigo QR</string>
     <string name="permission_camDeniedExp" >Se necesitan permisos sobre la cámara para acceder al escaneo</string>
+    <string name="permission_fineLocDeniedTitle" >Ubicación denegada</string>
+    <string name="permission_fineLocDeniedMsg" >Se necesita acceso a la ubicación para conectarse al WiFi</string>
+    <string name="permission_fineLocDeniedExp" >Se necesita acceso a la ubicación para conectarse al WiFi</string>
 
 </resources>

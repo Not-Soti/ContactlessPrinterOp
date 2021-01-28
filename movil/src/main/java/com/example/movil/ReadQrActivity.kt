@@ -1,6 +1,7 @@
 package com.example.movil
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
 import android.net.wifi.WifiConfiguration
@@ -33,7 +34,7 @@ class ReadQrActivity : AppCompatActivity() {
     lateinit var helpButton : ImageButton
 
     val requestCameraPermissionCode = 1 //Code needed to ask for permissions
-    //val requestWifiPermissionCode = 2
+    val accessFineLocationPermissionCode = 2
 
     val detectorHeight = 640
     val detectorWidth = 640
@@ -179,7 +180,46 @@ class ReadQrActivity : AppCompatActivity() {
             muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_powerOnWifi), Toast.LENGTH_LONG)
         }
 
+        muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_checkNotifications), Toast.LENGTH_LONG)
+
+        val permissionHelper = PermissionHelper(this@ReadQrActivity,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            accessFineLocationPermissionCode,
+            this@ReadQrActivity.getString(R.string.permission_fineLocDeniedTitle),
+            this@ReadQrActivity.getString(R.string.permission_fineLocDeniedMsg)
+        ).checkAndAskForPermission()
+
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            wifiManager.addSuggestionConnectionStatusListener(mainExecutor,
+                (WifiManager.SuggestionConnectionStatusListener { wifiNetworkSuggestion, failureReason ->
+                    Log.d(tag, "Unable to connect to the provided network")
+                    muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableToConnect), Toast.LENGTH_LONG)
+                    wifiManager.removeNetworkSuggestions(wifiList)
+                })
+            )
+        }
+
         val status = wifiManager.addNetworkSuggestions(wifiList)
+        if(status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS){
+            Log.d(tag, "Unable to connect to the provided network")
+            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableToConnect), Toast.LENGTH_LONG)
+            //qrCodeRead = false //So another one can be read
+            wifiManager.removeNetworkSuggestions(wifiList)
+        }
+
+        //Wait for post connection broadcast to one of your suggestions)
+        val intentFilter = IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
+
+        val broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (!intent.action.equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
+                    return;
+                }
+                // do post connect processing here
+            }
+        };
+        this@ReadQrActivity.registerReceiver(broadcastReceiver, intentFilter);
     }
 
     /**

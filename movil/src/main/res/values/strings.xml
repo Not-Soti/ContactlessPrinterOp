@@ -13,13 +13,18 @@
     <string name="ReadQrAct_unableToConnect">No se ha podido conectar a la red</string>
     <string name="ReadQrAct_checkNotifications">Acepta la conexión en la barra de notificaciones</string>
 
-
    <!-- ReadQrHelpDialog -->
     <string name="Dialog_qr_scanner_help">
         En caso de estar utilizando Andriod Q (10) o superior, será necesario
         encender el WiFi manualmente, y desconectarse de la red en caso de existir conexión con alguna.
         Al leer un código  QR correcto, deberás aceptar la conexión al WiFi desde la pestaña de notificaciones.
     </string>
+
+    <!-- Scan activity -->
+    <string name="ScanAct_startSearchButton">Buscar escáneres</string>
+    <string name="ScanAct_stopSearchButton">Detener búsqueda</string>
+    <string name="ScanAct_searchingLabel">Buscando escáneres</string>
+    <string name="ScanAct_stoppedLabel">Búsqueda detenida</string>
 
     <!-- Permissions -->
     <string name="permission_camDeniedTitle" >Camara denegada</string>

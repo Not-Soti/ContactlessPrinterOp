@@ -56,7 +56,7 @@ class ScanActivity : AppCompatActivity() {
         scannerBrowser = ScannersBrowser(this)
         progressBar = findViewById(R.id.act_scan_progressBar)
 
-        scannerListAdapter = ScannerListAdapter(this)
+        scannerListAdapter = ScannerListAdapter(applicationContext)
 
         scannerListView.adapter = scannerListAdapter
 
@@ -72,15 +72,23 @@ class ScanActivity : AppCompatActivity() {
                     isSearching = true
 
 
-                    scannerBrowser.start(scannerBrowserListener)
+                    //scannerBrowser.start(scannerBrowserListener)
+                    scannerListAdapter.add(ScannerImp("Scanner 1"))
+                    Log.d(tag, "Added scanner 1")
+                    scannerListView.adapter=scannerListAdapter
+                    scannerListAdapter.add(ScannerImp("Scanner 2"))
+                    scannerListView.adapter=scannerListAdapter
+
+                    Log.d(tag, "Added scanner 2")
 
                 } else {
                     //Stop searching
-                    auxText.text = getString(R.string.ScanAct_stoppedLabel)
+                    stopSearching()
+                    /*auxText.text = getString(R.string.ScanAct_stoppedLabel)
                     scannerSearchButton.text = getString(R.string.ScanAct_startSearchButton)
                     progressBar.visibility = View.INVISIBLE
                     isSearching = false
-                    scannerBrowser.stop()
+                    scannerBrowser.stop()*/
                 }
 
             }
@@ -89,11 +97,14 @@ class ScanActivity : AppCompatActivity() {
         scannerListView.onItemClickListener = object: AdapterView.OnItemClickListener{
             override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long){
 
+                //Stop searching
+                stopSearching()
+
                 val selectedScanner = parent?.adapter?.getItem(position) as Scanner
                 Toast.makeText(
                     this@ScanActivity,
                     "Seleccionado el escaner ${selectedScanner.humanReadableName}",
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
 
                 //Show popup menu
@@ -151,6 +162,7 @@ class ScanActivity : AppCompatActivity() {
                 }
             }
         })
+        menu.show()
         return ticket
     }
 
@@ -185,6 +197,17 @@ class ScanActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    //Stops the scanner searching over the network
+    private fun stopSearching(){
+        if(isSearching) {
+            auxText.text = getString(R.string.ScanAct_stoppedLabel)
+            scannerSearchButton.text = getString(R.string.ScanAct_startSearchButton)
+            progressBar.visibility = View.INVISIBLE
+            isSearching = false
+            scannerBrowser.stop()
+        }
     }
 
 }

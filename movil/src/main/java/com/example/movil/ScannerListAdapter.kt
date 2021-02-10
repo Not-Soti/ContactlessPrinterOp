@@ -5,7 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-
+import android.widget.ImageView
+import android.widget.TextView
 import com.hp.mobile.scan.sdk.Scanner
 
 
@@ -15,13 +16,13 @@ class ScannerListAdapter() : BaseAdapter() {
     private lateinit var layoutInflater : LayoutInflater
 
 
-    constructor(context : Context) : this() {
+    constructor(context: Context) : this() {
         layoutInflater = LayoutInflater.from(context)
     }
 
-    public fun add(scanner : Scanner){ scannerList.add(scanner)}
+    public fun add(scanner: Scanner){ scannerList.add(scanner)}
 
-    public fun remove(scanner : Scanner){ scannerList.remove(scanner)}
+    public fun remove(scanner: Scanner){ scannerList.remove(scanner)}
 
     override fun getCount(): Int { return scannerList.size }
 
@@ -34,9 +35,15 @@ class ScannerListAdapter() : BaseAdapter() {
         var selectedView = convertView
 
         if(selectedView == null){
-            selectedView = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false)
+            selectedView = layoutInflater.inflate(R.layout.scanner_list_item, parent, false)
         }
 
-        return  selectedView!!
+        var scannerName = selectedView?.findViewById<View>(R.id.listItem_scanner_name) as TextView
+        scannerName.text = selectedScanner.humanReadableName
+
+        var scannerIco = selectedView?.findViewById<View>(R.id.listItem_scanner_icon) as ImageView
+        scannerIco.setImageResource(R.drawable.scanner_mock_ico)
+
+        return selectedView
     }
 }

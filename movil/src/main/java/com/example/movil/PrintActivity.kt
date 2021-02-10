@@ -23,11 +23,13 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.print.PrintHelper
 import com.izettle.html2bitmap.Html2Bitmap
 import com.izettle.html2bitmap.content.WebViewContent
 import java.io.File
+import java.util.*
 
 
 class PrintActivity : AppCompatActivity() {
@@ -89,6 +91,7 @@ class PrintActivity : AppCompatActivity() {
 
                 //Storage access is granted
                 val intent = Intent(Intent.ACTION_PICK)
+                //val intent = Intent(Intent.ACTION_GET_CONTENT)
                 intent.type = "*/*"
                 startActivityForResult(intent, chooseFileRequestCode)
             }
@@ -178,6 +181,7 @@ class PrintActivity : AppCompatActivity() {
         })
     }
 
+
     //Overriding function to get images or files from activity results
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -235,6 +239,7 @@ class PrintActivity : AppCompatActivity() {
             }
         }
     }
+
 
     /**
      * Function to operate when a pdf is selected

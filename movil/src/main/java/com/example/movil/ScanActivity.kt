@@ -27,6 +27,7 @@ class ScanActivity : AppCompatActivity() {
     private var isSearching = false
     private lateinit var scannerBrowser : ScannersBrowser
     private lateinit var progressBar : ProgressBar
+    var scannerNumber = 0 //Debug
 
     private val scannerBrowserListener: ScannerAvailabilityListener =
         object : ScannerAvailabilityListener {
@@ -34,6 +35,7 @@ class ScanActivity : AppCompatActivity() {
                 Log.d(tag, "Scanner found")
                 if (aScanner != null) {
                     scannerListAdapter.add(aScanner)
+                    scannerListView.adapter=scannerListAdapter
                 }
             }
 
@@ -41,6 +43,8 @@ class ScanActivity : AppCompatActivity() {
                 Log.d(tag, "Scanner lost")
                 if (aScanner != null) {
                     scannerListAdapter.remove(aScanner)
+                    scannerListView.adapter=scannerListAdapter
+
                 }
             }
         }
@@ -71,15 +75,19 @@ class ScanActivity : AppCompatActivity() {
                     progressBar.visibility = View.VISIBLE
                     isSearching = true
 
+                    Log.d(tag, "Searching for scanners")
+                   // scannerBrowser.start(scannerBrowserListener)
 
-                    //scannerBrowser.start(scannerBrowserListener)
-                    scannerListAdapter.add(ScannerImp("Scanner 1"))
-                    Log.d(tag, "Added scanner 1")
+                    scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
+                    Log.d(tag, "Added scanner $scannerNumber")
                     scannerListView.adapter=scannerListAdapter
-                    scannerListAdapter.add(ScannerImp("Scanner 2"))
-                    scannerListView.adapter=scannerListAdapter
+                    ++scannerNumber
 
-                    Log.d(tag, "Added scanner 2")
+                    scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
+                    scannerListView.adapter=scannerListAdapter
+                    Log.d(tag, "Added scanner $scannerNumber")
+                    ++scannerNumber
+
 
                 } else {
                     //Stop searching
@@ -111,7 +119,10 @@ class ScanActivity : AppCompatActivity() {
                 if (view != null) {
                     val scanTicket = showPopupForScanTicket(view)
                     if(scanTicket != null) {
+                        Log.d(tag, "Preparing scan")
                         startScanning(selectedScanner, scanTicket)
+                    }else{
+                        Log.d(tag, "scanTicket is null")
                     }
                 }
             }
@@ -139,21 +150,32 @@ class ScanActivity : AppCompatActivity() {
                     when (item.itemId) {
                         R.id.scan_popup_photo -> {
                             //Create photo ScanTicket
+                            Log.d(tag, "Scan photo chosen")
                             ticket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
-                            return true;
+                            Log.d(tag, "Ticket ${ticket?.name}")
+
+                            return true
                         }
                         R.id.scan_popup_document -> {
                             //Create document with images ScanTicket
+                            Log.d(tag, "Scan document chosen")
+
                             ticket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_AND_IMAGES)
-                            return true;
+                            Log.d(tag, "Ticket ${ticket?.name}")
+
+                            return true
                         }
 
                         R.id.scan_popup_text -> {
                             //Create only text ScanTicket
+                            Log.d(tag, "Scan text chosen")
+
                             ticket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_DOCUMENT)
-                            return true;
+                            Log.d(tag, "Ticket ${ticket?.name}")
+
+                            return true
                         }
                         else -> return false
                     }
@@ -167,6 +189,9 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun startScanning(theScanner: Scanner, scanTicket: ScanTicket){
+
+        Log.d(tag, "startScanning()")
+
         //Create the file to save the scanning
         val theExternalStorageDirectory = Environment.getExternalStorageDirectory()
         val scanFile = File(theExternalStorageDirectory, "ContactlessPrinterOp")
@@ -202,6 +227,8 @@ class ScanActivity : AppCompatActivity() {
     //Stops the scanner searching over the network
     private fun stopSearching(){
         if(isSearching) {
+            Log.d(tag, "Stopping scanner search")
+
             auxText.text = getString(R.string.ScanAct_stoppedLabel)
             scannerSearchButton.text = getString(R.string.ScanAct_startSearchButton)
             progressBar.visibility = View.INVISIBLE

@@ -76,9 +76,9 @@ class ScanActivity : AppCompatActivity() {
                     isSearching = true
 
                     Log.d(tag, "Searching for scanners")
-                   // scannerBrowser.start(scannerBrowserListener)
+                    scannerBrowser.start(scannerBrowserListener)
 
-                    scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
+                    /*scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
                     Log.d(tag, "Added scanner $scannerNumber")
                     scannerListView.adapter=scannerListAdapter
                     ++scannerNumber
@@ -86,7 +86,7 @@ class ScanActivity : AppCompatActivity() {
                     scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
                     scannerListView.adapter=scannerListAdapter
                     Log.d(tag, "Added scanner $scannerNumber")
-                    ++scannerNumber
+                    ++scannerNumber*/
 
 
                 } else {
@@ -117,13 +117,13 @@ class ScanActivity : AppCompatActivity() {
 
                 //Show popup menu
                 if (view != null) {
-                    val scanTicket = showPopupForScanTicket(view)
-                    if(scanTicket != null) {
+                    val scanTicket = showPopupForScanTicket(view, selectedScanner)
+                    /* if(scanTicket != null) {
                         Log.d(tag, "Preparing scan")
                         startScanning(selectedScanner, scanTicket)
                     }else{
                         Log.d(tag, "scanTicket is null")
-                    }
+                    }*/
                 }
             }
         }
@@ -134,7 +134,7 @@ class ScanActivity : AppCompatActivity() {
      * Creates the popup menu when clicking on a scanner from the list, and returns
      * the ScanTicket based on the user's selection
      */
-    private fun showPopupForScanTicket(view: View) : ScanTicket? {
+    private fun showPopupForScanTicket(view: View, scanner: Scanner) : ScanTicket? {
 
         var ticket : ScanTicket? = null
 
@@ -154,6 +154,8 @@ class ScanActivity : AppCompatActivity() {
                             ticket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
                             Log.d(tag, "Ticket ${ticket?.name}")
 
+                            ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
+
                             return true
                         }
                         R.id.scan_popup_document -> {
@@ -163,6 +165,7 @@ class ScanActivity : AppCompatActivity() {
                             ticket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_AND_IMAGES)
                             Log.d(tag, "Ticket ${ticket?.name}")
+                            ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
                         }
@@ -174,6 +177,7 @@ class ScanActivity : AppCompatActivity() {
                             ticket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_DOCUMENT)
                             Log.d(tag, "Ticket ${ticket?.name}")
+                            ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
                         }
@@ -185,6 +189,7 @@ class ScanActivity : AppCompatActivity() {
             }
         })
         menu.show()
+        //Log.d(tag, "return ticket ${ticket?.name}")
         return ticket
     }
 

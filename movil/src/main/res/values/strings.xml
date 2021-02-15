@@ -33,5 +33,8 @@
     <string name="permission_fineLocDeniedTitle" >Ubicación denegada</string>
     <string name="permission_fineLocDeniedMsg" >Se necesita acceso a la ubicación para conectarse al WiFi</string>
     <string name="permission_fineLocDeniedExp" >Se necesita acceso a la ubicación para conectarse al WiFi</string>
+    <string name="permission_extStorageDeniedTitle" >Acceso al almacenamiento externo denegado</string>
+    <string name="permission_extStorageDeniedMsg" >Se necesita acceso al almacenamiento externo para obtener archivos</string>
+    <string name="permission_extStorageDeniedExp" >Se necesita acceso al almacenamiento externo para obtener archivos</string>
 
 </resources>

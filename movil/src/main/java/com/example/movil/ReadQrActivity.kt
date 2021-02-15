@@ -190,7 +190,7 @@ class ReadQrActivity : AppCompatActivity() {
         ).checkAndAskForPermission()
 
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+/*        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             wifiManager.addSuggestionConnectionStatusListener(mainExecutor,
                 (WifiManager.SuggestionConnectionStatusListener { wifiNetworkSuggestion, failureReason ->
                     Log.d(tag, "Unable to connect to the provided network")
@@ -198,7 +198,7 @@ class ReadQrActivity : AppCompatActivity() {
                     wifiManager.removeNetworkSuggestions(wifiList)
                 })
             )
-        }
+        }*/
 
         val status = wifiManager.addNetworkSuggestions(wifiList)
         if(status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS){

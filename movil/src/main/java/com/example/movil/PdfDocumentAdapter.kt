@@ -1,5 +1,6 @@
 package com.example.movil
 
+import android.net.Uri
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor
@@ -14,7 +15,7 @@ import java.io.FileOutputStream
 /**
  * Adapter class made to print PDF documents
  */
-class PdfDocumentAdapter(val resourceUri : String) : PrintDocumentAdapter() {
+class PdfDocumentAdapter(val resourcePath: String) : PrintDocumentAdapter() {
 
     //Provides info about the expected impression job
     override fun onLayout(
@@ -36,7 +37,7 @@ class PdfDocumentAdapter(val resourceUri : String) : PrintDocumentAdapter() {
 
         //Indicates the paper used to print is normal paper (not photo paper)
         documentBuilder.setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-        documentBuilder.setPageCount(PrintDocumentInfo.PAGE_COUNT_UNKNOWN) //TODO mirar a ver si es verdad que unknown
+        documentBuilder.setPageCount(PrintDocumentInfo.PAGE_COUNT_UNKNOWN)
         documentBuilder.build()
 
         callback.onLayoutFinished(documentBuilder.build(), newAttributes == oldAttributes)
@@ -50,7 +51,7 @@ class PdfDocumentAdapter(val resourceUri : String) : PrintDocumentAdapter() {
     ) {
         try {
             // copy file from the input stream to the output stream
-            FileInputStream(File(resourceUri)).use { inStream ->
+            FileInputStream(File(resourcePath)).use { inStream ->
                 FileOutputStream(destination.fileDescriptor).use { outStream ->
                     inStream.copyTo(outStream)
                 }

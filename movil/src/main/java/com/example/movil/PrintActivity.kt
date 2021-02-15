@@ -4,10 +4,10 @@ package com.example.movil
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.print.PrintAttributes
@@ -23,8 +23,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat
 import androidx.print.PrintHelper
 import com.izettle.html2bitmap.Html2Bitmap
 import com.izettle.html2bitmap.content.WebViewContent
@@ -61,7 +60,7 @@ class PrintActivity : AppCompatActivity() {
         IMAGE,
         PDF,
         HTML,
-        DOCUMENT
+        DOC
     }
 
 
@@ -87,13 +86,14 @@ class PrintActivity : AppCompatActivity() {
                     "Acceso al almacenamiento externo denegado",
                     "Se necesita acceso al almacenamiento exteno"
                 )
-                permissionHelper.checkAndAskForPermission()
 
-                //Storage access is granted
-                val intent = Intent(Intent.ACTION_PICK)
-                //val intent = Intent(Intent.ACTION_GET_CONTENT)
-                intent.type = "*/*"
-                startActivityForResult(intent, chooseFileRequestCode)
+                //If permission is already granted pick a file, else ask for them
+                if(ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED){
+                    getFile()
+                }else {
+                    permissionHelper.checkAndAskForPermission()
+                }
             }
         })
 
@@ -112,7 +112,6 @@ class PrintActivity : AppCompatActivity() {
 
                     //Open email app and load info
                     val emailIntent = Intent(Intent.ACTION_SEND)
-                    //emailIntent.type = "message/rfc822" //Shows only email clients
                     emailIntent.type = "*/*"
 
                     val to: Array<String> = emptyArray()
@@ -125,10 +124,9 @@ class PrintActivity : AppCompatActivity() {
                     }
 
                     emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Sujeto")
-                    startActivity(Intent.createChooser(emailIntent, "Enviar email"))
+                    startActivity(Intent.createChooser(emailIntent, "Enviar"))
                 }
             }
-
         })
 
         //Print button listener
@@ -145,17 +143,19 @@ class PrintActivity : AppCompatActivity() {
                         var photo: Bitmap = MediaStore.Images.Media.getBitmap(
                             this@PrintActivity.contentResolver,
                             resourceUri
-                        );
+                        )
                         printHelper.printBitmap("Imagen", photo)
                     }
 
                     //Printing a PDF
                     ResourceTypeEnum.PDF -> {
+
                         val printManager: PrintManager = this@PrintActivity.getSystemService(
                             Context.PRINT_SERVICE
                         ) as PrintManager
                         val printAdapter = PdfDocumentAdapter(resourcePath!!)
                         printManager.print("PDF", printAdapter, PrintAttributes.Builder().build())
+
                     }
 
                     //Printing an HTML
@@ -199,7 +199,8 @@ class PrintActivity : AppCompatActivity() {
 
                 //Get the file path from the uri
                 val pathUtils = RealPathUtils(this, resourceUri!!)
-                resourcePath = pathUtils.getRealPath(this@PrintActivity, resourceUri!!)
+                resourcePath = pathUtils.getRealPath(this@PrintActivity, resourceUri!!) //usado con action_pick
+                //resourcePath = resourceUri!!.path //usado con action_get_content
                 Log.d(tag, "file path: $resourcePath")
 
                 val file = File(resourcePath)
@@ -253,6 +254,7 @@ class PrintActivity : AppCompatActivity() {
             file,
             ParcelFileDescriptor.MODE_READ_ONLY
         )
+        //val fileDescriptor = contentResolver.openFileDescriptor(resourceUri!!, "r")
 
         val pdfRenderer = PdfRenderer(fileDescriptor)
         val pageToRender: PdfRenderer.Page = pdfRenderer.openPage(0)
@@ -289,12 +291,55 @@ class PrintActivity : AppCompatActivity() {
 
     }
 
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when(requestCode){
+            requestExternalStoragePermissionCode->{
+                var hasPermission = PackageManager.PERMISSION_DENIED
+
+                //Check for external storage permission
+                for (i in 0..permissions.size) {
+                    if (permissions[i] == Manifest.permission.READ_EXTERNAL_STORAGE) {
+                        hasPermission = grantResults[i]
+                        break
+                    }
+                }
+                if(hasPermission == PackageManager.PERMISSION_GRANTED){
+                    getFile()
+                }else{
+                    Toast.makeText(applicationContext,
+                        applicationContext.getString(R.string.permission_extStorageDeniedMsg),
+                        Toast.LENGTH_LONG).show()
+                }
+            }//ExtStoragePerms
+        }//when
+
+    }
+
+
+
     //On back pressed go to main activity
     override fun onBackPressed() {
         super.onBackPressed()
         startActivity(Intent(this, MainActivity::class.java))
     }
 
+    /**
+     * Fun that opens the intent to pick a file
+     */
+    private fun getFile(){
+        //Seleccionar archivo
 
+        val intent = Intent(Intent.ACTION_PICK)
+        //val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "*/*"
+        startActivityForResult(intent, chooseFileRequestCode)
+    }
 
 }

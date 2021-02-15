@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    compileSdkVersion 30 //probar 29
+    //buildToolsVersion "30.0.0"
 
     defaultConfig {
         applicationId "com.example.movil"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 30 // probar 29
         versionCode 1
         versionName "1.0"
 
@@ -29,11 +29,11 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation fileTree(dir: "libs", include: ['*.aar', '*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.print:print:1.0.0'
-    implementation fileTree(dir: 'C:\\Users\\sergi\\Desktop\\HPScanSDK_Android_1.0.1\\HPScanSDK_Android_1.0.1', include: ['*.aar', '*.jar'], exclude: [])
+    //implementation fileTree(dir: 'C:\\Users\\sergi\\Desktop\\HPScanSDK_Android_1.0.1\\HPScanSDK_Android_1.0.1', include: ['*.aar', '*.jar'], exclude: [])
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

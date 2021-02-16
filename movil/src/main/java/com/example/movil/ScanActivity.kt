@@ -29,6 +29,9 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var progressBar : ProgressBar
     var scannerNumber = 0 //Debug
 
+    lateinit var chosenScanner : Scanner
+
+    val writeExternalStoragePermissionCode = 1
     private val scannerBrowserListener: ScannerAvailabilityListener =
         object : ScannerAvailabilityListener {
             override fun onScannerFound(aScanner: Scanner) {
@@ -76,9 +79,9 @@ class ScanActivity : AppCompatActivity() {
                     isSearching = true
 
                     Log.d(tag, "Searching for scanners")
-                    scannerBrowser.start(scannerBrowserListener)
+                    //scannerBrowser.start(scannerBrowserListener)
 
-                    /*scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
+                    scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
                     Log.d(tag, "Added scanner $scannerNumber")
                     scannerListView.adapter=scannerListAdapter
                     ++scannerNumber
@@ -86,7 +89,7 @@ class ScanActivity : AppCompatActivity() {
                     scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
                     scannerListView.adapter=scannerListAdapter
                     Log.d(tag, "Added scanner $scannerNumber")
-                    ++scannerNumber*/
+                    ++scannerNumber
 
 
                 } else {
@@ -108,22 +111,16 @@ class ScanActivity : AppCompatActivity() {
                 //Stop searching
                 stopSearching()
 
-                val selectedScanner = parent?.adapter?.getItem(position) as Scanner
+                chosenScanner = parent?.adapter?.getItem(position) as Scanner
                 Toast.makeText(
                     this@ScanActivity,
-                    "Seleccionado el escaner ${selectedScanner.humanReadableName}",
+                    "Seleccionado el escaner ${chosenScanner.humanReadableName}",
                     Toast.LENGTH_SHORT
                 ).show()
 
                 //Show popup menu
                 if (view != null) {
-                    val scanTicket = showPopupForScanTicket(view, selectedScanner)
-                    /* if(scanTicket != null) {
-                        Log.d(tag, "Preparing scan")
-                        startScanning(selectedScanner, scanTicket)
-                    }else{
-                        Log.d(tag, "scanTicket is null")
-                    }*/
+                    showPopupAndPrint(view, chosenScanner)
                 }
             }
         }
@@ -134,7 +131,7 @@ class ScanActivity : AppCompatActivity() {
      * Creates the popup menu when clicking on a scanner from the list, and returns
      * the ScanTicket based on the user's selection
      */
-    private fun showPopupForScanTicket(view: View, scanner: Scanner) : ScanTicket? {
+    private fun showPopupAndPrint(view: View, scanner: Scanner) {
 
         var ticket : ScanTicket? = null
 
@@ -146,14 +143,12 @@ class ScanActivity : AppCompatActivity() {
         menu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem?): Boolean {
                 if (item != null) {
-
                     when (item.itemId) {
                         R.id.scan_popup_photo -> {
                             //Create photo ScanTicket
                             Log.d(tag, "Scan photo chosen")
                             ticket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
                             Log.d(tag, "Ticket ${ticket?.name}")
-
                             ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
@@ -182,24 +177,38 @@ class ScanActivity : AppCompatActivity() {
                             return true
                         }
                         else -> return false
-                    }
+                    }//when(itemId)
                 } else {
                     return false;
                 }
             }
         })
         menu.show()
-        //Log.d(tag, "return ticket ${ticket?.name}")
-        return ticket
     }
 
     private fun startScanning(theScanner: Scanner, scanTicket: ScanTicket){
 
         Log.d(tag, "startScanning()")
 
+        //Open scanning fragment
+
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        val scanningFragment = ScanningFragment()
+        //fragmentTransaction.add(R.id.activity_scan_root, scanningFragment)
+        //fragmentTransaction.commit()
+        scanningFragment.show(fragmentTransaction, "Escaneando")
+
+
+
+
+
+        Log.d(tag, "Se ha abierto el fragment")
         //Create the file to save the scanning
         val theExternalStorageDirectory = Environment.getExternalStorageDirectory()
         val scanFile = File(theExternalStorageDirectory, "ContactlessPrinterOp")
+
+        Log.d(tag, "Se ha creado el archivo de destino")
 
         theScanner.scan(scanFile.absolutePath, scanTicket, object : ScanCapture.ScanningProgressListener{
             override fun onScanningPageDone(p0: ScanPage?) {

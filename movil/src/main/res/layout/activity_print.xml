@@ -17,7 +17,7 @@
         android:id="@+id/act_print_sendEmailButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enviar por correo" />
+        android:text="Enviar" />
 
     <Button
         android:id="@+id/act_print_printButton"

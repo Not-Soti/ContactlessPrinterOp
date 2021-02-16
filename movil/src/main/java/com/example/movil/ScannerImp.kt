@@ -1,5 +1,6 @@
 package com.example.movil
 
+import android.util.Log
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.net.URL
@@ -10,11 +11,11 @@ class ScannerImp(
 ) : Scanner{
 
     override fun scan(p0: String?, p1: ScanTicket?, p2: ScanCapture.ScanningProgressListener?) {
-        TODO("Not yet implemented")
+        Log.d("ScannerImp", "escaneando")
     }
 
     override fun cancelScanning() {
-        TODO("Not yet implemented")
+        Log.d("ScannerImp", "cancelando escaneo")
     }
 
     override fun isScanning(): Boolean {

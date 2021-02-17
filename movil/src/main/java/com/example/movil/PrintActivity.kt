@@ -211,7 +211,7 @@ class PrintActivity : AppCompatActivity() {
                 when (extension.toLowerCase()) {
                     "jpg", "jpeg", "jpe", "png", "bmp", "gif", "webp" -> {
                         resourceType = ResourceTypeEnum.IMAGE
-                        Log.d(tag, "image uri $resourceUri")
+                        //Log.d(tag, "image uri $resourceUri")
 
                         //Make the image preview bigger
                         imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT

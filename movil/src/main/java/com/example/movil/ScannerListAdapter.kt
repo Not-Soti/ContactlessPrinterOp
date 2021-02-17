@@ -20,9 +20,20 @@ class ScannerListAdapter() : BaseAdapter() {
         layoutInflater = LayoutInflater.from(context)
     }
 
-    public fun add(scanner: Scanner){ scannerList.add(scanner)}
+    public fun add(scanner: Scanner){
+        scannerList.add(scanner)
+        notifyDataSetChanged()
+    }
 
-    public fun remove(scanner: Scanner){ scannerList.remove(scanner)}
+    public fun remove(scanner: Scanner){
+        scannerList.remove(scanner)
+        notifyDataSetChanged()
+    }
+
+    public fun clear(){
+        scannerList.clear()
+        notifyDataSetChanged()
+    }
 
     override fun getCount(): Int { return scannerList.size }
 

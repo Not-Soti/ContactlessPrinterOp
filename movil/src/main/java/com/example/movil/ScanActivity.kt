@@ -36,19 +36,12 @@ class ScanActivity : AppCompatActivity() {
         object : ScannerAvailabilityListener {
             override fun onScannerFound(aScanner: Scanner) {
                 Log.d(tag, "Scanner found")
-                if (aScanner != null) {
-                    scannerListAdapter.add(aScanner)
-                    scannerListView.adapter=scannerListAdapter
-                }
+                scannerListAdapter.add(aScanner)
             }
 
             override fun onScannerLost(aScanner: Scanner) {
                 Log.d(tag, "Scanner lost")
-                if (aScanner != null) {
-                    scannerListAdapter.remove(aScanner)
-                    scannerListView.adapter=scannerListAdapter
-
-                }
+                scannerListAdapter.remove(aScanner)
             }
         }
 
@@ -72,34 +65,27 @@ class ScanActivity : AppCompatActivity() {
             override fun onClick(v: View?) {
                 if (!isSearching) {
                     //Start searching
-
+                    scannerListAdapter.clear()
                     auxText.text = getString(R.string.ScanAct_searchingLabel)
                     scannerSearchButton.text = getString(R.string.ScanAct_stopSearchButton)
                     progressBar.visibility = View.VISIBLE
                     isSearching = true
 
                     Log.d(tag, "Searching for scanners")
-                    //scannerBrowser.start(scannerBrowserListener)
+                    scannerBrowser.start(scannerBrowserListener)
 
+                    /*
                     scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
                     Log.d(tag, "Added scanner $scannerNumber")
-                    scannerListView.adapter=scannerListAdapter
                     ++scannerNumber
 
                     scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
-                    scannerListView.adapter=scannerListAdapter
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
-
-
+                    */
                 } else {
                     //Stop searching
                     stopSearching()
-                    /*auxText.text = getString(R.string.ScanAct_stoppedLabel)
-                    scannerSearchButton.text = getString(R.string.ScanAct_startSearchButton)
-                    progressBar.visibility = View.INVISIBLE
-                    isSearching = false
-                    scannerBrowser.stop()*/
                 }
 
             }

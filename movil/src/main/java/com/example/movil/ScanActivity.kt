@@ -1,5 +1,9 @@
 package com.example.movil
 
+import android.app.Activity
+import android.content.Intent
+import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -30,8 +34,12 @@ class ScanActivity : AppCompatActivity() {
     var scannerNumber = 0 //Debug
 
     lateinit var chosenScanner : Scanner
+    var chosenTicket : ScanTicket? = null
+
 
     val writeExternalStoragePermissionCode = 1
+    val createDocumentPermissionCode = 2
+
     private val scannerBrowserListener: ScannerAvailabilityListener =
         object : ScannerAvailabilityListener {
             override fun onScannerFound(aScanner: Scanner) {
@@ -82,7 +90,10 @@ class ScanActivity : AppCompatActivity() {
                     scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
-                    */
+
+                    scannerListView.adapter=scannerListAdapter
+
+                     */
                 } else {
                     //Stop searching
                     stopSearching()
@@ -106,7 +117,8 @@ class ScanActivity : AppCompatActivity() {
 
                 //Show popup menu
                 if (view != null) {
-                    showPopupAndPrint(view, chosenScanner)
+                    //showPopupAndPrint(view, chosenScanner)
+                    showPopupChooseTicket(view)
                 }
             }
         }
@@ -117,9 +129,9 @@ class ScanActivity : AppCompatActivity() {
      * Creates the popup menu when clicking on a scanner from the list, and returns
      * the ScanTicket based on the user's selection
      */
-    private fun showPopupAndPrint(view: View, scanner: Scanner) {
-
-        var ticket : ScanTicket? = null
+    //private fun showPopupAndPrint(view: View, scanner: Scanner) {
+    private fun showPopupChooseTicket(view: View) {
+        //chosenTicket = null
 
         //Create and inflate the menu
         var menu = PopupMenu(this, view)
@@ -133,9 +145,10 @@ class ScanActivity : AppCompatActivity() {
                         R.id.scan_popup_photo -> {
                             //Create photo ScanTicket
                             Log.d(tag, "Scan photo chosen")
-                            ticket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
-                            Log.d(tag, "Ticket ${ticket?.name}")
-                            ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
+                            chosenTicket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
+                            Log.d(tag, "Ticket ${chosenTicket!!.name}")
+                            askDirectory()
+                            //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
                         }
@@ -143,10 +156,11 @@ class ScanActivity : AppCompatActivity() {
                             //Create document with images ScanTicket
                             Log.d(tag, "Scan document chosen")
 
-                            ticket =
+                            chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_AND_IMAGES)
-                            Log.d(tag, "Ticket ${ticket?.name}")
-                            ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
+                            Log.d(tag, "Ticket ${chosenTicket!!.name}")
+                            askDirectory()
+                            //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
                         }
@@ -155,10 +169,11 @@ class ScanActivity : AppCompatActivity() {
                             //Create only text ScanTicket
                             Log.d(tag, "Scan text chosen")
 
-                            ticket =
+                            chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_DOCUMENT)
-                            Log.d(tag, "Ticket ${ticket?.name}")
-                            ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
+                            Log.d(tag, "Ticket ${chosenTicket!!.name}")
+                            askDirectory()
+                            //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
                         }
@@ -172,7 +187,17 @@ class ScanActivity : AppCompatActivity() {
         menu.show()
     }
 
-    private fun startScanning(theScanner: Scanner, scanTicket: ScanTicket){
+    private fun askDirectory(){
+        Log.d(tag, "askDirectory()")
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/pdf"
+            putExtra(Intent.EXTRA_TITLE, "ArchivoPrueba1.pdf")
+        }
+        startActivityForResult(intent, createDocumentPermissionCode)
+    }
+
+    private fun startScanning(newDocPath : String){
 
         Log.d(tag, "startScanning()")
 
@@ -187,16 +212,15 @@ class ScanActivity : AppCompatActivity() {
 
 
 
-
-
-        Log.d(tag, "Se ha abierto el fragment")
         //Create the file to save the scanning
-        val theExternalStorageDirectory = Environment.getExternalStorageDirectory()
-        val scanFile = File(theExternalStorageDirectory, "ContactlessPrinterOp")
+        //val theExternalStorageDirectory = Environment.getExternalStorageDirectory()
+        //val theExternalStorageDirectory = applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+        //val scanFile = File(theExternalStorageDirectory, "ContactlessPrinterOp")
+        val scanFile = File(newDocPath)
 
-        Log.d(tag, "Se ha creado el archivo de destino")
+        Log.d(tag, "Se ha creado el archivo de destino en ${scanFile.absolutePath}")
 
-        theScanner.scan(scanFile.absolutePath, scanTicket, object : ScanCapture.ScanningProgressListener{
+        chosenScanner.scan(scanFile.absolutePath, chosenTicket, object : ScanCapture.ScanningProgressListener{
             override fun onScanningPageDone(p0: ScanPage?) {
                 Toast.makeText(this@ScanActivity, "Pagina escaneada", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Pagina Escaneada")
@@ -205,11 +229,17 @@ class ScanActivity : AppCompatActivity() {
             override fun onScanningComplete() {
                 Toast.makeText(this@ScanActivity, "Escaneo completado", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Escaneo completado")
+                scanningFragment.dismiss()
             }
 
             override fun onScanningError(theException: ScannerException?) {
                 try{
                     Toast.makeText(this@ScanActivity, "Error en el escaneo", Toast.LENGTH_LONG).show()
+
+                    scanningFragment.dismiss()
+                    //Tell mediastore to show the new file
+                    MediaScannerConnection.scanFile(applicationContext, arrayOf(scanFile.absolutePath), arrayOf("application/pdf"), null)
+
                     throw theException!!
 
                 }catch (e: AdfException){
@@ -234,6 +264,25 @@ class ScanActivity : AppCompatActivity() {
             progressBar.visibility = View.INVISIBLE
             isSearching = false
             scannerBrowser.stop()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode){
+            createDocumentPermissionCode ->{
+                if(resultCode == Activity.RESULT_OK) {
+                    val newDocPath = data?.data?.path
+                    val newDocUri = data?.data
+                    Log.d(tag, "Ruta del nuevo archivo: $newDocPath")
+                    Log.d(tag, "Uri del nuevo archivo: $newDocUri")
+
+                    startScanning(newDocPath!!)
+                }else{
+                    Log.d(tag, "Create document cancelado")
+                }
+            }
         }
     }
 

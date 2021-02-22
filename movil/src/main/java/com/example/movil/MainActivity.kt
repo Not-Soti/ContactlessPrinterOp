@@ -1,13 +1,22 @@
 package com.example.movil
 
 
+import android.content.ContentValues
 import android.content.Intent
+import android.media.MediaScannerConnection
+import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import java.io.File
+import java.io.FileOutputStream
 
 
 class MainActivity : AppCompatActivity(){
@@ -16,6 +25,8 @@ class MainActivity : AppCompatActivity(){
     lateinit var buttonPrint: Button
     lateinit var buttonScan: Button
 
+    lateinit var buttonSaveFile: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -23,6 +34,8 @@ class MainActivity : AppCompatActivity(){
         buttonReadQr = findViewById(R.id.act_main_readQrButton)
         buttonPrint = findViewById(R.id.act_main_startPrintActivity)
         buttonScan = findViewById(R.id.act_main_startScanActivity)
+
+        //buttonSaveFile = findViewById(R.id.act_main_saveFile)
 
         buttonPrint.setOnClickListener(object : View.OnClickListener{
             override fun onClick(p0: View?) {
@@ -46,6 +59,22 @@ class MainActivity : AppCompatActivity(){
             }
 
         })
+
+        /*
+        //save a file
+        buttonSaveFile.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(v: View?) {
+
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "application/pdf"
+                    putExtra(Intent.EXTRA_TITLE, "ArchivoPrueba1.pdf")
+                }
+                startActivityForResult(intent, 1)
+            }
+        })
+        */
+
     }
 
     //Se cierra la app

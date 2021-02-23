@@ -230,16 +230,20 @@ class ScanActivity : AppCompatActivity() {
             override fun onScanningComplete() {
                 Toast.makeText(this@ScanActivity, "Escaneo completado", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Escaneo completado")
-                scanningFragment.dismiss()
+                scanningFragment.scanningCompleted()
+                //scanningFragment.dismiss()
+
+                //MediaScannerConnection.scanFile(applicationContext, arrayOf(scanFile.absolutePath), arrayOf("application/pdf"), null)
+
             }
 
             override fun onScanningError(theException: ScannerException?) {
                 try{
                     Toast.makeText(this@ScanActivity, "Error en el escaneo", Toast.LENGTH_LONG).show()
 
-                    scanningFragment.dismiss()
+                    scanningFragment.scanningErrorOccurred()
+                    //scanningFragment.dismiss()
                     //Tell mediastore to show the new file
-                    MediaScannerConnection.scanFile(applicationContext, arrayOf(scanFile.absolutePath), arrayOf("application/pdf"), null)
 
                     Toast.makeText(applicationContext, "Error, ${theException!!.reason}", Toast.LENGTH_LONG)
 

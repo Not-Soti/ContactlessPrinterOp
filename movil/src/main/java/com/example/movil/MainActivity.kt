@@ -1,29 +1,24 @@
 package com.example.movil
 
 
-import android.content.ContentValues
 import android.content.Intent
-import android.media.MediaScannerConnection
-import android.net.Uri
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
-import android.util.Log
 
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
-import java.io.File
-import java.io.FileOutputStream
+import android.widget.LinearLayout
 
 
 class MainActivity : AppCompatActivity(){
 
-    lateinit var buttonReadQr: Button
+    /*lateinit var buttonReadQr: Button
     lateinit var buttonPrint: Button
-    lateinit var buttonScan: Button
+    lateinit var buttonScan: Button*/
+
+    lateinit var linLayReadQr: LinearLayout
+    lateinit var linLayPrint: LinearLayout
+    lateinit var linLayScan: LinearLayout
 
     lateinit var buttonSaveFile: Button
 
@@ -31,13 +26,38 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        buttonReadQr = findViewById(R.id.act_main_readQrButton)
+        /*buttonReadQr = findViewById(R.id.act_main_readQrButton)
         buttonPrint = findViewById(R.id.act_main_startPrintActivity)
-        buttonScan = findViewById(R.id.act_main_startScanActivity)
+        buttonScan = findViewById(R.id.act_main_startScanActivity)*/
 
         //buttonSaveFile = findViewById(R.id.act_main_saveFile)
 
-        buttonPrint.setOnClickListener(object : View.OnClickListener{
+        linLayPrint = findViewById(R.id.act_main_print_LinLay)
+        linLayScan = findViewById(R.id.act_main_scan_LinLay)
+        linLayReadQr = findViewById(R.id.act_main_readQr_LinLay)
+
+        linLayPrint.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(p0: View?) {
+                startActivity(Intent(this@MainActivity, PrintActivity::class.java))
+            }
+
+        })
+
+        linLayReadQr.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(p0: View?) {
+                val i = Intent(this@MainActivity, ReadQrActivity::class.java)
+                startActivity(i)
+            }
+        })
+
+        linLayScan.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(v: View?) {
+                startActivity(Intent(this@MainActivity, ScanActivity::class.java))
+            }
+
+        })
+
+        /*buttonPrint.setOnClickListener(object : View.OnClickListener{
             override fun onClick(p0: View?) {
                 startActivity(Intent(this@MainActivity, PrintActivity::class.java))
             }
@@ -58,7 +78,7 @@ class MainActivity : AppCompatActivity(){
                 startActivity(Intent(this@MainActivity, ScanActivity::class.java))
             }
 
-        })
+        })*/
 
         /*
         //save a file

@@ -53,7 +53,7 @@ class ScannerListAdapter() : BaseAdapter() {
         scannerName.text = selectedScanner.humanReadableName
 
         var scannerIco = selectedView?.findViewById<View>(R.id.listItem_scanner_icon) as ImageView
-        scannerIco.setImageResource(R.drawable.scanner_mock_ico)
+        scannerIco.setImageResource(R.drawable.icon_printer_mini)
 
         return selectedView
     }

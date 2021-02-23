@@ -91,6 +91,7 @@ class ScanActivity : AppCompatActivity() {
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
 
+
                     scannerListView.adapter=scannerListAdapter
 
                      */
@@ -239,6 +240,8 @@ class ScanActivity : AppCompatActivity() {
                     scanningFragment.dismiss()
                     //Tell mediastore to show the new file
                     MediaScannerConnection.scanFile(applicationContext, arrayOf(scanFile.absolutePath), arrayOf("application/pdf"), null)
+
+                    Toast.makeText(applicationContext, "Error, ${theException!!.reason}", Toast.LENGTH_LONG)
 
                     throw theException!!
 

@@ -20,6 +20,7 @@ import com.hp.mobile.scan.sdk.browsing.ScannersBrowser.ScannerAvailabilityListen
 import com.hp.mobile.scan.sdk.model.ScanPage
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
+import java.util.jar.Manifest
 
 class ScanActivity : AppCompatActivity() {
 
@@ -82,7 +83,7 @@ class ScanActivity : AppCompatActivity() {
                     Log.d(tag, "Searching for scanners")
                     scannerBrowser.start(scannerBrowserListener)
 
-                    /*
+
                     scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
@@ -94,7 +95,7 @@ class ScanActivity : AppCompatActivity() {
 
                     scannerListView.adapter=scannerListAdapter
 
-                     */
+
                 } else {
                     //Stop searching
                     stopSearching()
@@ -148,7 +149,8 @@ class ScanActivity : AppCompatActivity() {
                             Log.d(tag, "Scan photo chosen")
                             chosenTicket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
                             Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            askDirectory()
+                            startScanningRoutine()
+                            //askDirectory()
                             //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
@@ -160,7 +162,8 @@ class ScanActivity : AppCompatActivity() {
                             chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_AND_IMAGES)
                             Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            askDirectory()
+                            startScanningRoutine()
+                            //askDirectory()
                             //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
@@ -173,7 +176,8 @@ class ScanActivity : AppCompatActivity() {
                             chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_DOCUMENT)
                             Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            askDirectory()
+                            startScanningRoutine()
+                            //askDirectory()
                             //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
 
                             return true
@@ -189,6 +193,7 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun askDirectory(){
+        //TODO pedir permisos
         Log.d(tag, "askDirectory()")
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -289,6 +294,33 @@ class ScanActivity : AppCompatActivity() {
                 }else{
                     Log.d(tag, "Create document cancelado")
                 }
+            }
+        }
+    }
+
+    private fun startScanningRoutine(){
+        val permissionHelper = PermissionHelper(
+            this,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            writeExternalStoragePermissionCode,
+            "Acceso al almacenamiendo necesario",
+            "Acceso al almacenamiento necesario para crear el archivo escaneado"
+        )
+
+        permissionHelper.checkAndAskForPermission()
+        //askDirectory()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when(requestCode){
+            writeExternalStoragePermissionCode ->{
+                askDirectory()
             }
         }
     }

@@ -153,8 +153,8 @@ class PrintActivity : AppCompatActivity() {
                     ).show()
                 } else {
 
-                    val file = File(resourcePath)
-                    val uriAux = FileProvider.getUriForFile(applicationContext, packageName+".provider", file)
+                    val file = File(resourcePath!!)
+                    val uriAux = FileProvider.getUriForFile(applicationContext, "$packageName.provider", file)
 
                     //Open email app and load info
                     val emailIntent = Intent(Intent.ACTION_SEND)
@@ -163,11 +163,13 @@ class PrintActivity : AppCompatActivity() {
                     val to: Array<String> = emptyArray()
                     emailIntent.putExtra(Intent.EXTRA_EMAIL, to)
 
-                    if (resourceType == ResourceTypeEnum.IMAGE) {
+                    /*if (resourceType == ResourceTypeEnum.IMAGE) {
                         emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
                     } else if (resourceType == ResourceTypeEnum.PDF) {
                         emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
-                    }
+                    }*/
+                    emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
+
 
                     emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Sujeto")
                     startActivity(Intent.createChooser(emailIntent, "Enviar"))

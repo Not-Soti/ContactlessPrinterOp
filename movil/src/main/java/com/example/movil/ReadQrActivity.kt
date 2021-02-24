@@ -21,6 +21,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
@@ -81,7 +82,7 @@ class ReadQrActivity : AppCompatActivity() {
         surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
 
-                //Check for camera permission
+/*                //Check for camera permission
                 val permissionHelper = PermissionHelper(
                     this@ReadQrActivity,
                     Manifest.permission.CAMERA,
@@ -92,7 +93,9 @@ class ReadQrActivity : AppCompatActivity() {
                 permissionHelper.checkAndAskForPermission()
 
                 Log.d(tag, "Camera permission granted")
-                cameraSource.start(holder)
+                cameraSource.start(holder)*/
+
+                startCamera(holder)
             }
 
             override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {}
@@ -329,28 +332,23 @@ class ReadQrActivity : AppCompatActivity() {
 
         when (requestCode){
             requestCameraPermissionCode -> {
-
-                var hasPermission = PackageManager.PERMISSION_DENIED
-
-                //Check for camera permission
-                for (i in 0..permissions.size) {
-                    if (permissions[i] == Manifest.permission.CAMERA) {
-                        hasPermission = grantResults[i]
-                        break
-                    }
-                }
-
-                if (hasPermission == PackageManager.PERMISSION_GRANTED) {
-                    this.recreate()
-                } else {
-                    Toast.makeText(
-                        this@ReadQrActivity,
-                        this@ReadQrActivity.getString(R.string.permission_camDeniedExp),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-
+                recreate()
             }
+        }
+    }
+
+    private fun startCamera(holder: SurfaceHolder){
+        if(ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
+            val permissionHelper = PermissionHelper(
+                this@ReadQrActivity,
+                Manifest.permission.CAMERA,
+                requestCameraPermissionCode,
+                this@ReadQrActivity.getString(R.string.permission_camDeniedTitle),
+                this@ReadQrActivity.getString(R.string.permission_camDeniedMsg)
+            )
+            permissionHelper.checkAndAskForPermission()
+        }else{
+            cameraSource.start(holder)
         }
     }
 

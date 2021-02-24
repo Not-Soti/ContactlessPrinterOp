@@ -2,6 +2,7 @@ package com.example.movil
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.hp.mobile.scan.sdk.AdfException
 import com.hp.mobile.scan.sdk.ScanCapture
 import com.hp.mobile.scan.sdk.Scanner
@@ -299,16 +301,20 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun startScanningRoutine(){
-        val permissionHelper = PermissionHelper(
-            this,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            writeExternalStoragePermissionCode,
-            "Acceso al almacenamiendo necesario",
-            "Acceso al almacenamiento necesario para crear el archivo escaneado"
-        )
 
-        permissionHelper.checkAndAskForPermission()
-        //askDirectory()
+        if(ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED){
+            askDirectory()
+        }else {
+            val permissionHelper = PermissionHelper(
+                this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                writeExternalStoragePermissionCode,
+                "Acceso al almacenamiendo necesario",
+                "Acceso al almacenamiento necesario para crear el archivo escaneado"
+            )
+            permissionHelper.checkAndAskForPermission()
+        }
     }
 
     override fun onRequestPermissionsResult(

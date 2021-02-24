@@ -8,7 +8,7 @@
     <!-- MainActivity -->
     <string name="MainAct_readQr_text">Leer código QR</string>
     <string name="MainAct_print_text">Imprimir archivo</string>
-    <string name="MainAct_scan_text">Escaear</string>
+    <string name="MainAct_scan_text">Escanear</string>
 
 
     <!-- ReadQrActivity -->

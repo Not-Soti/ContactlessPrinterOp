@@ -15,6 +15,7 @@ import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -32,6 +33,7 @@ class ReadQrActivity : AppCompatActivity() {
     lateinit var cameraSource: CameraSource
     lateinit var barcodeDetector: BarcodeDetector
     lateinit var helpButton : ImageButton
+    lateinit var connectManuallyButton : Button
 
     val requestCameraPermissionCode = 1 //Code needed to ask for permissions
     val accessFineLocationPermissionCode = 2
@@ -48,6 +50,7 @@ class ReadQrActivity : AppCompatActivity() {
 
         surfaceView = findViewById<SurfaceView>(R.id.act_readQR_cameraPreview)
         helpButton = findViewById(R.id.act_readQR_help_button)
+        connectManuallyButton = findViewById(R.id.act_readQR_connectManuallyButton)
         barcodeDetector = BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.QR_CODE).build()
         cameraSource = CameraSource.Builder(this, barcodeDetector)
             .setRequestedPreviewSize(detectorHeight, detectorWidth).setAutoFocusEnabled(true)
@@ -66,6 +69,13 @@ class ReadQrActivity : AppCompatActivity() {
                     dialog.show()
                 }
             }
+        })
+
+        connectManuallyButton.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(v: View?) {
+                startActivity(Intent(android.provider.Settings.ACTION_WIFI_SETTINGS))
+            }
+
         })
 
         surfaceView.holder.addCallback(object : SurfaceHolder.Callback {

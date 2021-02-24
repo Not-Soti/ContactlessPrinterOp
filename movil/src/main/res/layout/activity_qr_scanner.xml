@@ -31,4 +31,10 @@
         android:id="@+id/act_readQR_cameraPreview"
         />
 
+    <Button
+        android:id="@+id/act_readQR_connectManuallyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Conectarse manualmente" />
+
 </LinearLayout>

@@ -216,7 +216,7 @@ class ScanActivity : AppCompatActivity() {
         val scanningFragment = ScanningFragment()
         //fragmentTransaction.add(R.id.activity_scan_root, scanningFragment)
         //fragmentTransaction.commit()
-        scanningFragment.show(fragmentTransaction, "Escaneando")
+        scanningFragment.show(fragmentTransaction, "scanningFragment")
 
 
 
@@ -237,8 +237,11 @@ class ScanActivity : AppCompatActivity() {
             override fun onScanningComplete() {
                 Toast.makeText(this@ScanActivity, "Escaneo completado", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Escaneo completado")
-                scanningFragment.scanningCompleted()
+
                 //scanningFragment.dismiss()
+                supportFragmentManager.beginTransaction().remove(scanningFragment)
+                val scanCompletedFragment = ScanCompletedFragment()
+                scanCompletedFragment.show(fragmentTransaction, "scanCompletedFragment")
 
                 //MediaScannerConnection.scanFile(applicationContext, arrayOf(scanFile.absolutePath), arrayOf("application/pdf"), null)
 
@@ -248,11 +251,12 @@ class ScanActivity : AppCompatActivity() {
                 try{
                     Toast.makeText(this@ScanActivity, "Error en el escaneo", Toast.LENGTH_LONG).show()
 
-                    scanningFragment.scanningErrorOccurred()
                     //scanningFragment.dismiss()
-                    //Tell mediastore to show the new file
+                    supportFragmentManager.beginTransaction().remove(scanningFragment)
+                    val scanErrorFragment = ScanErrorFragment()
+                    scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")
 
-                    Toast.makeText(applicationContext, "Error, ${theException!!.reason}", Toast.LENGTH_LONG)
+                    Toast.makeText(applicationContext, "Error, ${theException!!.reason}", Toast.LENGTH_LONG).show()
 
                     throw theException!!
 

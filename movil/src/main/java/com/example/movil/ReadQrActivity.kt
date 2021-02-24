@@ -81,20 +81,6 @@ class ReadQrActivity : AppCompatActivity() {
 
         surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
-
-/*                //Check for camera permission
-                val permissionHelper = PermissionHelper(
-                    this@ReadQrActivity,
-                    Manifest.permission.CAMERA,
-                    requestCameraPermissionCode,
-                    this@ReadQrActivity.getString(R.string.permission_camDeniedTitle),
-                    this@ReadQrActivity.getString(R.string.permission_camDeniedMsg)
-                )
-                permissionHelper.checkAndAskForPermission()
-
-                Log.d(tag, "Camera permission granted")
-                cameraSource.start(holder)*/
-
                 startCamera(holder)
             }
 

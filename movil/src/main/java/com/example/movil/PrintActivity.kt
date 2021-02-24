@@ -46,13 +46,22 @@ class PrintActivity : AppCompatActivity() {
     lateinit var buttonPrint: Button
     lateinit var imagePreview: ImageView
     lateinit var webPreview: WebView
+    lateinit var downloadFragment: DownloadingFileFragment
+
 
     lateinit var pickit : PickiT //returns real path from uris
     val pickitListener = object: PickiTCallbacks{
         override fun PickiTonUriReturned() {
             //Used when the file is picked from the Cloud
             Log.d(tag, "Pickit on uri returned (Descargando archivo)")
-            Toast.makeText(applicationContext, "Obteniendo archivo", Toast.LENGTH_LONG).show()
+            //Toast.makeText(applicationContext, "Obteniendo archivo", Toast.LENGTH_LONG).show()
+
+            //Create downloading fragment
+            val fragmentManager = supportFragmentManager
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            downloadFragment = DownloadingFileFragment()
+            downloadFragment.show(fragmentTransaction, "downloadFragment")
+
         }
 
         override fun PickiTonStartListener() {
@@ -61,6 +70,8 @@ class PrintActivity : AppCompatActivity() {
 
         override fun PickiTonProgressUpdate(progress: Int) {
             Log.d(tag, "Pickit on progress update (Progreso de descarga $progress")
+            downloadFragment.updateProgressBar(progress)
+            if(progress==100) downloadFragment.dismiss()
         }
 
         override fun PickiTonCompleteListener(
@@ -78,9 +89,7 @@ class PrintActivity : AppCompatActivity() {
 
     }
 
-
     //Request codes for each activity with a result
-    val chooseImageRequestCode = 0
     val chooseFileRequestCode = 1
 
 
@@ -114,31 +123,7 @@ class PrintActivity : AppCompatActivity() {
         pickit = PickiT(this, pickitListener, this)
 
         //ChooseFile button listener
-        buttonChooseFile.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(p0: View?) {
-                /*
-                //Check for permission
-                val permissionHelper = PermissionHelper(
-                    this@PrintActivity,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    requestExternalStoragePermissionCode,
-                    "Acceso al almacenamiento externo denegado",
-                    "Se necesita acceso al almacenamiento exteno"
-                )
-
-                //If permission is already granted pick a file, else ask for them
-                if(ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED){
-                    getFile()
-                }else {
-                    permissionHelper.checkAndAskForPermission()
-                }
-
-                 */
-
-                getFile()
-            }
-        })
+        buttonChooseFile.setOnClickListener { getFile() }
 
         //SendEmail button listener
         buttonSendEmail.setOnClickListener(object : View.OnClickListener {
@@ -163,11 +148,6 @@ class PrintActivity : AppCompatActivity() {
                     val to: Array<String> = emptyArray()
                     emailIntent.putExtra(Intent.EXTRA_EMAIL, to)
 
-                    /*if (resourceType == ResourceTypeEnum.IMAGE) {
-                        emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
-                    } else if (resourceType == ResourceTypeEnum.PDF) {
-                        emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
-                    }*/
                     emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
 
 
@@ -229,68 +209,6 @@ class PrintActivity : AppCompatActivity() {
         })
     }
 
-
-    /*
-    //Overriding function to get images or files from activity results
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        //Remove a image from the imagePreview if there was any
-        imagePreview.setImageDrawable(null)
-        webPreview.loadUrl("about:blank")
-
-        when (requestCode) {
-            //Document selected
-            chooseFileRequestCode -> if (data != null) {
-                resourceUri = data.data
-
-                Log.d(tag, "file uri: " + resourceUri)
-
-                //Get the file path from the uri
-                val pathUtils = RealPathUtils(this, resourceUri!!)
-                resourcePath = pathUtils.getRealPath(this@PrintActivity, resourceUri!!) //usado con action_pick
-                //resourcePath = resourceUri!!.path //usado con action_get_content
-                Log.d(tag, "file path: $resourcePath")
-
-                val file = File(resourcePath)
-                val extension = file.extension
-                Log.d(tag, "extension  $extension")
-
-                //Continue depending on the file extension
-                when (extension.toLowerCase()) {
-                    "jpg", "jpeg", "jpe", "png", "bmp", "gif", "webp" -> {
-                        resourceType = ResourceTypeEnum.IMAGE
-                        //Log.d(tag, "image uri $resourceUri")
-
-                        //Make the image preview bigger
-                        imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                        imagePreview.setImageURI(resourceUri)
-                    }
-                    "pdf" -> {
-                        resourceType = ResourceTypeEnum.PDF
-                        //Make the image preview bigger
-                        imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                        previewPdf(file)
-                    }
-                    "html" ->{
-                        resourceType = ResourceTypeEnum.HTML
-                        webPreview.loadUrl(resourceUri.toString())
-                        Toast.makeText(this@PrintActivity,"Seleccionado HTML", Toast.LENGTH_LONG).show()
-                    }
-                    else -> {
-                        Log.d(tag, "Extension no soportada")
-                        Toast.makeText(
-                            this@PrintActivity,
-                            "Extension no soportada",
-                            Toast.LENGTH_LONG
-                        ).show()//TODO crear dialogo de extensiones soportada
-                    }
-                }
-            }
-        }
-    }
-     */
-
     private fun previewFile(){
 
         //Create file and get extension
@@ -313,7 +231,7 @@ class PrintActivity : AppCompatActivity() {
                 resourceType = ResourceTypeEnum.PDF
                 //Make the image preview bigger
                 imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                //previewPdf(file)
+
                 /* Render the first page of the document */
                 // This is the PdfRenderer we use to render the PDF.
                 val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
@@ -375,41 +293,6 @@ class PrintActivity : AppCompatActivity() {
         }//ChooseFileRequestCode
     }//onActResult
 
-
-    /**
-     * Function to operate when a pdf is selected
-     */
-    /*
-    private fun previewPdf(file: File){
-        /* Render the first page of the document */
-        // This is the PdfRenderer we use to render the PDF.
-        val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
-            file,
-            ParcelFileDescriptor.MODE_READ_ONLY
-        )
-
-        val pdfRenderer = PdfRenderer(fileDescriptor)
-        val pageToRender: PdfRenderer.Page = pdfRenderer.openPage(0)
-        val bitmap = Bitmap.createBitmap(
-            pageToRender.width,
-            pageToRender.height,
-            Bitmap.Config.ARGB_8888
-        )
-        pageToRender.render(
-            bitmap,
-            null,
-            null,
-            PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
-        )
-        //Set the page on the imageView
-        imagePreview.setImageBitmap(bitmap)
-
-        pageToRender.close()
-        pdfRenderer.close()
-        fileDescriptor.close()
-    }
-*/
-
     private fun createWebPrintJob(webView: WebView){
         //Create the print job
         // Get a PrintManager instance
@@ -433,30 +316,6 @@ class PrintActivity : AppCompatActivity() {
         when(requestCode){
             requestExternalStoragePermissionCode -> getFile()
         }
-    /*
-        when(requestCode){
-            requestExternalStoragePermissionCode->{
-                var hasPermission = PackageManager.PERMISSION_DENIED
-
-                //Check for external storage permission
-                for (i in 0..permissions.size) {
-                    if (permissions[i] == Manifest.permission.READ_EXTERNAL_STORAGE) {
-                        hasPermission = grantResults[i]
-                        break
-                    }
-                }
-                if(hasPermission == PackageManager.PERMISSION_GRANTED){
-                    getFile()
-                }else{
-                    Toast.makeText(applicationContext,
-                        applicationContext.getString(R.string.permission_extStorageDeniedMsg),
-                        Toast.LENGTH_LONG).show()
-                }
-            }//ExtStoragePerms
-        }//when
-
- */
-
     }
 
 
@@ -493,13 +352,17 @@ class PrintActivity : AppCompatActivity() {
     //On back pressed go to main activity
     override fun onBackPressed() {
         super.onBackPressed()
-        pickit.deleteTemporaryFile(this)
+        removeTempFiles()
         startActivity(Intent(this, MainActivity::class.java))
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        pickit.deleteTemporaryFile(this)
+        removeTempFiles()
     }
 
+    private fun removeTempFiles(){
+        Log.d(tag, "Removing temporary files")
+        pickit.deleteTemporaryFile(this)
+    }
 }

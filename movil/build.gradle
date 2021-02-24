@@ -52,6 +52,8 @@ dependencies {
 
     //Get real path from Uris
     implementation 'com.github.HBiSoft:PickiT:0.1.14'
+
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
 }
 repositories {
     mavenCentral()

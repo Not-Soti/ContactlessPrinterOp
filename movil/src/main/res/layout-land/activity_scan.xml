@@ -16,7 +16,8 @@
         android:layout_weight="1"
         android:text="Buscar escáneres"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/scan_act_button_bg"/>
 
     <TextView
         android:id="@+id/act_scan_aux"

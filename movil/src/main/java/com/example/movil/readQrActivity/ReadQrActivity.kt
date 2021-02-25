@@ -3,6 +3,7 @@ package com.example.movil.readQrActivity
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSuggestion
@@ -16,6 +17,7 @@ import android.view.SurfaceView
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -30,13 +32,13 @@ import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 
 class ReadQrActivity : AppCompatActivity() {
-    lateinit var surfaceView: SurfaceView
 
-    //lateinit var textoQr: TextView
+    lateinit var surfaceView: SurfaceView
     lateinit var cameraSource: CameraSource
     lateinit var barcodeDetector: BarcodeDetector
     lateinit var helpButton : ImageButton
     lateinit var connectManuallyButton : Button
+
 
     val requestCameraPermissionCode = 1 //Code needed to ask for permissions
     val accessFineLocationPermissionCode = 2
@@ -51,7 +53,7 @@ class ReadQrActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qr_scanner)
 
-        surfaceView = findViewById<SurfaceView>(R.id.act_readQR_cameraPreview)
+        surfaceView = findViewById(R.id.act_readQR_cameraPreview)
         helpButton = findViewById(R.id.act_readQR_help_button)
         connectManuallyButton = findViewById(R.id.act_readQR_connectManuallyButton)
         barcodeDetector = BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.QR_CODE).build()

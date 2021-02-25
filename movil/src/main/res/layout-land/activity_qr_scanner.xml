@@ -21,21 +21,31 @@
         app:layout_constraintEnd_toEndOf="@+id/act_readQR_connectManuallyButton"
         app:srcCompat="@android:drawable/ic_menu_help" />
 
-    <SurfaceView
-        android:id="@+id/act_readQR_cameraPreview"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/act_readQR_cameraLL"
+        android:layout_width="506dp"
         android:layout_height="match_parent"
+        android:layout_marginStart="1dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/act_readQR_connectManuallyButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <SurfaceView
+            android:id="@+id/act_readQR_cameraPreview"
+            android:layout_width="430dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/act_readQR_connectManuallyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:text="Conectarse manualmente"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/act_readQR_cameraPreview" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

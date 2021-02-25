@@ -11,28 +11,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Seleccionar archivo"
+        android:text="@string/PrintAct_chooseFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-<!--    <Button
-        android:id="@+id/act_print_sendEmailButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Enviar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_print_chooseFileButton" />
-
-    <Button
-        android:id="@+id/act_print_printButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Imprimir"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_print_sendEmailButton" />
--->
 
     <TextView
         android:id="@+id/textView"
@@ -41,7 +22,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:gravity="center"
-        android:text="PREVISUALIZACIÓN"
+        android:text="@string/PrintAct_previewLabel"
         app:layout_constraintEnd_toStartOf="@+id/act_print_chooseFileButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -54,7 +35,8 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toStartOf="@+id/act_print_chooseFileButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        android:contentDescription="@string/PrintAct_imagePreview_cd" />
 
     <WebView
         android:id="@+id/act_print_webPreview"
@@ -78,8 +60,9 @@
         app:layout_constraintBottom_toTopOf="@+id/act_print_printFab"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_share"
-
-        app:maxImageSize="@dimen/print_act_fab_icon_size"/>
+        app:maxImageSize="@dimen/print_act_fab_icon_size"
+        android:contentDescription="@string/PrintAct_shareFab_cd"
+        android:focusable="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/act_print_printFab"
@@ -91,5 +74,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/icon_printer_mini_black"
-        app:maxImageSize="@dimen/print_act_fab_icon_size"/>
+        app:maxImageSize="@dimen/print_act_fab_icon_size"
+        android:contentDescription="@string/PrintAct_printFab_cd"
+        android:focusable="true" />
 </androidx.constraintlayout.widget.ConstraintLayout>

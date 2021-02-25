@@ -4,12 +4,16 @@
     <!-- Common -->
     <string name="aceptar">Aceptar</string>
     <string name="help">Ayuda</string>
+    <string name="close">Cerrar</string>
+    <string name="stop">Detener</string>
 
     <!-- MainActivity -->
     <string name="MainAct_readQr_text">Leer código QR</string>
     <string name="MainAct_print_text">Imprimir archivo</string>
     <string name="MainAct_scan_text">Escanear</string>
-
+    <string name="MainAct_readQr_cd">Leer código QR</string>
+    <string name="MainAct_print_cd">Imprimir archivo</string>
+    <string name="MainAct_scan_cd">Escanear</string>
 
     <!-- ReadQrActivity -->
     <string name="ReadQrAct_readQrFailed">El código leído no es correcto</string>
@@ -30,6 +34,31 @@
     <string name="ScanAct_stopSearchButton">Detener búsqueda</string>
     <string name="ScanAct_searchingLabel">Buscando escáneres</string>
     <string name="ScanAct_stoppedLabel">Búsqueda detenida</string>
+
+    <!-- Print activity -->
+    <string name="PrintAct_chooseFileButton">Seleccionar archivo</string>
+    <string name="PrintAct_previewLabel">PREVISUALIZACIÓN</string>
+    <string name="PrintAct_imagePreview_cd">Previsualizacion de la image</string>
+    <string name="PrintAct_shareFab_cd">Compartir</string>
+    <string name="PrintAct_printFab_cd">Imprimir</string>
+
+    <!-- Fragment downloading file -->
+    <string name="fragDownloadFile_downloadingFile">Descargando archivo</string>
+
+    <!-- Fragment scan completed -->
+    <string name="fragScanCompletedImage">Error en el escaneo</string>
+    <string name="fragScanCompletedLabel">Error en el escaneo</string>
+
+    <!-- Fragment scan error -->
+    <string name="fragScanErrorImage">Escaneo completado</string>
+    <string name="fragScanErrorLabel">Escaneo completado</string>
+
+    <!-- Fragment scanning -->
+    <string name="fragScanningImage">Escaneando</string>
+    <string name="fragScanningLabel">Escaneando</string>
+
+    <!-- Scanner list item -->
+    <string name="scannerListItemImage">Scanner image</string>
 
     <!-- Permissions -->
     <string name="permission_camDeniedTitle" >Camara denegada</string>

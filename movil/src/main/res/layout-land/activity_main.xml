@@ -8,42 +8,6 @@
     android:gravity="center"
     tools:context=".MainActivity">
 
-<!--
-    <Button
-        android:id="@+id/act_main_readQrButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:text="Leer código QR"
-        app:layout_constraintBottom_toTopOf="@+id/act_main_startPrintActivity"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <Button
-        android:id="@+id/act_main_startPrintActivity"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Imprimir"
-        app:layout_constraintBottom_toTopOf="@+id/act_main_startScanActivity"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_readQrButton" />
-
-    <Button
-        android:id="@+id/act_main_startScanActivity"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Escanear"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_startPrintActivity" />
--->
-
     <LinearLayout
         android:id="@+id/act_main_print_LinLay"
         android:layout_width="wrap_content"
@@ -59,7 +23,8 @@
             android:id="@+id/act_main_print_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_printer" />
+            app:srcCompat="@drawable/icon_printer"
+            android:contentDescription="@string/MainAct_print_cd" />
 
         <TextView
             android:id="@+id/act_main_print_text"
@@ -86,7 +51,8 @@
             android:id="@+id/act_main_scan_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_scanner" />
+            app:srcCompat="@drawable/icon_scanner"
+            android:contentDescription="@string/MainAct_scan_cd" />
 
         <TextView
             android:id="@+id/act_main_scan_text"
@@ -113,7 +79,8 @@
             android:id="@+id/act_main_readQr_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_qr" />
+            app:srcCompat="@drawable/icon_qr"
+            android:contentDescription="@string/MainAct_readQr_cd" />
 
         <TextView
             android:id="@+id/act_main_readQr_text"

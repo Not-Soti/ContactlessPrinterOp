@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 /**
  * Adapter class made to print PDF documents
  */
-class PdfDocumentAdapter(val resourcePath: String) : PrintDocumentAdapter() {
+class PdfDocumentAdapter(private val resourcePath: String) : PrintDocumentAdapter() {
 
     //Provides info about the expected impression job
     override fun onLayout(

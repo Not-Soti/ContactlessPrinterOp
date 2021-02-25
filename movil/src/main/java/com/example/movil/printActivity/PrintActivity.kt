@@ -42,19 +42,16 @@ class PrintActivity : AppCompatActivity() {
 
     private val tag = "--- PrintActivity ---"
 
-    //lateinit var buttonChooseImage: Button
-    lateinit var buttonChooseFile: Button
-    //lateinit var buttonSendEmail: Button
-    //lateinit var buttonPrint: Button
-    lateinit var buttonShare : FloatingActionButton
-    lateinit var buttonPrint : FloatingActionButton
-    lateinit var imagePreview: ImageView
-    lateinit var webPreview: WebView
-    lateinit var downloadFragment: DownloadingFileFragment
+    private lateinit var buttonChooseFile: Button
+    private lateinit var buttonShare : FloatingActionButton
+    private lateinit var buttonPrint : FloatingActionButton
+    private lateinit var imagePreview: ImageView
+    private lateinit var webPreview: WebView
+    private lateinit var downloadFragment: DownloadingFileFragment
 
 
-    lateinit var pickit : PickiT //returns real path from uris
-    val pickitListener = object: PickiTCallbacks{
+    private lateinit var pickit : PickiT //returns real path from uris
+    private val pickitListener = object: PickiTCallbacks{
         override fun PickiTonUriReturned() {
             //Used when the file is picked from the Cloud
             Log.d(tag, "Pickit on uri returned (Descargando archivo)")
@@ -94,14 +91,13 @@ class PrintActivity : AppCompatActivity() {
     }
 
     //Request codes for each activity with a result
-    val chooseFileRequestCode = 1
+    private val chooseFileRequestCode = 1
 
+    private var resourceUri: Uri? = null //selected resource uri
+    private var resourcePath : String? = null //using the uri does not work when trying to print documents
+    private var resourceType = ResourceTypeEnum.NOT_DEFINED
 
-    var resourceUri: Uri? = null //selected resource uri
-    var resourcePath : String? = null //using the uri does not work when trying to print documents
-    var resourceType = ResourceTypeEnum.NOT_DEFINED
-
-    val requestExternalStoragePermissionCode = 10 //Code uses when asking for permissions
+    private val requestExternalStoragePermissionCode = 10 //Code uses when asking for permissions
 
     //Enum needed to check the extension of the selected file to print
     enum class ResourceTypeEnum {
@@ -179,9 +175,9 @@ class PrintActivity : AppCompatActivity() {
 
                 //Printing an image
                 ResourceTypeEnum.IMAGE -> {
-                    var printHelper = PrintHelper(this@PrintActivity)
+                    val printHelper = PrintHelper(this@PrintActivity)
                     printHelper.scaleMode = PrintHelper.SCALE_MODE_FILL
-                    var photo: Bitmap = MediaStore.Images.Media.getBitmap(
+                    val photo: Bitmap = MediaStore.Images.Media.getBitmap(
                         this@PrintActivity.contentResolver,
                         resourceUri
                     )

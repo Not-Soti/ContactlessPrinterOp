@@ -8,57 +8,22 @@
     android:gravity="center"
     tools:context=".MainActivity">
 
-<!--
-    <Button
-        android:id="@+id/act_main_readQrButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:text="Leer código QR"
-        app:layout_constraintBottom_toTopOf="@+id/act_main_startPrintActivity"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <Button
-        android:id="@+id/act_main_startPrintActivity"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Imprimir"
-        app:layout_constraintBottom_toTopOf="@+id/act_main_startScanActivity"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_readQrButton" />
-
-    <Button
-        android:id="@+id/act_main_startScanActivity"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Escanear"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_startPrintActivity" />
--->
-
     <LinearLayout
         android:id="@+id/act_main_print_LinLay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="65dp"
+        android:layout_marginStart="50dp"
         android:layout_marginTop="170dp"
+        android:background="@drawable/main_button_bg"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/main_button_bg">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/act_main_print_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
+            android:contentDescription="@string/MainAct_print_cd"
             app:srcCompat="@drawable/icon_printer" />
 
         <TextView
@@ -76,17 +41,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="170dp"
-        android:layout_marginEnd="65dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/main_button_bg"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/main_button_bg">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/act_main_scan_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_scanner" />
+            app:srcCompat="@drawable/icon_scanner"
+            android:contentDescription="@string/MainAct_scan_cd" />
 
         <TextView
             android:id="@+id/act_main_scan_text"
@@ -103,17 +69,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="96dp"
-        android:layout_marginEnd="65dp"
+        android:background="@drawable/main_button_bg"
         android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_scan_LinLay"
-        android:background="@drawable/main_button_bg">
+        app:layout_constraintEnd_toEndOf="@+id/act_main_scan_LinLay"
+        app:layout_constraintTop_toBottomOf="@+id/act_main_scan_LinLay">
 
         <ImageView
             android:id="@+id/act_main_readQr_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_qr" />
+            app:srcCompat="@drawable/icon_qr"
+            android:contentDescription="@string/MainAct_readQr_cd" />
 
         <TextView
             android:id="@+id/act_main_readQr_text"

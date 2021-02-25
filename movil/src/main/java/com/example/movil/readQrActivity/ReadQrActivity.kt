@@ -3,7 +3,6 @@ package com.example.movil.readQrActivity
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSuggestion
@@ -17,7 +16,6 @@ import android.view.SurfaceView
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -33,21 +31,21 @@ import com.google.android.gms.vision.barcode.BarcodeDetector
 
 class ReadQrActivity : AppCompatActivity() {
 
-    lateinit var surfaceView: SurfaceView
-    lateinit var cameraSource: CameraSource
-    lateinit var barcodeDetector: BarcodeDetector
-    lateinit var helpButton : ImageButton
-    lateinit var connectManuallyButton : Button
+    private lateinit var surfaceView: SurfaceView
+    private lateinit var cameraSource: CameraSource
+    private lateinit var barcodeDetector: BarcodeDetector
+    private lateinit var helpButton : ImageButton
+    private lateinit var connectManuallyButton : Button
 
 
-    val requestCameraPermissionCode = 1 //Code needed to ask for permissions
-    val accessFineLocationPermissionCode = 2
+    private val requestCameraPermissionCode = 1 //Code needed to ask for permissions
+    private val accessFineLocationPermissionCode = 2
 
-    val detectorHeight = 640
-    val detectorWidth = 640
-    var qrCodeRead: Boolean = false //Checks if a QR code has been detected
+    private val detectorHeight = 640
+    private val detectorWidth = 640
+    private var qrCodeRead: Boolean = false //Checks if a QR code has been detected
 
-    val tag = "---ReadQrActivity---"
+    private val tag = "---ReadQrActivity---"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,29 +59,22 @@ class ReadQrActivity : AppCompatActivity() {
             .setRequestedPreviewSize(detectorHeight, detectorWidth).setAutoFocusEnabled(true)
             .build()
 
-        helpButton.setOnClickListener(object : View.OnClickListener{
-            override fun onClick(v: View?) {
-                //Create alert dialog
-                val builder: AlertDialog.Builder? = this@ReadQrActivity?.let {AlertDialog.Builder(it)}
+        helpButton.setOnClickListener { //Create alert dialog
+            val builder: AlertDialog.Builder? = this@ReadQrActivity?.let { AlertDialog.Builder(it) }
 
-                builder?.apply { setNeutralButton(R.string.aceptar) { dialog, _ -> dialog.dismiss() } }
+            builder?.apply { setNeutralButton(R.string.aceptar) { dialog, _ -> dialog.dismiss() } }
 
-                builder?.setMessage(this@ReadQrActivity.getString(R.string.Dialog_qr_scanner_help))?.setTitle(
+            builder?.setMessage(this@ReadQrActivity.getString(R.string.Dialog_qr_scanner_help))
+                ?.setTitle(
                     R.string.help
                 )
-                val dialog: AlertDialog? = builder?.create()
-                if (dialog != null) {
-                    dialog.show()
-                }
+            val dialog: AlertDialog? = builder?.create()
+            if (dialog != null) {
+                dialog.show()
             }
-        })
+        }
 
-        connectManuallyButton.setOnClickListener(object : View.OnClickListener{
-            override fun onClick(v: View?) {
-                startActivity(Intent(android.provider.Settings.ACTION_WIFI_SETTINGS))
-            }
-
-        })
+        connectManuallyButton.setOnClickListener { startActivity(Intent(android.provider.Settings.ACTION_WIFI_SETTINGS)) }
 
         surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
@@ -109,7 +100,7 @@ class ReadQrActivity : AppCompatActivity() {
                         qrCodeRead = true
 
                         //The device vibrates if a code is detected
-                        var vibrator: Vibrator =
+                        val vibrator: Vibrator =
                             applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
                         vibrator.vibrate(500)
 

@@ -1,7 +1,6 @@
-package com.example.movil
+package com.example.movil.readQrActivity
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
 import android.net.wifi.WifiConfiguration
@@ -22,6 +21,9 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.movil.MainActivity
+import com.example.movil.PermissionHelper
+import com.example.movil.R
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
@@ -64,7 +66,9 @@ class ReadQrActivity : AppCompatActivity() {
 
                 builder?.apply { setNeutralButton(R.string.aceptar) { dialog, _ -> dialog.dismiss() } }
 
-                builder?.setMessage(this@ReadQrActivity.getString(R.string.Dialog_qr_scanner_help))?.setTitle(R.string.help)
+                builder?.setMessage(this@ReadQrActivity.getString(R.string.Dialog_qr_scanner_help))?.setTitle(
+                    R.string.help
+                )
                 val dialog: AlertDialog? = builder?.create()
                 if (dialog != null) {
                     dialog.show()

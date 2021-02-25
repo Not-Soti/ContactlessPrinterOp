@@ -1,4 +1,4 @@
-package com.example.movil
+package com.example.movil.scanActivity
 
 import android.util.Log
 import com.hp.mobile.scan.sdk.*

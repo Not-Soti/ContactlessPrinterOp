@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import com.example.movil.printActivity.PrintActivity
+import com.example.movil.readQrActivity.ReadQrActivity
+import com.example.movil.scanActivity.ScanActivity
 
 
 class MainActivity : AppCompatActivity(){

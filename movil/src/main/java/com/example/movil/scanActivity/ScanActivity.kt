@@ -1,18 +1,17 @@
-package com.example.movil
+package com.example.movil.scanActivity
 
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.MediaScannerConnection
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.movil.PermissionHelper
+import com.example.movil.R
 import com.hp.mobile.scan.sdk.AdfException
 import com.hp.mobile.scan.sdk.ScanCapture
 import com.hp.mobile.scan.sdk.Scanner
@@ -22,7 +21,6 @@ import com.hp.mobile.scan.sdk.browsing.ScannersBrowser.ScannerAvailabilityListen
 import com.hp.mobile.scan.sdk.model.ScanPage
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
-import java.util.jar.Manifest
 
 class ScanActivity : AppCompatActivity() {
 

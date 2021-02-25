@@ -1,8 +1,9 @@
-package com.example.movil
+package com.example.movil.readQrActivity
 
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.movil.R
 
 class ReadQrHelpDialog : AppCompatActivity()  {
 

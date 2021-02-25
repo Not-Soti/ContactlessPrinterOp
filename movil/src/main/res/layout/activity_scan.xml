@@ -16,7 +16,8 @@
         android:layout_weight="1"
         android:text="Buscar escáneres"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/scan_act_button_bg"/>
 
     <LinearLayout
         android:id="@+id/act_scan_searching_linearLayout"
@@ -49,11 +50,9 @@
 
     <ListView
         android:id="@+id/act_scan_deviceListView"
-        android:layout_width="389dp"
+        android:layout_width="match_parent"
         android:layout_height="613dp"
-        android:layout_marginStart="5dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"

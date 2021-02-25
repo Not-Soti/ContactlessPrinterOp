@@ -1,4 +1,4 @@
-package com.example.movil
+package com.example.movil.printActivity
 
 
 import android.Manifest
@@ -28,10 +28,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.print.PrintHelper
+import com.example.movil.MainActivity
+import com.example.movil.PermissionHelper
+import com.example.movil.R
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
-import com.izettle.html2bitmap.Html2Bitmap
-import com.izettle.html2bitmap.content.WebViewContent
 import java.io.File
 import java.util.*
 
@@ -42,8 +44,10 @@ class PrintActivity : AppCompatActivity() {
 
     //lateinit var buttonChooseImage: Button
     lateinit var buttonChooseFile: Button
-    lateinit var buttonSendEmail: Button
-    lateinit var buttonPrint: Button
+    //lateinit var buttonSendEmail: Button
+    //lateinit var buttonPrint: Button
+    lateinit var buttonShare : FloatingActionButton
+    lateinit var buttonPrint : FloatingActionButton
     lateinit var imagePreview: ImageView
     lateinit var webPreview: WebView
     lateinit var downloadFragment: DownloadingFileFragment
@@ -115,98 +119,109 @@ class PrintActivity : AppCompatActivity() {
 
         //buttonChooseImage = findViewById(R.id.act_print_chooseImageButton)
         buttonChooseFile = findViewById(R.id.act_print_chooseFileButton)
-        buttonSendEmail = findViewById(R.id.act_print_sendEmailButton)
-        buttonPrint = findViewById(R.id.act_print_printButton)
+        //buttonSendEmail = findViewById(R.id.act_print_sendEmailButton)
+        //buttonPrint = findViewById(R.id.act_print_printButton)
+        buttonPrint = findViewById(R.id.act_print_printFab)
+        buttonShare = findViewById(R.id.act_print_shareFab)
         imagePreview = findViewById(R.id.act_print_imagePreview)
         webPreview = findViewById(R.id.act_print_webPreview)
 
         pickit = PickiT(this, pickitListener, this)
 
+        webPreview.visibility = View.INVISIBLE
+        imagePreview.visibility = View.INVISIBLE
+
         //ChooseFile button listener
         buttonChooseFile.setOnClickListener { getFile() }
 
         //SendEmail button listener
-        buttonSendEmail.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(p0: View?) {
+        buttonShare.setOnClickListener {
+            //Nothing was selected
+            if (resourceType == ResourceTypeEnum.NOT_DEFINED) {
+                Toast.makeText(
+                    this@PrintActivity,
+                    "Selecciona algún archivo",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
 
-                //Nothing was selected
-                if (resourceType == ResourceTypeEnum.NOT_DEFINED) {
+                val file = File(resourcePath!!)
+                val uriAux =
+                    FileProvider.getUriForFile(applicationContext, "$packageName.provider", file)
+
+                //Open email app and load info
+                val emailIntent = Intent(Intent.ACTION_SEND)
+                emailIntent.type = "*/*"
+
+                val to: Array<String> = emptyArray()
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, to)
+
+                emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
+
+
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Sujeto")
+                startActivity(Intent.createChooser(emailIntent, "Enviar"))
+            }
+        }
+
+        //Print button listener
+        buttonPrint.setOnClickListener {
+            //Check for the resource type (photo, doc...)
+            when (resourceType) {
+
+                ResourceTypeEnum.NOT_DEFINED->{
                     Toast.makeText(
                         this@PrintActivity,
                         "Selecciona algún archivo",
                         Toast.LENGTH_LONG
                     ).show()
-                } else {
-
-                    val file = File(resourcePath!!)
-                    val uriAux = FileProvider.getUriForFile(applicationContext, "$packageName.provider", file)
-
-                    //Open email app and load info
-                    val emailIntent = Intent(Intent.ACTION_SEND)
-                    emailIntent.type = "*/*"
-
-                    val to: Array<String> = emptyArray()
-                    emailIntent.putExtra(Intent.EXTRA_EMAIL, to)
-
-                    emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
-
-
-                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Sujeto")
-                    startActivity(Intent.createChooser(emailIntent, "Enviar"))
                 }
-            }
-        })
 
-        //Print button listener
-        buttonPrint.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(p0: View?) {
+                //Printing an image
+                ResourceTypeEnum.IMAGE -> {
+                    var printHelper = PrintHelper(this@PrintActivity)
+                    printHelper.scaleMode = PrintHelper.SCALE_MODE_FILL
+                    var photo: Bitmap = MediaStore.Images.Media.getBitmap(
+                        this@PrintActivity.contentResolver,
+                        resourceUri
+                    )
+                    printHelper.printBitmap("Imagen", photo)
+                }//Image
 
-                //Check for the resource type (photo, doc...)
-                when (resourceType) {
+                //Printing a PDF
+                ResourceTypeEnum.PDF -> {
+                    val printManager: PrintManager = this@PrintActivity.getSystemService(
+                        Context.PRINT_SERVICE
+                    ) as PrintManager
+                    val printAdapter = PdfDocumentAdapter(resourcePath!!)
+                    printManager.print("PDF", printAdapter, PrintAttributes.Builder().build())
+                }//PDF
 
-                    //Printing an image
-                    ResourceTypeEnum.IMAGE -> {
-                        var printHelper = PrintHelper(this@PrintActivity)
-                        printHelper.scaleMode = PrintHelper.SCALE_MODE_FILL
-                        var photo: Bitmap = MediaStore.Images.Media.getBitmap(
-                            this@PrintActivity.contentResolver,
-                            resourceUri
-                        )
-                        printHelper.printBitmap("Imagen", photo)
-                    }//Image
+                //Printing an HTML
+                ResourceTypeEnum.HTML -> {
+                    //Creating a webView for printing
+                    val webView = WebView(this@PrintActivity)
 
-                    //Printing a PDF
-                    ResourceTypeEnum.PDF -> {
-                        val printManager: PrintManager = this@PrintActivity.getSystemService(
-                            Context.PRINT_SERVICE
-                        ) as PrintManager
-                        val printAdapter = PdfDocumentAdapter(resourcePath!!)
-                        printManager.print("PDF", printAdapter, PrintAttributes.Builder().build())
-                    }//PDF
+                    webView.settings.allowContentAccess = true
+                    webView.settings.allowFileAccess = true
 
-                    //Printing an HTML
-                    ResourceTypeEnum.HTML -> {
-                        //Creating a webView for printing
-                        val webView = WebView(this@PrintActivity)
+                    webView.webViewClient = object : WebViewClient() {
 
-                        webView.settings.allowContentAccess = true
-                        webView.settings.allowFileAccess = true
+                        override fun shouldOverrideUrlLoading(
+                            view: WebView,
+                            request: WebResourceRequest
+                        ) = false
 
-                        webView.webViewClient = object : WebViewClient() {
-
-                            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = false
-
-                            override fun onPageFinished(view: WebView, url: String) {
-                                Log.i(tag, "page finished loading $url")
-                                createWebPrintJob(view)
-                                //mWebView = null
-                            }
+                        override fun onPageFinished(view: WebView, url: String) {
+                            Log.i(tag, "page finished loading $url")
+                            createWebPrintJob(view)
+                            //mWebView = null
                         }
-                        webView.loadUrl(resourceUri.toString())
-                    }//HTML
-                }
+                    }
+                    webView.loadUrl(resourceUri.toString())
+                }//HTML
             }
-        })
+        }
     }
 
     private fun previewFile(){
@@ -216,6 +231,8 @@ class PrintActivity : AppCompatActivity() {
         resourceUri = Uri.fromFile(file)
         val extension = file.extension
         Log.d(tag, "extension  $extension")
+        webPreview.visibility = View.INVISIBLE
+        imagePreview.visibility = View.INVISIBLE
 
         //Continue depending on the file extension
         when (extension.toLowerCase(Locale.ROOT)) {
@@ -224,12 +241,15 @@ class PrintActivity : AppCompatActivity() {
                 //Log.d(tag, "image uri $resourceUri")
 
                 //Make the image preview bigger
+                imagePreview.visibility = View.VISIBLE
                 imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
                 imagePreview.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
             }
             "pdf" -> {
                 resourceType = ResourceTypeEnum.PDF
+
                 //Make the image preview bigger
+                imagePreview.visibility = View.VISIBLE
                 imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
 
                 /* Render the first page of the document */
@@ -260,6 +280,7 @@ class PrintActivity : AppCompatActivity() {
             }
             "html" ->{
                 resourceType = ResourceTypeEnum.HTML
+                webPreview.visibility = View.VISIBLE
                 webPreview.settings.allowContentAccess = true
                 webPreview.settings.allowFileAccess = true
                 webPreview.loadUrl(resourceUri.toString())

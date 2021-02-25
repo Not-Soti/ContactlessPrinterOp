@@ -1,6 +1,5 @@
-package com.example.movil
+package com.example.movil.scanActivity
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +9,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import com.example.movil.R
 
 class ScanningFragment : DialogFragment() {
 

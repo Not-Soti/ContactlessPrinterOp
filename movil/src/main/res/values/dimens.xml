@@ -3,4 +3,7 @@
 
     <dimen name="main_act_button_size">120dp</dimen>
 
+    <dimen name="print_act_fab_size">64dp</dimen>
+    <dimen name="print_act_fab_icon_size">48dp</dimen>
+
 </resources>

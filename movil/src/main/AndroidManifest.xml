@@ -47,10 +47,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ReadQrActivity"/>
-        <activity android:name=".PrintActivity" />
-        <activity android:name=".ScanActivity" />
-        <activity android:name=".ReadQrHelpDialog" android:theme="@android:style/Theme.Dialog"/>
+        <activity android:name=".readQrActivity.ReadQrActivity"/>
+        <activity android:name=".printActivity.PrintActivity" />
+        <activity android:name=".scanActivity.ScanActivity" />
+        <activity android:name=".readQrActivity.ReadQrHelpDialog" android:theme="@android:style/Theme.Dialog"/>
     </application>
 
 </manifest>

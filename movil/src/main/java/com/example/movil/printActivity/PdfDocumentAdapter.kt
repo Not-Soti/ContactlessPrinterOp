@@ -1,6 +1,5 @@
-package com.example.movil
+package com.example.movil.printActivity
 
-import android.net.Uri
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor

@@ -1,4 +1,4 @@
-package com.example.movil
+package com.example.movil.scanActivity
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.movil.R
 import com.hp.mobile.scan.sdk.Scanner
 
 

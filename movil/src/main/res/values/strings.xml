@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ContactlessPrinterOp</string>
+    <string name="app_name" translatable="false">ContactlessPrinterOp</string>
 
     <!-- Common -->
     <string name="aceptar">Aceptar</string>
@@ -23,7 +23,7 @@
     <string name="ReadQrAct_checkNotifications">Acepta la conexión en la barra de notificaciones</string>
 
    <!-- ReadQrHelpDialog -->
-    <string name="Dialog_qr_scanner_help">
+    <string name="Dialog_qr_scanner_help" translatable="false">
         En caso de estar utilizando Andriod Q (10) o superior, será necesario
         encender el WiFi manualmente, y desconectarse de la red en caso de existir conexión con alguna.
         Al leer un código  QR correcto, deberás aceptar la conexión al WiFi desde la pestaña de notificaciones.
@@ -58,7 +58,7 @@
     <string name="fragScanningLabel">Escaneando</string>
 
     <!-- Scanner list item -->
-    <string name="scannerListItemImage">Scanner image</string>
+    <string name="scannerListItemImage">Imagen del escaner</string>
 
     <!-- Permissions -->
     <string name="permission_camDeniedTitle" >Camara denegada</string>

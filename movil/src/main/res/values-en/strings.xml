@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aceptar">Acept</string>
+    <string name="help">Help</string>
+    <string name="close">Close</string>
+    <string name="stop">Stop</string>
+    <string name="MainAct_readQr_text">Read QR code</string>
+    <string name="MainAct_print_text">Print file</string>
+    <string name="MainAct_scan_text">Scan</string>
+    <string name="MainAct_readQr_cd">Read QR code</string>
+    <string name="MainAct_print_cd">Print file</string>
+    <string name="MainAct_scan_cd">Scan</string>
+    <string name="ReadQrAct_readQrFailed">Read code is not correct</string>
+    <string name="ReadQrAct_powerOnWifi">Please, enable WiFi manually</string>
+    <string name="ReadQrAct_unableDisconnectNet">Unable to disconnect from the current net</string>
+    <string name="ReadQrAct_unableToConnect">Unable to connect to the net</string>
+    <string name="ReadQrAct_checkNotifications">Accept conection in notifications bar</string>
+    <string name="ScanAct_startSearchButton">Search scanners</string>
+    <string name="ScanAct_stopSearchButton">Stop search</string>
+    <string name="ScanAct_searchingLabel">Searching scanners</string>
+    <string name="ScanAct_stoppedLabel">Search stopped</string>
+    <string name="PrintAct_chooseFileButton">Choose a file</string>
+    <string name="PrintAct_previewLabel">PREVISUALIZATION</string>
+    <string name="PrintAct_imagePreview_cd">Image preview</string>
+    <string name="PrintAct_shareFab_cd">Share</string>
+    <string name="PrintAct_printFab_cd">Print</string>
+    <string name="fragDownloadFile_downloadingFile">Downloading file</string>
+    <string name="fragScanCompletedImage">Scan error</string>
+    <string name="fragScanCompletedLabel">Scan error</string>
+    <string name="fragScanErrorImage">Scan completed</string>
+    <string name="fragScanErrorLabel">Scan completed</string>
+    <string name="fragScanningImage">Scanning</string>
+    <string name="fragScanningLabel">Scanning</string>
+    <string name="scannerListItemImage">Scanner image</string>
+    <string name="permission_camDeniedTitle">Camera refused</string>
+    <string name="permission_camDeniedMsg">Camera access is needed to scan the QR code</string>
+    <string name="permission_camDeniedExp">Camera permission needed in order to scan</string>
+    <string name="permission_fineLocDeniedTitle">Location refused</string>
+    <string name="permission_fineLocDeniedMsg">Location needed in order to connect to WiFi</string>
+    <string name="permission_fineLocDeniedExp">Location needed in order to connect to WiFi</string>
+    <string name="permission_extStorageDeniedTitle">External storage access refused</string>
+    <string name="permission_extStorageDeniedMsg">Sternal storage access needed in order to pick a file</string>
+    <string name="permission_extStorageDeniedExp">Sternal storage access needed in order to pick a file</string>
+</resources>

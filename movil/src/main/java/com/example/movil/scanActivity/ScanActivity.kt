@@ -3,15 +3,24 @@ package com.example.movil.scanActivity
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.movil.BuildConfig
 import com.example.movil.PermissionHelper
 import com.example.movil.R
+import com.example.movil.printActivity.DownloadingFileFragment
+import com.hbisoft.pickit.PickiT
+import com.hbisoft.pickit.PickiTCallbacks
 import com.hp.mobile.scan.sdk.AdfException
 import com.hp.mobile.scan.sdk.ScanCapture
 import com.hp.mobile.scan.sdk.Scanner
@@ -21,6 +30,7 @@ import com.hp.mobile.scan.sdk.browsing.ScannersBrowser.ScannerAvailabilityListen
 import com.hp.mobile.scan.sdk.model.ScanPage
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
+import java.io.FileOutputStream
 
 class ScanActivity : AppCompatActivity() {
 
@@ -37,9 +47,40 @@ class ScanActivity : AppCompatActivity() {
     lateinit var chosenScanner : Scanner
     var chosenTicket : ScanTicket? = null
 
+    private lateinit var pickit: PickiT
+    private val pickitListener = object: PickiTCallbacks {
+        override fun PickiTonUriReturned() {
+            //Used when the file is picked from the Cloud
+            Log.d(tag, "Pickit on uri returned (Descargando archivo)")
+        }
 
-    val writeExternalStoragePermissionCode = 1
-    val createDocumentPermissionCode = 2
+        override fun PickiTonStartListener() {
+            Log.d(tag, "Pickit on start listener (Creando archivo de descarga)")
+        }
+
+        override fun PickiTonProgressUpdate(progress: Int) {
+            Log.d(tag, "Pickit on progress update (Progreso de descarga $progress")
+        }
+
+        override fun PickiTonCompleteListener(
+            path: String?,
+            wasDriveFile: Boolean,
+            wasUnknownProvider: Boolean,
+            wasSuccessful: Boolean,
+            Reason: String?
+        ) {
+            Log.d(tag, "Pickit on complete listener Ruta: $path")
+            Toast.makeText(applicationContext, "Ruta: $path", Toast.LENGTH_LONG).show()
+
+            Log.d(tag, "PickiT path: $path")
+            startScanning(path!!)
+        }
+
+    }
+
+
+    private val writeExternalStoragePermissionCode = 1
+    private val createDocumentPermissionCode = 2
 
     private val scannerBrowserListener: ScannerAvailabilityListener =
         object : ScannerAvailabilityListener {
@@ -59,6 +100,8 @@ class ScanActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
 
+        askAccessAllFilesPermission()
+
         scannerListView = findViewById(R.id.act_scan_deviceListView)
         scannerSearchButton = findViewById(R.id.act_scan_searchScannerButton)
         auxText = findViewById(R.id.act_scan_aux)
@@ -68,6 +111,8 @@ class ScanActivity : AppCompatActivity() {
         scannerListAdapter = ScannerListAdapter(applicationContext)
 
         scannerListView.adapter = scannerListAdapter
+
+        pickit = PickiT(this, pickitListener, this)
 
         scannerSearchButton.setOnClickListener(object : View.OnClickListener {
 
@@ -84,16 +129,19 @@ class ScanActivity : AppCompatActivity() {
                     scannerBrowser.start(scannerBrowserListener)
 
 
-                    scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
+/*                    val sc1 = ScannerImp("Scanner $scannerNumber")
+                    sc1.act = this@ScanActivity
+                    scannerListAdapter.add(sc1)
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
 
-                    scannerListAdapter.add(ScannerImp("Scanner $scannerNumber"))
+                    val sc2 = ScannerImp("Scanner $scannerNumber")
+                    sc2.act = this@ScanActivity
+                    scannerListAdapter.add(sc2)
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
 
-
-                    scannerListView.adapter=scannerListAdapter
+                    scannerListView.adapter=scannerListAdapter*/
 
 
                 } else {
@@ -197,8 +245,10 @@ class ScanActivity : AppCompatActivity() {
         Log.d(tag, "askDirectory()")
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
             addCategory(Intent.CATEGORY_OPENABLE)
+
             type = "application/pdf"
-            putExtra(Intent.EXTRA_TITLE, "ArchivoPrueba1.pdf")
+            //type = "text/plain"
+            putExtra(Intent.EXTRA_TITLE, "ArchivoPrueba1")
         }
         startActivityForResult(intent, createDocumentPermissionCode)
     }
@@ -226,7 +276,8 @@ class ScanActivity : AppCompatActivity() {
 
         Log.d(tag, "Se ha creado el archivo de destino en ${scanFile.absolutePath}")
 
-        chosenScanner.scan(scanFile.absolutePath, chosenTicket, object : ScanCapture.ScanningProgressListener{
+
+        chosenScanner.scan(newDocPath, chosenTicket, object : ScanCapture.ScanningProgressListener{
             override fun onScanningPageDone(p0: ScanPage?) {
                 Toast.makeText(this@ScanActivity, "Pagina escaneada", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Pagina Escaneada")
@@ -247,14 +298,15 @@ class ScanActivity : AppCompatActivity() {
 
             override fun onScanningError(theException: ScannerException?) {
                 try{
-                    Toast.makeText(this@ScanActivity, "Error en el escaneo", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this@ScanActivity, "Error en el escaneo", Toast.LENGTH_LONG).show()
+
+                    chosenScanner.cancelScanning()
+                    Toast.makeText(applicationContext, "Error, ${theException!!.message}", Toast.LENGTH_LONG).show()
 
                     //scanningFragment.dismiss()
                     supportFragmentManager.beginTransaction().remove(scanningFragment)
                     val scanErrorFragment = ScanErrorFragment()
                     scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")
-
-                    Toast.makeText(applicationContext, "Error, ${theException!!.reason}", Toast.LENGTH_LONG).show()
 
                     throw theException!!
 
@@ -294,7 +346,8 @@ class ScanActivity : AppCompatActivity() {
                     Log.d(tag, "Ruta del nuevo archivo: $newDocPath")
                     Log.d(tag, "Uri del nuevo archivo: $newDocUri")
 
-                    startScanning(newDocPath!!)
+                    //startScanning(newDocPath!!)
+                    pickit.getPath(newDocUri, Build.VERSION.SDK_INT)
                 }else{
                     Log.d(tag, "Create document cancelado")
                 }
@@ -303,19 +356,28 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun startScanningRoutine(){
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
+            //In android 11 manage all files permission is needed
+            if(Environment.isExternalStorageManager()){
+                askDirectory()
+            }else {
+                askAccessAllFilesPermission()
+            }
+        }else {
 
-        if(ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+            if(ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED){
             askDirectory()
-        }else {
-            val permissionHelper = PermissionHelper(
-                this,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                writeExternalStoragePermissionCode,
-                "Acceso al almacenamiendo necesario",
-                "Acceso al almacenamiento necesario para crear el archivo escaneado"
-            )
-            permissionHelper.checkAndAskForPermission()
+            }else {
+                val permissionHelper = PermissionHelper(
+                    this,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    writeExternalStoragePermissionCode,
+                    "Acceso al almacenamiendo necesario",
+                    "Acceso al almacenamiento necesario para crear el archivo escaneado"
+                )
+                permissionHelper.checkAndAskForPermission()
+            }
         }
     }
 
@@ -328,9 +390,23 @@ class ScanActivity : AppCompatActivity() {
 
         when(requestCode){
             writeExternalStoragePermissionCode ->{
-                askDirectory()
+                startScanningRoutine()
             }
         }
     }
 
+
+    private fun askAccessAllFilesPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                val uri = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+                startActivity(
+                    Intent(
+                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                        uri
+                    )
+                )
+            }
+        }
+    }
 }

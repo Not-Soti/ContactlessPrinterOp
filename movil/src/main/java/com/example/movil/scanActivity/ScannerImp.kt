@@ -1,17 +1,46 @@
 package com.example.movil.scanActivity
 
+import android.R.attr.data
+import android.app.Activity
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
 import android.util.Log
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.ScanTicket
+import java.io.File
+import java.io.FileOutputStream
 import java.net.URL
 
 
 class ScannerImp(
-    val name : String
+    val name: String
 ) : Scanner{
+
+    lateinit var act : Activity
 
     override fun scan(p0: String?, p1: ScanTicket?, p2: ScanCapture.ScanningProgressListener?) {
         Log.d("ScannerImp", "escaneando")
+
+        val file  = File(p0!!)
+        val fOut = FileOutputStream(file)
+
+        var document = PdfDocument()
+        var pageInfo = PdfDocument.PageInfo.Builder(100, 100, 1).create()
+        var page = document.startPage(pageInfo)
+        val canvas: Canvas = page.canvas
+        val paint = Paint()
+
+        canvas.drawText("Texto de prueba", 10.toFloat(), 10.toFloat(), paint)
+
+
+
+        document.finishPage(page)
+        document.writeTo(fOut)
+        document.close()
+
+        Log.d("ScannerImp", "Archivo escrito")
+
     }
 
     override fun cancelScanning() {

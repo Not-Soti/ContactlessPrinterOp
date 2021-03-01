@@ -70,5 +70,6 @@
     <string name="permission_extStorageDeniedTitle" >Acceso al almacenamiento externo denegado</string>
     <string name="permission_extStorageDeniedMsg" >Se necesita acceso al almacenamiento externo para obtener archivos</string>
     <string name="permission_extStorageDeniedExp" >Se necesita acceso al almacenamiento externo para obtener archivos</string>
+    <string name="ReadQrAct_connectManuallyButton">Conectarse manualmente</string>
 
 </resources>

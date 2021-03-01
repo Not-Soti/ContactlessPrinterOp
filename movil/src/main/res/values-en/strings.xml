@@ -41,4 +41,5 @@
     <string name="permission_extStorageDeniedTitle">External storage access refused</string>
     <string name="permission_extStorageDeniedMsg">Sternal storage access needed in order to pick a file</string>
     <string name="permission_extStorageDeniedExp">Sternal storage access needed in order to pick a file</string>
+    <string name="ReadQrAct_connectManuallyButton">Connect manually</string>
 </resources>

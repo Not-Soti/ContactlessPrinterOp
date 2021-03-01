@@ -1,4 +1,4 @@
-package com.example.movil
+ package com.example.movil
 
 import android.app.Activity
 import android.content.Intent
@@ -25,8 +25,11 @@ class ScanPreview : AppCompatActivity() {
     private val tag = "ScanPreview"
     private val writeExternalStoragePermissionCode = 0
     private val createDocumentPermissionCode = 1
+
     private lateinit var imagePreview : ImageView
     private lateinit var saveButton : Button
+    private lateinit var discardButton: Button
+
     private lateinit var tempFilePath : String
     private lateinit var pickit : PickiT
     private val pickitListener = object: PickiTCallbacks {
@@ -65,11 +68,12 @@ class ScanPreview : AppCompatActivity() {
 
         imagePreview = findViewById(R.id.act_scan_preview_ImageView)
         saveButton = findViewById(R.id.act_scan_preview_saveButton)
-        //imagePreview.visibility = View.INVISIBLE
+        discardButton = findViewById(R.id.act_scan_preview_dicardButton)
 
         askAccessAllFilesPermission()
 
         saveButton.setOnClickListener { saveFile() }
+        discardButton.setOnClickListener{ discardFile() }
 
         val bundle = intent.extras
         if (bundle != null) {
@@ -105,6 +109,12 @@ class ScanPreview : AppCompatActivity() {
         pageToRender.close()
         pdfRenderer.close()
         fileDescriptor.close()
+    }
+
+    private fun discardFile(){
+        val tempFile = File(tempFilePath)
+        tempFile.delete()
+        startActivity(Intent(this, ScanOp3::class.java))
     }
 
     private fun saveFile(){
@@ -197,6 +207,12 @@ class ScanPreview : AppCompatActivity() {
         Log.d(tag, "Archivo copiado")
         temp.delete()
         Log.d(tag, "Temporal borrado")
+        startActivity(Intent(this, ScanOp3::class.java))
 
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        discardFile()
     }
 }

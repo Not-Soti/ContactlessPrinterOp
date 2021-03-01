@@ -93,7 +93,7 @@ class ScanOp3 : AppCompatActivity() {
                     scannerBrowser.start(scannerBrowserListener)
 
 
-                    val sc1 = ScannerImp("Scanner $scannerNumber")
+                    /*val sc1 = ScannerImp("Scanner $scannerNumber")
                     sc1.act = this@ScanOp3
                     scannerListAdapter.add(sc1)
                     Log.d(tag, "Added scanner $scannerNumber")
@@ -105,7 +105,7 @@ class ScanOp3 : AppCompatActivity() {
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
 
-                    scannerListView.adapter=scannerListAdapter
+                    scannerListView.adapter=scannerListAdapter*/
 
 
                 } else {

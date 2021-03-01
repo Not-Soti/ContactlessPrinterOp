@@ -41,6 +41,10 @@ class MainActivity : AppCompatActivity(){
         buttonScan2 = findViewById(R.id.act_main_scanOp2)
         buttonScan3 = findViewById(R.id.act_main_scanOp3)
 
+        buttonScan1.visibility = View.INVISIBLE
+        buttonScan2.visibility = View.INVISIBLE
+        buttonScan3.visibility = View.INVISIBLE
+
         linLayPrint = findViewById(R.id.act_main_print_LinLay)
         linLayScan = findViewById(R.id.act_main_scan_LinLay)
         linLayReadQr = findViewById(R.id.act_main_readQr_LinLay)
@@ -61,7 +65,8 @@ class MainActivity : AppCompatActivity(){
 
         linLayScan.setOnClickListener(object : View.OnClickListener{
             override fun onClick(v: View?) {
-                startActivity(Intent(this@MainActivity, ScanActivity::class.java))
+                //startActivity(Intent(this@MainActivity, ScanActivity::class.java))
+                startActivity(Intent(this@MainActivity, ScanOp3::class.java))
             }
 
         })

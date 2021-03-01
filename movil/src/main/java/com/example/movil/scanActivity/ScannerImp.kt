@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.util.Log
+import com.example.movil.ScanOp3
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
@@ -41,6 +42,8 @@ class ScannerImp(
 
         Log.d("ScannerImp", "Archivo escrito")
 
+        var actAux = act as ScanOp3
+        actAux.scanningCompleted()
     }
 
     override fun cancelScanning() {

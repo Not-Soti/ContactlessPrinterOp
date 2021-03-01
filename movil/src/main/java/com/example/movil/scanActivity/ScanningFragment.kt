@@ -23,16 +23,12 @@ class ScanningFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        Log.d(TAG, "Creando fragmento")
         val theView = inflater.inflate(R.layout.fragment_scanning, container, false)
 
         button = theView.findViewById(R.id.frag_scanning_button)
         textView = theView.findViewById(R.id.frag_scanning_status)
-
-
         button.setOnClickListener { stopScanning() }
 
-        Log.d(TAG, "Fragment creado")
         return theView
     }
 

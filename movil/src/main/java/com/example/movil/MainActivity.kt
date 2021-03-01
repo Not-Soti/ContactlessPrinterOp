@@ -2,21 +2,16 @@ package com.example.movil
 
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import com.example.movil.printActivity.PrintActivity
 import com.example.movil.readQrActivity.ReadQrActivity
 import com.example.movil.scanActivity.ScanActivity
-import java.io.File
-import java.io.FileOutputStream
-import java.util.jar.Manifest
+import kotlin.system.exitProcess
 
 
 class MainActivity : AppCompatActivity(){
@@ -30,7 +25,9 @@ class MainActivity : AppCompatActivity(){
     lateinit var linLayPrint: LinearLayout
     lateinit var linLayScan: LinearLayout
 
-    lateinit var buttonSaveFile: Button
+    lateinit var buttonScan1: Button
+    lateinit var buttonScan2: Button
+    lateinit var buttonScan3: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +37,9 @@ class MainActivity : AppCompatActivity(){
         buttonPrint = findViewById(R.id.act_main_startPrintActivity)
         buttonScan = findViewById(R.id.act_main_startScanActivity)*/
 
-        buttonSaveFile = findViewById(R.id.act_main_saveFile)
-        buttonSaveFile.visibility = View.INVISIBLE
+        buttonScan1 = findViewById(R.id.act_main_scanOp1)
+        buttonScan2 = findViewById(R.id.act_main_scanOp2)
+        buttonScan3 = findViewById(R.id.act_main_scanOp3)
 
         linLayPrint = findViewById(R.id.act_main_print_LinLay)
         linLayScan = findViewById(R.id.act_main_scan_LinLay)
@@ -69,18 +67,11 @@ class MainActivity : AppCompatActivity(){
         })
 
 
-        //save a file
-        buttonSaveFile.setOnClickListener(object : View.OnClickListener{
-            override fun onClick(v: View?) {
+        //Pruebas escaneo
 
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    type = "application/pdf"
-                    putExtra(Intent.EXTRA_TITLE, "ArchivoPrueba1.pdf")
-                }
-                startActivityForResult(intent, 1)
-            }
-        })
+        buttonScan1.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp1::class.java))} //Cambiar nombre del fichero en File(ruta, nombre)
+        buttonScan2.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp2::class.java))} //Cambiar nombre del scanTicket
+        buttonScan3.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp3::class.java))} //Guardar archivo temporal para previsualizar
 
 
     }
@@ -88,6 +79,6 @@ class MainActivity : AppCompatActivity(){
 
     //Se cierra la app
     override fun onBackPressed() {
-        System.exit(0)
+        exitProcess(0)
     }
 }

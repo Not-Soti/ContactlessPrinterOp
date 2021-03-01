@@ -53,6 +53,11 @@
         <activity android:name=".printActivity.PrintActivity" />
         <activity android:name=".scanActivity.ScanActivity" />
         <activity android:name=".readQrActivity.ReadQrHelpDialog" android:theme="@android:style/Theme.Dialog"/>
+        <activity android:name=".ScanPreview"/>
+
+        <activity android:name=".ScanOp1"/>
+        <activity android:name=".ScanOp2"/>
+        <activity android:name=".ScanOp3"/>
     </application>
 
 </manifest>

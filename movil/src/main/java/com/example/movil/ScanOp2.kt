@@ -1,4 +1,6 @@
-package com.example.movil.scanActivity
+package com.example.movil
+
+import com.example.movil.scanActivity.*
 
 import android.app.Activity
 import android.content.Intent
@@ -32,9 +34,9 @@ import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
 import java.io.FileOutputStream
 
-class ScanActivity : AppCompatActivity() {
+class ScanOp2 : AppCompatActivity() {
 
-    private val tag = "--- ScanActivity ---"
+    private val tag = "--- ScanOp2 ---"
     private lateinit var scannerListAdapter : ScannerListAdapter
     private lateinit var scannerListView : ListView
     private lateinit var scannerSearchButton : Button
@@ -130,13 +132,13 @@ class ScanActivity : AppCompatActivity() {
 
 
                     val sc1 = ScannerImp("Scanner $scannerNumber")
-                    sc1.act = this@ScanActivity
+                    sc1.act = this@ScanOp2
                     scannerListAdapter.add(sc1)
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
 
                     val sc2 = ScannerImp("Scanner $scannerNumber")
-                    sc2.act = this@ScanActivity
+                    sc2.act = this@ScanOp2
                     scannerListAdapter.add(sc2)
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
@@ -160,7 +162,7 @@ class ScanActivity : AppCompatActivity() {
 
                 chosenScanner = parent?.adapter?.getItem(position) as Scanner
                 Toast.makeText(
-                    this@ScanActivity,
+                    this@ScanOp2,
                     "Seleccionado el escaner ${chosenScanner.humanReadableName}",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -273,18 +275,19 @@ class ScanActivity : AppCompatActivity() {
         //val theExternalStorageDirectory = applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
         //val scanFile = File(theExternalStorageDirectory, "ContactlessPrinterOp")
         val scanFile = File(newDocPath)
+        chosenTicket?.name = "NombreTicket.pdf" //TODO NOMBRE AQUI
 
         Log.d(tag, "Se ha creado el archivo de destino en ${scanFile.absolutePath}")
 
 
         chosenScanner.scan(newDocPath, chosenTicket, object : ScanCapture.ScanningProgressListener{
             override fun onScanningPageDone(p0: ScanPage?) {
-                Toast.makeText(this@ScanActivity, "Pagina escaneada", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ScanOp2, "Pagina escaneada", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Pagina Escaneada")
             }
 
             override fun onScanningComplete() {
-                Toast.makeText(this@ScanActivity, "Escaneo completado", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ScanOp2, "Escaneo completado", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Escaneo completado")
 
                 //scanningFragment.dismiss()
@@ -298,7 +301,7 @@ class ScanActivity : AppCompatActivity() {
 
             override fun onScanningError(theException: ScannerException?) {
                 try{
-                    //Toast.makeText(this@ScanActivity, "Error en el escaneo", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this@ScanOp2, "Error en el escaneo", Toast.LENGTH_LONG).show()
 
                     chosenScanner.cancelScanning()
                     Toast.makeText(applicationContext, "Error, ${theException!!.message}", Toast.LENGTH_LONG).show()
@@ -367,7 +370,7 @@ class ScanActivity : AppCompatActivity() {
 
             if(ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED){
-            askDirectory()
+                askDirectory()
             }else {
                 val permissionHelper = PermissionHelper(
                     this,

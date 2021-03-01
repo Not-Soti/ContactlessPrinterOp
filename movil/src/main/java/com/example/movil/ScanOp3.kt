@@ -1,4 +1,6 @@
-package com.example.movil.scanActivity
+package com.example.movil
+
+import com.example.movil.scanActivity.*
 
 import android.app.Activity
 import android.content.Intent
@@ -32,9 +34,11 @@ import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
 import java.io.FileOutputStream
 
-class ScanActivity : AppCompatActivity() {
+class ScanOp3 : AppCompatActivity() {
 
-    private val tag = "--- ScanActivity ---"
+
+    private val tempScanDir = "TempScan"
+    private val tag = "--- ScanOp3 ---"
     private lateinit var scannerListAdapter : ScannerListAdapter
     private lateinit var scannerListView : ListView
     private lateinit var scannerSearchButton : Button
@@ -44,43 +48,10 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var progressBar : ProgressBar
     var scannerNumber = 0 //Debug
 
+    private var tempPathAux = ""
+
     lateinit var chosenScanner : Scanner
     var chosenTicket : ScanTicket? = null
-
-    private lateinit var pickit: PickiT
-    private val pickitListener = object: PickiTCallbacks {
-        override fun PickiTonUriReturned() {
-            //Used when the file is picked from the Cloud
-            Log.d(tag, "Pickit on uri returned (Descargando archivo)")
-        }
-
-        override fun PickiTonStartListener() {
-            Log.d(tag, "Pickit on start listener (Creando archivo de descarga)")
-        }
-
-        override fun PickiTonProgressUpdate(progress: Int) {
-            Log.d(tag, "Pickit on progress update (Progreso de descarga $progress")
-        }
-
-        override fun PickiTonCompleteListener(
-            path: String?,
-            wasDriveFile: Boolean,
-            wasUnknownProvider: Boolean,
-            wasSuccessful: Boolean,
-            Reason: String?
-        ) {
-            Log.d(tag, "Pickit on complete listener Ruta: $path")
-            Toast.makeText(applicationContext, "Ruta: $path", Toast.LENGTH_LONG).show()
-
-            Log.d(tag, "PickiT path: $path")
-            startScanning(path!!)
-        }
-
-    }
-
-
-    private val writeExternalStoragePermissionCode = 1
-    private val createDocumentPermissionCode = 2
 
     private val scannerBrowserListener: ScannerAvailabilityListener =
         object : ScannerAvailabilityListener {
@@ -100,22 +71,15 @@ class ScanActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
 
-        askAccessAllFilesPermission()
-
         scannerListView = findViewById(R.id.act_scan_deviceListView)
         scannerSearchButton = findViewById(R.id.act_scan_searchScannerButton)
         auxText = findViewById(R.id.act_scan_aux)
         scannerBrowser = ScannersBrowser(this)
         progressBar = findViewById(R.id.act_scan_progressBar)
-
         scannerListAdapter = ScannerListAdapter(applicationContext)
-
         scannerListView.adapter = scannerListAdapter
 
-        pickit = PickiT(this, pickitListener, this)
-
         scannerSearchButton.setOnClickListener(object : View.OnClickListener {
-
             override fun onClick(v: View?) {
                 if (!isSearching) {
                     //Start searching
@@ -130,13 +94,13 @@ class ScanActivity : AppCompatActivity() {
 
 
                     val sc1 = ScannerImp("Scanner $scannerNumber")
-                    sc1.act = this@ScanActivity
+                    sc1.act = this@ScanOp3
                     scannerListAdapter.add(sc1)
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
 
                     val sc2 = ScannerImp("Scanner $scannerNumber")
-                    sc2.act = this@ScanActivity
+                    sc2.act = this@ScanOp3
                     scannerListAdapter.add(sc2)
                     Log.d(tag, "Added scanner $scannerNumber")
                     ++scannerNumber
@@ -160,14 +124,13 @@ class ScanActivity : AppCompatActivity() {
 
                 chosenScanner = parent?.adapter?.getItem(position) as Scanner
                 Toast.makeText(
-                    this@ScanActivity,
+                    this@ScanOp3,
                     "Seleccionado el escaner ${chosenScanner.humanReadableName}",
                     Toast.LENGTH_SHORT
                 ).show()
 
                 //Show popup menu
                 if (view != null) {
-                    //showPopupAndPrint(view, chosenScanner)
                     showPopupChooseTicket(view)
                 }
             }
@@ -181,7 +144,6 @@ class ScanActivity : AppCompatActivity() {
      */
     //private fun showPopupAndPrint(view: View, scanner: Scanner) {
     private fun showPopupChooseTicket(view: View) {
-        //chosenTicket = null
 
         //Create and inflate the menu
         var menu = PopupMenu(this, view)
@@ -197,9 +159,7 @@ class ScanActivity : AppCompatActivity() {
                             Log.d(tag, "Scan photo chosen")
                             chosenTicket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
                             Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            startScanningRoutine()
-                            //askDirectory()
-                            //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
+                            startScanning()
 
                             return true
                         }
@@ -210,9 +170,7 @@ class ScanActivity : AppCompatActivity() {
                             chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_AND_IMAGES)
                             Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            startScanningRoutine()
-                            //askDirectory()
-                            //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
+                            startScanning()
 
                             return true
                         }
@@ -224,9 +182,7 @@ class ScanActivity : AppCompatActivity() {
                             chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_DOCUMENT)
                             Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            startScanningRoutine()
-                            //askDirectory()
-                            //ticket?.let { startScanning(scanner, it) } ?: Log.d(tag, "Ticket is null")
+                            startScanning()
 
                             return true
                         }
@@ -240,82 +196,56 @@ class ScanActivity : AppCompatActivity() {
         menu.show()
     }
 
-    private fun askDirectory(){
-        //TODO pedir permisos
-        Log.d(tag, "askDirectory()")
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
-            addCategory(Intent.CATEGORY_OPENABLE)
-
-            type = "application/pdf"
-            //type = "text/plain"
-            putExtra(Intent.EXTRA_TITLE, "ArchivoPrueba1")
-        }
-        startActivityForResult(intent, createDocumentPermissionCode)
-    }
-
-    private fun startScanning(newDocPath : String){
+    private fun startScanning(){
 
         Log.d(tag, "startScanning()")
 
         //Open scanning fragment
-
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         val scanningFragment = ScanningFragment()
-        //fragmentTransaction.add(R.id.activity_scan_root, scanningFragment)
-        //fragmentTransaction.commit()
         scanningFragment.show(fragmentTransaction, "scanningFragment")
 
+        //Create the temp file to save the scanning
+        val tempFile = File.createTempFile("tempScan", ".pdf", cacheDir)
 
+        tempPathAux = tempFile.absolutePath
 
-        //Create the file to save the scanning
-        //val theExternalStorageDirectory = Environment.getExternalStorageDirectory()
-        //val theExternalStorageDirectory = applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        //val scanFile = File(theExternalStorageDirectory, "ContactlessPrinterOp")
-        val scanFile = File(newDocPath)
-
-        Log.d(tag, "Se ha creado el archivo de destino en ${scanFile.absolutePath}")
-
-
-        chosenScanner.scan(newDocPath, chosenTicket, object : ScanCapture.ScanningProgressListener{
+        chosenScanner.scan(tempFile.absolutePath, chosenTicket, object : ScanCapture.ScanningProgressListener{
             override fun onScanningPageDone(p0: ScanPage?) {
-                Toast.makeText(this@ScanActivity, "Pagina escaneada", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ScanOp3, "Pagina escaneada", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Pagina Escaneada")
             }
 
             override fun onScanningComplete() {
-                Toast.makeText(this@ScanActivity, "Escaneo completado", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ScanOp3, "Escaneo completado", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Escaneo completado")
 
-                //scanningFragment.dismiss()
-                supportFragmentManager.beginTransaction().remove(scanningFragment)
-                val scanCompletedFragment = ScanCompletedFragment()
-                scanCompletedFragment.show(fragmentTransaction, "scanCompletedFragment")
-
-                //MediaScannerConnection.scanFile(applicationContext, arrayOf(scanFile.absolutePath), arrayOf("application/pdf"), null)
-
+                scanningFragment.dismiss()
+                val i = Intent(applicationContext, ScanPreview::class.java)
+                i.putExtra("tempPath", tempFile.absolutePath)
+                startActivity(i)
             }
 
             override fun onScanningError(theException: ScannerException?) {
                 try{
-                    //Toast.makeText(this@ScanActivity, "Error en el escaneo", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this@ScanOp3, "Error en el escaneo", Toast.LENGTH_LONG).show()
 
                     chosenScanner.cancelScanning()
                     Toast.makeText(applicationContext, "Error, ${theException!!.message}", Toast.LENGTH_LONG).show()
 
-                    //scanningFragment.dismiss()
-                    supportFragmentManager.beginTransaction().remove(scanningFragment)
+                    scanningFragment.dismiss()
+                    //supportFragmentManager.beginTransaction().remove(scanningFragment)
                     val scanErrorFragment = ScanErrorFragment()
                     scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")
 
-                    throw theException!!
+                    throw theException
 
                 }catch (e: AdfException){
                     Log.d(tag, "Excepcion AdfException\n Estado: ${e.adfStatus}")
 
                 }catch (e: ScannerException){
                     Log.d(tag, "Excepcion ScannerException\n Razón: ${e.reason}")
-
                 }
             }
 
@@ -335,78 +265,10 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+   fun scanningCompleted(){
+       val i = Intent(this@ScanOp3, ScanPreview::class.java)
+       i.putExtra("tempPath", tempPathAux)
+       startActivity(i)
+   }
 
-        when(requestCode){
-            createDocumentPermissionCode ->{
-                if(resultCode == Activity.RESULT_OK) {
-                    val newDocPath = data?.data?.path
-                    val newDocUri = data?.data
-                    Log.d(tag, "Ruta del nuevo archivo: $newDocPath")
-                    Log.d(tag, "Uri del nuevo archivo: $newDocUri")
-
-                    //startScanning(newDocPath!!)
-                    pickit.getPath(newDocUri, Build.VERSION.SDK_INT)
-                }else{
-                    Log.d(tag, "Create document cancelado")
-                }
-            }
-        }
-    }
-
-    private fun startScanningRoutine(){
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
-            //In android 11 manage all files permission is needed
-            if(Environment.isExternalStorageManager()){
-                askDirectory()
-            }else {
-                askAccessAllFilesPermission()
-            }
-        }else {
-
-            if(ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED){
-            askDirectory()
-            }else {
-                val permissionHelper = PermissionHelper(
-                    this,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    writeExternalStoragePermissionCode,
-                    "Acceso al almacenamiendo necesario",
-                    "Acceso al almacenamiento necesario para crear el archivo escaneado"
-                )
-                permissionHelper.checkAndAskForPermission()
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when(requestCode){
-            writeExternalStoragePermissionCode ->{
-                startScanningRoutine()
-            }
-        }
-    }
-
-
-    private fun askAccessAllFilesPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                val uri = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
-                startActivity(
-                    Intent(
-                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                        uri
-                    )
-                )
-            }
-        }
-    }
 }

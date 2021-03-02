@@ -41,8 +41,8 @@ class MainActivity : AppCompatActivity(){
         buttonScan2 = findViewById(R.id.act_main_scanOp2)
         buttonScan3 = findViewById(R.id.act_main_scanOp3)
 
-        buttonScan1.visibility = View.INVISIBLE
-        buttonScan2.visibility = View.INVISIBLE
+        //buttonScan1.visibility = View.INVISIBLE
+        //buttonScan2.visibility = View.INVISIBLE
         buttonScan3.visibility = View.INVISIBLE
 
         linLayPrint = findViewById(R.id.act_main_print_LinLay)
@@ -74,9 +74,8 @@ class MainActivity : AppCompatActivity(){
 
         //Pruebas escaneo
 
-        buttonScan1.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp1::class.java))} //Cambiar nombre del fichero en File(ruta, nombre)
-        buttonScan2.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp2::class.java))} //Cambiar nombre del scanTicket
-        buttonScan3.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp3::class.java))} //Guardar archivo temporal para previsualizar
+        buttonScan1.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp3::class.java))} //Guardar archivo en la cache
+        buttonScan2.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp4::class.java))} //Guardarlo en una carpeta a parte
 
 
     }

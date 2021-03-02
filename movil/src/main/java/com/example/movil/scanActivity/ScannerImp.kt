@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.util.Log
 import com.example.movil.ScanOp3
+import com.example.movil.ScanOp4
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
@@ -19,6 +20,7 @@ class ScannerImp(
 ) : Scanner{
 
     lateinit var act : Activity
+    var isOp3 = true
 
     override fun scan(p0: String?, p1: ScanTicket?, p2: ScanCapture.ScanningProgressListener?) {
         Log.d("ScannerImp", "escaneando")
@@ -42,8 +44,15 @@ class ScannerImp(
 
         Log.d("ScannerImp", "Archivo escrito")
 
-        var actAux = act as ScanOp3
-        actAux.scanningCompleted()
+        lateinit var actAux: Activity
+        if(isOp3) {
+            actAux = act as ScanOp3
+            actAux.scanningCompleted()
+        }else{
+            actAux = act as ScanOp4
+            actAux.scanningCompleted()
+        }
+
     }
 
     override fun cancelScanning() {

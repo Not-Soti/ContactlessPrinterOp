@@ -71,6 +71,8 @@ class ScanOp3 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
 
+        Toast.makeText(this, "OP1", Toast.LENGTH_SHORT).show()
+
         scannerListView = findViewById(R.id.act_scan_deviceListView)
         scannerSearchButton = findViewById(R.id.act_scan_searchScannerButton)
         auxText = findViewById(R.id.act_scan_aux)
@@ -232,6 +234,7 @@ class ScanOp3 : AppCompatActivity() {
                     //Toast.makeText(this@ScanOp3, "Error en el escaneo", Toast.LENGTH_LONG).show()
 
                     chosenScanner.cancelScanning()
+                    tempFile.delete()
                     Toast.makeText(applicationContext, "Error, ${theException!!.message}", Toast.LENGTH_LONG).show()
 
                     scanningFragment.dismiss()

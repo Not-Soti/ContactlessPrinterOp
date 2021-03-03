@@ -37,13 +37,13 @@ class MainActivity : AppCompatActivity(){
         buttonPrint = findViewById(R.id.act_main_startPrintActivity)
         buttonScan = findViewById(R.id.act_main_startScanActivity)*/
 
-        buttonScan1 = findViewById(R.id.act_main_scanOp1)
-        buttonScan2 = findViewById(R.id.act_main_scanOp2)
-        buttonScan3 = findViewById(R.id.act_main_scanOp3)
+        //buttonScan1 = findViewById(R.id.act_main_scanOp1)
+        //buttonScan2 = findViewById(R.id.act_main_scanOp2)
+        //buttonScan3 = findViewById(R.id.act_main_scanOp3)
 
         //buttonScan1.visibility = View.INVISIBLE
         //buttonScan2.visibility = View.INVISIBLE
-        buttonScan3.visibility = View.INVISIBLE
+        //buttonScan3.visibility = View.INVISIBLE
 
         linLayPrint = findViewById(R.id.act_main_print_LinLay)
         linLayScan = findViewById(R.id.act_main_scan_LinLay)
@@ -74,8 +74,8 @@ class MainActivity : AppCompatActivity(){
 
         //Pruebas escaneo
 
-        buttonScan1.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp3::class.java))} //Guardar archivo en la cache
-        buttonScan2.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp4::class.java))} //Guardarlo en una carpeta a parte
+        //buttonScan1.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp3::class.java))} //Guardar archivo en la cache
+        //buttonScan2.setOnClickListener { startActivity(Intent(this@MainActivity,ScanOp4::class.java))} //Guardarlo en una carpeta a parte
 
 
     }

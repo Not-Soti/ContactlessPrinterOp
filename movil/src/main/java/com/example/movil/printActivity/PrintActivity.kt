@@ -26,6 +26,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.ViewModelProvider
 import androidx.print.PrintHelper
 import com.example.movil.MainActivity
 import com.example.movil.PermissionHelper
@@ -36,6 +37,7 @@ import com.hbisoft.pickit.PickiTCallbacks
 import java.io.File
 import java.util.*
 
+import com.example.movil.printActivity.PrintActViewModel.ResourceTypeEnum
 
 class PrintActivity : AppCompatActivity() {
 
@@ -82,7 +84,7 @@ class PrintActivity : AppCompatActivity() {
             Reason: String?
         ) {
             Log.d(tag, "Pickit on complete listener Ruta: $path")
-            resourcePath = path
+            viewModel.setPath(path)
             previewFile()
         }
 
@@ -90,31 +92,25 @@ class PrintActivity : AppCompatActivity() {
 
     //Request codes for each activity with a result
     private val chooseFileRequestCode = 1
+    private val requestExternalStoragePermissionCode = 2 //Code used when asking for permissions
 
-    private var resourceUri: Uri? = null //selected resource uri
-    private var resourcePath : String? = null //using the uri does not work when trying to print documents
-    private var resourceType = ResourceTypeEnum.NOT_DEFINED
+    private lateinit var viewModel : PrintActViewModel
 
-    private val requestExternalStoragePermissionCode = 10 //Code uses when asking for permissions
 
-    //Enum needed to check the extension of the selected file to print
-    enum class ResourceTypeEnum {
-        NOT_DEFINED,
-        IMAGE,
-        PDF,
-        HTML,
-        DOC
+    override fun onStart() {
+        super.onStart()
+        if(viewModel.getType() != ResourceTypeEnum.NOT_DEFINED){
+            previewFile()
+        }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_print)
 
-        //buttonChooseImage = findViewById(R.id.act_print_chooseImageButton)
+        viewModel = ViewModelProvider(this).get(PrintActViewModel::class.java)
+
         buttonChooseFile = findViewById(R.id.act_print_chooseFileButton)
-        //buttonSendEmail = findViewById(R.id.act_print_sendEmailButton)
-        //buttonPrint = findViewById(R.id.act_print_printButton)
         buttonPrint = findViewById(R.id.act_print_printFab)
         buttonShare = findViewById(R.id.act_print_shareFab)
         imagePreview = findViewById(R.id.act_print_imagePreview)
@@ -131,11 +127,11 @@ class PrintActivity : AppCompatActivity() {
         //SendEmail button listener
         buttonShare.setOnClickListener {
             //Nothing was selected
-            if (resourceType == ResourceTypeEnum.NOT_DEFINED) {
+            if (viewModel.getType() == ResourceTypeEnum.NOT_DEFINED) {
                 showFileNotChosenDialog()
             } else {
 
-                val file = File(resourcePath!!)
+                val file = File(viewModel.getPath()!!)
                 val uriAux =
                     FileProvider.getUriForFile(applicationContext, "$packageName.provider", file)
 
@@ -157,7 +153,7 @@ class PrintActivity : AppCompatActivity() {
         //Print button listener
         buttonPrint.setOnClickListener {
             //Check for the resource type (photo, doc...)
-            when (resourceType) {
+            when (viewModel.getType()) {
 
                 ResourceTypeEnum.NOT_DEFINED->{
                     showFileNotChosenDialog()
@@ -169,7 +165,7 @@ class PrintActivity : AppCompatActivity() {
                     printHelper.scaleMode = PrintHelper.SCALE_MODE_FILL
                     val photo: Bitmap = MediaStore.Images.Media.getBitmap(
                         this@PrintActivity.contentResolver,
-                        resourceUri
+                        viewModel.getUri()
                     )
                     printHelper.printBitmap("Imagen", photo)
                 }//Image
@@ -179,7 +175,7 @@ class PrintActivity : AppCompatActivity() {
                     val printManager: PrintManager = this@PrintActivity.getSystemService(
                         Context.PRINT_SERVICE
                     ) as PrintManager
-                    val printAdapter = PdfDocumentAdapter(resourcePath!!)
+                    val printAdapter = PdfDocumentAdapter(viewModel.getPath()!!)
                     printManager.print("PDF", printAdapter, PrintAttributes.Builder().build())
                 }//PDF
 
@@ -204,7 +200,7 @@ class PrintActivity : AppCompatActivity() {
                             //mWebView = null
                         }
                     }
-                    webView.loadUrl(resourceUri.toString())
+                    webView.loadUrl(viewModel.getUri().toString())
                 }//HTML
             }
         }
@@ -213,8 +209,8 @@ class PrintActivity : AppCompatActivity() {
     private fun previewFile(){
 
         //Create file and get extension
-        val file = File(resourcePath!!)
-        resourceUri = Uri.fromFile(file)
+        val file = File(viewModel.getPath()!!)
+        viewModel.setUri(Uri.fromFile(file))
         val extension = file.extension
         Log.d(tag, "extension  $extension")
         webPreview.visibility = View.INVISIBLE
@@ -223,7 +219,7 @@ class PrintActivity : AppCompatActivity() {
         //Continue depending on the file extension
         when (extension.toLowerCase(Locale.ROOT)) {
             "jpg", "jpeg", "jpe", "png", "bmp", "gif", "webp" -> {
-                resourceType = ResourceTypeEnum.IMAGE
+                viewModel.setType(ResourceTypeEnum.IMAGE)
                 //Log.d(tag, "image uri $resourceUri")
 
                 //Make the image preview bigger
@@ -232,7 +228,7 @@ class PrintActivity : AppCompatActivity() {
                 imagePreview.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
             }
             "pdf" -> {
-                resourceType = ResourceTypeEnum.PDF
+                viewModel.setType(ResourceTypeEnum.PDF)
 
                 //Make the image preview bigger
                 imagePreview.visibility = View.VISIBLE
@@ -265,15 +261,16 @@ class PrintActivity : AppCompatActivity() {
                 fileDescriptor.close()
             }
             "html" ->{
-                resourceType = ResourceTypeEnum.HTML
+                viewModel.setType(ResourceTypeEnum.HTML)
                 webPreview.visibility = View.VISIBLE
                 webPreview.settings.allowContentAccess = true
                 webPreview.settings.allowFileAccess = true
-                webPreview.loadUrl(resourceUri.toString())
+                webPreview.loadUrl(viewModel.getUri().toString())
             }
             else -> {
                 Log.d(tag, "Extension no soportada")
                 showExtensionNotSuppertedDialog()
+                clearViewModelData()
             }
         }
     }
@@ -400,4 +397,11 @@ class PrintActivity : AppCompatActivity() {
         }
         alertDialog?.show()
     }
+
+    private fun clearViewModelData(){
+        viewModel.setUri(null)
+        viewModel.setPath(null)
+        viewModel.setType(ResourceTypeEnum.NOT_DEFINED)
+    }
+
 }

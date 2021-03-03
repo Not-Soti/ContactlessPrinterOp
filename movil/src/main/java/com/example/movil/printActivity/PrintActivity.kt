@@ -1,6 +1,5 @@
 package com.example.movil.printActivity
 
-
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -23,7 +22,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -83,7 +82,6 @@ class PrintActivity : AppCompatActivity() {
             Reason: String?
         ) {
             Log.d(tag, "Pickit on complete listener Ruta: $path")
-            Toast.makeText(applicationContext, "Ruta: $path", Toast.LENGTH_LONG).show()
             resourcePath = path
             previewFile()
         }
@@ -134,11 +132,7 @@ class PrintActivity : AppCompatActivity() {
         buttonShare.setOnClickListener {
             //Nothing was selected
             if (resourceType == ResourceTypeEnum.NOT_DEFINED) {
-                Toast.makeText(
-                    this@PrintActivity,
-                    "Selecciona algún archivo",
-                    Toast.LENGTH_LONG
-                ).show()
+                showFileNotChosenDialog()
             } else {
 
                 val file = File(resourcePath!!)
@@ -166,11 +160,7 @@ class PrintActivity : AppCompatActivity() {
             when (resourceType) {
 
                 ResourceTypeEnum.NOT_DEFINED->{
-                    Toast.makeText(
-                        this@PrintActivity,
-                        "Selecciona algún archivo",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showFileNotChosenDialog()
                 }
 
                 //Printing an image
@@ -280,15 +270,10 @@ class PrintActivity : AppCompatActivity() {
                 webPreview.settings.allowContentAccess = true
                 webPreview.settings.allowFileAccess = true
                 webPreview.loadUrl(resourceUri.toString())
-                Toast.makeText(this@PrintActivity,"Seleccionado HTML", Toast.LENGTH_LONG).show()
             }
             else -> {
                 Log.d(tag, "Extension no soportada")
-                Toast.makeText(
-                    this@PrintActivity,
-                    "Extension no soportada",
-                    Toast.LENGTH_LONG
-                ).show()//TODO crear dialogo de extensiones soportada
+                showExtensionNotSuppertedDialog()
             }
         }
     }
@@ -354,11 +339,6 @@ class PrintActivity : AppCompatActivity() {
 
         }else{
             //Seleccionar archivo
-
-            //val intent = Intent(Intent.ACTION_PICK)
-            //intent.type = "*/*"
-            //startActivityForResult(intent, chooseFileRequestCode)
-
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "*/*"
             startActivityForResult(intent, chooseFileRequestCode)
@@ -381,5 +361,43 @@ class PrintActivity : AppCompatActivity() {
     private fun removeTempFiles(){
         Log.d(tag, "Removing temporary files")
         pickit.deleteTemporaryFile(this)
+    }
+
+    private fun showFileNotChosenDialog(){
+        val alertDialog: AlertDialog? = this.let {
+            val builder = AlertDialog.Builder(it)
+            builder.apply {
+
+                setMessage(R.string.PrintAct_FileNotChosen_msg).setTitle(R.string.PrintAct_FileNotChosen_title)
+
+                setPositiveButton(R.string.accept
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+            }
+            // Create the AlertDialog
+            builder.create()
+        }
+        alertDialog?.show()
+    }
+
+    private fun showExtensionNotSuppertedDialog(){
+        val alertDialog: AlertDialog? = this.let {
+            val builder = AlertDialog.Builder(it)
+            builder.apply {
+
+                setMessage(R.string.PrintAct_extensionNotSupported_msg).setTitle(R.string.PrintAct_extensionNotSupported_title)
+
+                setPositiveButton(R.string.accept
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+            }
+            // Create the AlertDialog
+            builder.create()
+        }
+        alertDialog?.show()
     }
 }

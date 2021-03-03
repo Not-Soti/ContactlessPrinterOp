@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="aceptar">Acept</string>
+    <string name="accept">Accept</string>
     <string name="help">Help</string>
     <string name="close">Close</string>
     <string name="stop">Stop</string>
@@ -42,4 +42,16 @@
     <string name="permission_extStorageDeniedMsg">Sternal storage access needed in order to pick a file</string>
     <string name="permission_extStorageDeniedExp">Sternal storage access needed in order to pick a file</string>
     <string name="ReadQrAct_connectManuallyButton">Connect manually</string>
-</resources>
+    <string name="PrintAct_FileNotChosen_title">File not chosen</string>
+    <string name="PrintAct_FileNotChosen_msg">Please, choose any file</string>
+    <string name="PrintAct_extensionNotSupported_title">Extension not supported</string>
+    <string name="PrintAct_extensionNotSupported_msg">Supported extensions are:\n
+        \n \u25CF PDF
+        \n \u25CF HTML
+        \n \u25CF Images:
+        \n \t\t\t\t \u2022 JPG, JPEG, JPE
+        \n \t\t\t\t \u2022 PNG
+        \n \t\t\t\t \u2022 BMP
+        \n \t\t\t\t \u2022 GIF
+        \n \t\t\t\t \u2022 WEBP
+    </string></resources>

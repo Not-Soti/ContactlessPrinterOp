@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">ContactlessPrinterOp</string>
 
     <!-- Common -->
-    <string name="aceptar">Aceptar</string>
+    <string name="accept">Aceptar</string>
     <string name="help">Ayuda</string>
     <string name="close">Cerrar</string>
     <string name="stop">Detener</string>
@@ -71,5 +71,18 @@
     <string name="permission_extStorageDeniedMsg" >Se necesita acceso al almacenamiento externo para obtener archivos</string>
     <string name="permission_extStorageDeniedExp" >Se necesita acceso al almacenamiento externo para obtener archivos</string>
     <string name="ReadQrAct_connectManuallyButton">Conectarse manualmente</string>
+    <string name="PrintAct_FileNotChosen_title">Archivo no seleccionado</string>
+    <string name="PrintAct_FileNotChosen_msg">Por favor, selecciona algún archivo</string>
+    <string name="PrintAct_extensionNotSupported_title">Extension no soportada</string>
+    <string name="PrintAct_extensionNotSupported_msg">Las extensiones soportadas son las siguientes:\n
+        \n \u25CF PDF
+        \n \u25CF HTML
+        \n \u25CF Imágenes:
+        \n \t\t\t\t \u2022 JPG, JPEG, JPE
+        \n \t\t\t\t \u2022 PNG
+        \n \t\t\t\t \u2022 BMP
+        \n \t\t\t\t \u2022 GIF
+        \n \t\t\t\t \u2022 WEBP
+    </string>
 
 </resources>

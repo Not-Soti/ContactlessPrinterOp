@@ -13,7 +13,6 @@ import android.util.Log
 import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
@@ -62,7 +61,7 @@ class ReadQrActivity : AppCompatActivity() {
         helpButton.setOnClickListener { //Create alert dialog
             val builder: AlertDialog.Builder? = this@ReadQrActivity?.let { AlertDialog.Builder(it) }
 
-            builder?.apply { setNeutralButton(R.string.aceptar) { dialog, _ -> dialog.dismiss() } }
+            builder?.apply { setNeutralButton(R.string.accept) { dialog, _ -> dialog.dismiss() } }
 
             builder?.setMessage(this@ReadQrActivity.getString(R.string.Dialog_qr_scanner_help))
                 ?.setTitle(

@@ -229,7 +229,7 @@ class ScanOp3 : AppCompatActivity() {
                 //scanningFragment.dismiss()
                 val i = Intent(applicationContext, ScanPreview::class.java)
                 //i.putExtra("tempPath", tempFile.absolutePath)
-                i.putExtra("tempUri", scanResultUri)
+                i.putExtra("tempUri", scanResultUri.toString())
                 startActivity(i)
             }
 

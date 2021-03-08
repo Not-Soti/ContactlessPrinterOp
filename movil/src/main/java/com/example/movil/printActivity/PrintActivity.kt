@@ -141,11 +141,8 @@ class PrintActivity : AppCompatActivity() {
 
                 val to: Array<String> = emptyArray()
                 emailIntent.putExtra(Intent.EXTRA_EMAIL, to)
-
                 emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
-
-
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Sujeto")
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "")
                 startActivity(Intent.createChooser(emailIntent, "Enviar"))
             }
         }
@@ -196,8 +193,14 @@ class PrintActivity : AppCompatActivity() {
 
                         override fun onPageFinished(view: WebView, url: String) {
                             Log.i(tag, "page finished loading $url")
-                            createWebPrintJob(view)
-                            //mWebView = null
+                            //Create the print job
+                            // Get a PrintManager instance
+                            val printManager: PrintManager = this@PrintActivity.getSystemService(
+                                Context.PRINT_SERVICE
+                            ) as PrintManager
+
+                            val printAdapter = view.createPrintDocumentAdapter("${getString(R.string.app_name)} HTML")
+                            printManager.print("Documento HTML", printAdapter, PrintAttributes.Builder().build())
                         }
                     }
                     webView.loadUrl(viewModel.getUri().toString())
@@ -292,19 +295,6 @@ class PrintActivity : AppCompatActivity() {
         }//ChooseFileRequestCode
     }//onActResult
 
-    private fun createWebPrintJob(webView: WebView){
-        //Create the print job
-        // Get a PrintManager instance
-        val printManager: PrintManager = this@PrintActivity.getSystemService(
-            Context.PRINT_SERVICE
-        ) as PrintManager
-
-        val printAdapter = webView.createPrintDocumentAdapter("${getString(R.string.app_name)} HTML")
-        printManager.print("Documento HTML", printAdapter, PrintAttributes.Builder().build())
-
-    }
-
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -333,14 +323,12 @@ class PrintActivity : AppCompatActivity() {
                 getString(R.string.permission_extStorageDeniedMsg)
             )
             permissionHelper.checkAndAskForPermission()
-
         }else{
             //Seleccionar archivo
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "*/*"
             startActivityForResult(intent, chooseFileRequestCode)
         }
-
     }
 
     //On back pressed go to main activity
@@ -390,7 +378,6 @@ class PrintActivity : AppCompatActivity() {
                 ) { dialog, _ ->
                     dialog.dismiss()
                 }
-
             }
             // Create the AlertDialog
             builder.create()

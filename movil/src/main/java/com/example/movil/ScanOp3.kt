@@ -47,6 +47,7 @@ class ScanOp3 : AppCompatActivity() {
     private lateinit var scannerBrowser : ScannersBrowser
     private lateinit var progressBar : ProgressBar
     var scannerNumber = 0 //Debug
+    var scanResultUri : Uri? = null
 
     private var tempPathAux = ""
 
@@ -217,15 +218,18 @@ class ScanOp3 : AppCompatActivity() {
             override fun onScanningPageDone(p0: ScanPage?) {
                 Toast.makeText(this@ScanOp3, "Pagina escaneada", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Pagina Escaneada")
+                scanResultUri = p0?.uri
+                Log.d(tag, "ScanPage uri: $scanResultUri")
             }
 
             override fun onScanningComplete() {
                 Toast.makeText(this@ScanOp3, "Escaneo completado", Toast.LENGTH_LONG).show()
                 Log.d(tag, "Escaneo completado")
 
-                scanningFragment.dismiss()
+                //scanningFragment.dismiss()
                 val i = Intent(applicationContext, ScanPreview::class.java)
-                i.putExtra("tempPath", tempFile.absolutePath)
+                //i.putExtra("tempPath", tempFile.absolutePath)
+                i.putExtra("tempUri", scanResultUri)
                 startActivity(i)
             }
 
@@ -237,7 +241,7 @@ class ScanOp3 : AppCompatActivity() {
                     tempFile.delete()
                     Toast.makeText(applicationContext, "Error, ${theException!!.message}", Toast.LENGTH_LONG).show()
 
-                    scanningFragment.dismiss()
+                    //scanningFragment.dismiss()
                     //supportFragmentManager.beginTransaction().remove(scanningFragment)
                     val scanErrorFragment = ScanErrorFragment()
                     scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")

@@ -31,6 +31,7 @@ class ScanPreview : AppCompatActivity() {
     private lateinit var discardButton: Button
 
     private lateinit var tempFilePath : String
+    private var tempFileUri : Uri? = null
     private lateinit var pickit : PickiT
     private val pickitListener = object: PickiTCallbacks {
         override fun PickiTonUriReturned() {
@@ -77,7 +78,9 @@ class ScanPreview : AppCompatActivity() {
 
         val bundle = intent.extras
         if (bundle != null) {
-            tempFilePath = bundle.getString("tempPath", "")
+            tempFileUri = Uri.parse(bundle.getString("tempUri", ""))
+            tempFilePath = tempFileUri?.path!!
+            Log.d(tag, "Temp file uri: $tempFileUri")
             Log.d(tag, "Temp file path: $tempFilePath")
         }
 

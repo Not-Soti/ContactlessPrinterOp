@@ -1,6 +1,7 @@
 package com.example.movil.readQrActivity
 
 import android.Manifest
+import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
 import android.net.wifi.WifiConfiguration
@@ -19,6 +20,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.movil.MainActivity
 import com.example.movil.PermissionHelper
@@ -314,13 +316,18 @@ class ReadQrActivity : AppCompatActivity() {
 
         when (requestCode){
             requestCameraPermissionCode -> {
-                recreate()
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    recreate()
+                }else{
+                    endActivityNoPermission()
+                }
+                return
             }
         }
     }
 
-    private fun startCamera(holder: SurfaceHolder){
-        if(ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
+    private fun startCamera(holder: SurfaceHolder) {
+        /*if(ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
             val permissionHelper = PermissionHelper(
                 this@ReadQrActivity,
                 Manifest.permission.CAMERA,
@@ -331,7 +338,43 @@ class ReadQrActivity : AppCompatActivity() {
             permissionHelper.checkAndAskForPermission()
         }else{
             cameraSource.start(holder)
+        }*/
+
+        when {
+            ContextCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // You can use the API that requires the permission.
+                cameraSource.start(holder)
+            }
+            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) -> {
+            //Show explanatory message
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            builder.setTitle(getString(R.string.permission_camDeniedTitle)).setMessage(getString(R.string.permission_camDeniedMsg))
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    requestCameraPermissionCode) }
+                .setNegativeButton(android.R.string.cancel) { _, _ ->
+                    endActivityNoPermission() }
+                builder.create().show()
         }
+            else -> {
+                // You can directly ask for the permission.
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    requestCameraPermissionCode)
+            }
+        }
+    }
+
+    private fun endActivityNoPermission(){
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.permission_camDenied_endAct))
+            .setPositiveButton(android.R.string.ok){ _, _ ->
+                startActivity(Intent(applicationContext, MainActivity::class.java))
+            }.show()
     }
 
 }

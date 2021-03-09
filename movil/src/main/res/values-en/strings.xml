@@ -54,4 +54,7 @@
         \n \t\t\t\t \u2022 BMP
         \n \t\t\t\t \u2022 GIF
         \n \t\t\t\t \u2022 WEBP
-    </string></resources>
+    </string>
+    <string name="permission_camDenied_endAct">Camera access needs to be granted in order to use this functionality</string>
+    <string name="permission_ExtStorageDenied_endAct">External storage access needed in order to get or create the needed file</string>
+</resources>

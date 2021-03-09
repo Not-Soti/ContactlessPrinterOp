@@ -24,6 +24,7 @@ import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
@@ -51,6 +52,11 @@ class PrintActivity : AppCompatActivity() {
     private lateinit var downloadFragment: DownloadingFileFragment
 
 
+    private val chooseFileActRequestCode = 1 //Code used in the onActivityResult petition
+    private val requestExternalStoragePermissionCode = 2 //Code used when asking for permissions
+
+    private lateinit var viewModel : PrintActViewModel
+
     private lateinit var pickit : PickiT //returns real path from uris
     private val pickitListener = object: PickiTCallbacks{
         override fun PickiTonUriReturned() {
@@ -63,19 +69,16 @@ class PrintActivity : AppCompatActivity() {
             val fragmentTransaction = fragmentManager.beginTransaction()
             downloadFragment = DownloadingFileFragment()
             downloadFragment.show(fragmentTransaction, "downloadFragment")
-
         }
 
         override fun PickiTonStartListener() {
             Log.d(tag, "Pickit on start listener (Creando archivo de descarga)")
         }
-
         override fun PickiTonProgressUpdate(progress: Int) {
             Log.d(tag, "Pickit on progress update (Progreso de descarga $progress")
             downloadFragment.updateProgressBar(progress)
             if(progress==100) downloadFragment.dismiss()
         }
-
         override fun PickiTonCompleteListener(
             path: String?,
             wasDriveFile: Boolean,
@@ -87,14 +90,7 @@ class PrintActivity : AppCompatActivity() {
             viewModel.setPath(path)
             previewFile()
         }
-
     }
-
-    //Request codes for each activity with a result
-    private val chooseFileRequestCode = 1
-    private val requestExternalStoragePermissionCode = 2 //Code used when asking for permissions
-
-    private lateinit var viewModel : PrintActViewModel
 
 
     override fun onStart() {
@@ -281,7 +277,7 @@ class PrintActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == chooseFileRequestCode) {
+        if(requestCode == chooseFileActRequestCode) {
             if (resultCode == RESULT_OK) {
 
                 //Remove a image from the imagePreview if there was any
@@ -303,7 +299,16 @@ class PrintActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when(requestCode){
-            requestExternalStoragePermissionCode -> getFile()
+            requestExternalStoragePermissionCode -> {
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    //Pick the file
+                    val intent = Intent(Intent.ACTION_GET_CONTENT)
+                    intent.type = "*/*"
+                    startActivityForResult(intent, chooseFileActRequestCode)
+                }else{
+                    endActivityNoPermission()
+                }
+            }
         }
     }
 
@@ -312,7 +317,7 @@ class PrintActivity : AppCompatActivity() {
      * Fun that opens the intent to pick a file
      */
     private fun getFile(){
-        //Check permission
+        /*//Check permission
         if(ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.READ_EXTERNAL_STORAGE) ==
             PackageManager.PERMISSION_DENIED){
             val permissionHelper = PermissionHelper(
@@ -325,10 +330,49 @@ class PrintActivity : AppCompatActivity() {
             permissionHelper.checkAndAskForPermission()
         }else{
             //Seleccionar archivo
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "*/*"
-            startActivityForResult(intent, chooseFileRequestCode)
+            val intent = Intent(Intent.ACTION_GET_CONTENT)*/
+            //intent.type = "*/*"
+           /* startActivityForResult(intent, chooseFileActRequestCode)
+        }*/
+
+        when {
+            ContextCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // You can use the API that requires the permission.
+                //Seleccionar archivo
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.type = "*/*"
+                startActivityForResult(intent, chooseFileActRequestCode)
+            }
+            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                //Show explanatory message
+                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                builder.setTitle(getString(R.string.permission_extStorageDeniedTitle)).setMessage(getString(R.string.permission_extStorageDeniedMsg))
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        ActivityCompat.requestPermissions(this,
+                            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                            requestExternalStoragePermissionCode) }
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        endActivityNoPermission() }
+                builder.create().show()
+            }
+            else -> {
+                // You can directly ask for the permission.
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    requestExternalStoragePermissionCode)
+            }
         }
+    }
+
+    private fun endActivityNoPermission(){
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.permission_ExtStorageDenied_endAct))
+            .setPositiveButton(android.R.string.ok){ _, _ ->
+                startActivity(Intent(applicationContext, MainActivity::class.java))
+            }.show()
     }
 
     //On back pressed go to main activity

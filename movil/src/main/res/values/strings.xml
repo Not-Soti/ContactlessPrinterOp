@@ -84,5 +84,7 @@
         \n \t\t\t\t \u2022 GIF
         \n \t\t\t\t \u2022 WEBP
     </string>
+    <string name="permission_camDenied_endAct">Se necesita acceso a la camara para seguir utilizando esta funcionalidad</string>
+    <string name="permission_ExtStorageDenied_endAct">Se necesita acceso al almacenamiento para crear u obtener el archivo deseado</string>
 
 </resources>

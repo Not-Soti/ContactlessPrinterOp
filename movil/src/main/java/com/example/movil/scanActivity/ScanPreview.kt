@@ -14,10 +14,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.movil.BuildConfig
-import com.example.movil.PermissionHelper
+import com.example.movil.MainActivity
 import com.example.movil.R
 import com.example.movil.ScanActivity
 import com.hbisoft.pickit.PickiT
@@ -27,8 +29,8 @@ import java.io.File
 class ScanPreview : AppCompatActivity() {
 
     private val tag = "ScanPreview"
-    private val writeExternalStoragePermissionCode = 0
-    private val createDocumentPermissionCode = 1
+    private val requestExternalStoragePermissionCode = 0
+    private val createDocumentActCode = 1
 
     private lateinit var imagePreview : ImageView
     private lateinit var saveButton : Button
@@ -132,8 +134,7 @@ class ScanPreview : AppCompatActivity() {
                 askAccessAllFilesPermission()
             }
         }else {
-
-            if(ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+           /* if(ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED){
                 askDirectory()
             }else {
@@ -145,20 +146,42 @@ class ScanPreview : AppCompatActivity() {
                     "Acceso al almacenamiento necesario para crear el archivo escaneado"
                 )
                 permissionHelper.checkAndAskForPermission()
+            }*/
+            when {
+                ContextCompat.checkSelfPermission(
+                    applicationContext,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // You can use the API that requires the permission.
+                    askDirectory()
+                }
+                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) -> {
+                    //Show explanatory message
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                    builder.setTitle(getString(R.string.permission_extStorageDeniedTitle)).setMessage(getString(R.string.permission_extStorageDeniedMsg))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            ActivityCompat.requestPermissions(this,
+                                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                                requestExternalStoragePermissionCode) }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            endActivityNoPermission() }
+                    builder.create().show()
+                }
+                else -> {
+                    // You can directly ask for the permission.
+                    ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        requestExternalStoragePermissionCode)
+                }
             }
         }
     }
 
     private fun askAccessAllFilesPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 val uri = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
-                startActivity(
-                    Intent(
-                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                        uri
-                    )
-                )
+                startActivity(Intent( Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri))
             }
         }
     }
@@ -173,7 +196,7 @@ class ScanPreview : AppCompatActivity() {
             //type = "text/plain"
             putExtra(Intent.EXTRA_TITLE, "ArchivoPrueba1")
         }
-        startActivityForResult(intent, createDocumentPermissionCode)
+        startActivityForResult(intent, createDocumentActCode)
     }
 
     override fun onRequestPermissionsResult(
@@ -184,8 +207,12 @@ class ScanPreview : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when(requestCode){
-            writeExternalStoragePermissionCode ->{
-                saveFile()
+            requestExternalStoragePermissionCode ->{
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    saveFile()
+                }else{
+                    endActivityNoPermission()
+                }
             }
         }
     }
@@ -194,7 +221,7 @@ class ScanPreview : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         when(requestCode){
-            createDocumentPermissionCode ->{
+            createDocumentActCode ->{
                 if(resultCode == Activity.RESULT_OK) {
                     val newDocUri = data?.data
                     Log.d(tag, "Uri del nuevo archivo: $newDocUri")
@@ -214,7 +241,14 @@ class ScanPreview : AppCompatActivity() {
         temp.delete()
         Log.d(tag, "Temporal borrado")
         startActivity(Intent(this, ScanActivity::class.java))
+    }
 
+    private fun endActivityNoPermission(){
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.permission_ExtStorageDenied_endAct))
+            .setPositiveButton(android.R.string.ok){ _, _ ->
+                startActivity(Intent(applicationContext, MainActivity::class.java))
+            }.show()
     }
 
     override fun onBackPressed() {

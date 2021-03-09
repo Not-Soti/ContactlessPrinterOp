@@ -92,33 +92,4 @@
     </LinearLayout>
 
 
-    <Button
-        android:id="@+id/act_main_scanOp1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Escaneo 1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/act_main_scanOp2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Escaneo 2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_scanOp1" />
-
-    <Button
-        android:id="@+id/act_main_scanOp3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Escaneo 3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_scanOp2" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

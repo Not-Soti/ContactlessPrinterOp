@@ -1,5 +1,6 @@
- package com.example.movil
+ package com.example.movil.scanActivity
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,13 +10,16 @@ import android.net.Uri
 import android.os.*
 import android.provider.Settings
 import android.util.Log
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.movil.BuildConfig
+import com.example.movil.PermissionHelper
+import com.example.movil.R
+import com.example.movil.ScanActivity
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
 import java.io.File
@@ -58,9 +62,8 @@ class ScanPreview : AppCompatActivity() {
             Toast.makeText(applicationContext, "Ruta: $path", Toast.LENGTH_LONG).show()
 
             Log.d(tag, "PickiT path: $path")
-            copyTempToPath(File(path))
+            copyTempToPath(File(path!!))
         }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,7 +120,7 @@ class ScanPreview : AppCompatActivity() {
     private fun discardFile(){
         val tempFile = File(tempFilePath)
         tempFile.delete()
-        startActivity(Intent(this, ScanOp3::class.java))
+        startActivity(Intent(this, ScanActivity::class.java))
     }
 
     private fun saveFile(){
@@ -136,7 +139,7 @@ class ScanPreview : AppCompatActivity() {
             }else {
                 val permissionHelper = PermissionHelper(
                     this,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     writeExternalStoragePermissionCode,
                     "Acceso al almacenamiendo necesario",
                     "Acceso al almacenamiento necesario para crear el archivo escaneado"
@@ -210,7 +213,7 @@ class ScanPreview : AppCompatActivity() {
         Log.d(tag, "Archivo copiado")
         temp.delete()
         Log.d(tag, "Temporal borrado")
-        startActivity(Intent(this, ScanOp3::class.java))
+        startActivity(Intent(this, ScanActivity::class.java))
 
     }
 

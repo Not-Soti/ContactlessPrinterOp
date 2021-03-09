@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import com.example.movil.R
+import com.example.movil.ScanActivity
 
 class ScanCompletedFragment : DialogFragment() {
     lateinit var button : Button

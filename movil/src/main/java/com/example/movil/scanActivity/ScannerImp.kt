@@ -1,13 +1,11 @@
 package com.example.movil.scanActivity
 
-import android.R.attr.data
 import android.app.Activity
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.util.Log
-import com.example.movil.ScanOp3
-import com.example.movil.ScanOp4
+import com.example.movil.ScanActivity
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
@@ -20,7 +18,6 @@ class ScannerImp(
 ) : Scanner{
 
     lateinit var act : Activity
-    var isOp3 = true
 
     override fun scan(p0: String?, p1: ScanTicket?, p2: ScanCapture.ScanningProgressListener?) {
         Log.d("ScannerImp", "escaneando")
@@ -36,8 +33,6 @@ class ScannerImp(
 
         canvas.drawText("Texto de prueba", 10.toFloat(), 10.toFloat(), paint)
 
-
-
         document.finishPage(page)
         document.writeTo(fOut)
         document.close()
@@ -45,13 +40,9 @@ class ScannerImp(
         Log.d("ScannerImp", "Archivo escrito")
 
         lateinit var actAux: Activity
-        if(isOp3) {
-            actAux = act as ScanOp3
-            actAux.scanningCompleted()
-        }else{
-            actAux = act as ScanOp4
-            actAux.scanningCompleted()
-        }
+
+        actAux = act as ScanActivity
+        actAux.scanningCompleted()
 
     }
 

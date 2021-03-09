@@ -399,11 +399,10 @@ class PrintActivity : AppCompatActivity() {
 
                 setMessage(R.string.PrintAct_FileNotChosen_msg).setTitle(R.string.PrintAct_FileNotChosen_title)
 
-                setPositiveButton(R.string.accept
+                setNeutralButton(R.string.accept
                 ) { dialog, _ ->
                     dialog.dismiss()
                 }
-
             }
             // Create the AlertDialog
             builder.create()

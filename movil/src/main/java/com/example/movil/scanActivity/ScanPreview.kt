@@ -187,7 +187,6 @@ class ScanPreview : AppCompatActivity() {
     }
 
     private fun askDirectory(){
-        //TODO pedir permisos
         Log.d(tag, "askDirectory()")
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -209,7 +208,7 @@ class ScanPreview : AppCompatActivity() {
         when(requestCode){
             requestExternalStoragePermissionCode ->{
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    saveFile()
+                    askDirectory()
                 }else{
                     endActivityNoPermission()
                 }

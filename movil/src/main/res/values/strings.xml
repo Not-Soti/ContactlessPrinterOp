@@ -24,9 +24,8 @@
 
    <!-- ReadQrHelpDialog -->
     <string name="Dialog_qr_scanner_help" translatable="false">
-        En caso de estar utilizando Andriod Q (10) o superior, será necesario
-        encender el WiFi manualmente, y desconectarse de la red en caso de existir conexión con alguna.
-        Al leer un código  QR correcto, deberás aceptar la conexión al WiFi desde la pestaña de notificaciones.
+        Es posible que utilizando dispositivos modernos, la conexión a la red no pueda establecerse automáticamente.
+        Pulse el botón para conectarse manualmente en caso de que ésto no sea posible.
     </string>
 
     <!-- Scan activity -->
@@ -85,6 +84,6 @@
         \n \t\t\t\t \u2022 WEBP
     </string>
     <string name="permission_camDenied_endAct">Se necesita acceso a la camara para seguir utilizando esta funcionalidad</string>
-    <string name="permission_ExtStorageDenied_endAct">Se necesita acceso al almacenamiento para crear u obtener el archivo deseado</string>
+    <string name="permission_ExtStorageDenied_endAct">Se necesita acceso al almacenamiento para seguir utilizando esta funcionalidad</string>
 
 </resources>

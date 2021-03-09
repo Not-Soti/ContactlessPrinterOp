@@ -10,10 +10,12 @@ import android.net.wifi.WifiNetworkSuggestion
 import android.os.Build
 import android.os.Bundle
 import android.os.Vibrator
+import android.provider.Settings
 import android.util.Log
 import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
@@ -29,6 +31,7 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
+import com.google.android.material.snackbar.Snackbar
 
 class ReadQrActivity : AppCompatActivity() {
 
@@ -37,7 +40,7 @@ class ReadQrActivity : AppCompatActivity() {
     private lateinit var barcodeDetector: BarcodeDetector
     private lateinit var helpButton : ImageButton
     private lateinit var connectManuallyButton : Button
-
+    private lateinit var rootLayout : View
 
     private val requestCameraPermissionCode = 1 //Code needed to ask for permissions
     private val accessFineLocationPermissionCode = 2
@@ -52,6 +55,7 @@ class ReadQrActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qr_scanner)
 
+        rootLayout = findViewById(R.id.act_readQR_root)
         surfaceView = findViewById(R.id.act_readQR_cameraPreview)
         helpButton = findViewById(R.id.act_readQR_help_button)
         connectManuallyButton = findViewById(R.id.act_readQR_connectManuallyButton)
@@ -64,15 +68,9 @@ class ReadQrActivity : AppCompatActivity() {
             val builder: AlertDialog.Builder? = this@ReadQrActivity?.let { AlertDialog.Builder(it) }
 
             builder?.apply { setNeutralButton(R.string.accept) { dialog, _ -> dialog.dismiss() } }
-
-            builder?.setMessage(this@ReadQrActivity.getString(R.string.Dialog_qr_scanner_help))
-                ?.setTitle(
-                    R.string.help
-                )
+            builder?.setMessage(this@ReadQrActivity.getString(R.string.Dialog_qr_scanner_help))?.setTitle(R.string.help)
             val dialog: AlertDialog? = builder?.create()
-            if (dialog != null) {
-                dialog.show()
-            }
+            dialog?.show()
         }
 
         connectManuallyButton.setOnClickListener { startActivity(Intent(android.provider.Settings.ACTION_WIFI_SETTINGS)) }
@@ -81,9 +79,7 @@ class ReadQrActivity : AppCompatActivity() {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 startCamera(holder)
             }
-
             override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {}
-
             override fun surfaceDestroyed(p0: SurfaceHolder) {cameraSource.stop()}
         })
 
@@ -114,7 +110,7 @@ class ReadQrActivity : AppCompatActivity() {
                             connectToWifi(infoWifi)
 
                         }else{
-                            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_readQrFailed), Toast.LENGTH_LONG)
+                            //muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_readQrFailed), Toast.LENGTH_LONG)
                             qrCodeRead = false
                         }
                     }
@@ -128,13 +124,42 @@ class ReadQrActivity : AppCompatActivity() {
      * @param infoWifi: WiFi configuration string following the pattern WIFI:T:WPA;S:mynetwork;P:mypass;;
      */
     private fun connectToWifi(infoWifi: String){
+
+        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             //Android 10 or more
-            connectToWifiPostQ(infoWifi)
+            if(wifiManager.isWifiEnabled){
+                connectToWifiPostQ(infoWifi)
+            }else{
+                enableWifiDialog()
+            }
         } else {
             //Android 9 or less
-            //if (connectToWifiPreQ(infoWiFi[0], infoWiFi[1])) {
-            connectToWifiPreQ(infoWifi)
+            if(wifiManager.isWifiEnabled){
+                connectToWifiPreQ(infoWifi)
+            }else{
+                enableWifiDialog()
+            }
+        }
+    }
+
+    private fun enableWifiDialog(){
+        runOnUiThread {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+
+                val snackbar = Snackbar.make(rootLayout, "Enciende el wifi", Snackbar.LENGTH_LONG)
+                    .setAction("Encender", View.OnClickListener {
+                        startActivity(Intent(Settings.Panel.ACTION_WIFI))
+                        //startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                    }).show()
+
+            } else {
+                val snackbar = Snackbar.make(rootLayout, "Enciende el wifi", Snackbar.LENGTH_LONG)
+                    .setAction("Encender", View.OnClickListener {
+                        startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                    }).show()
+            }
         }
     }
 
@@ -159,25 +184,42 @@ class ReadQrActivity : AppCompatActivity() {
                 networkPass = i.split(":")[1]
             }
         }
-        Log.d(tag, "Network type: $networkType, SSID: $networkSSID, passwd = $networkPass");
-
+        //Log.d(tag, "Network type: $networkType, SSID: $networkSSID, passwd = $networkPass");
         Log.d(tag, "Connecting to wifi on Android Q+")
 
-
         val wifiBuilder = WifiNetworkSuggestion.Builder().setSsid(networkSSID).setWpa2Passphrase(networkPass)
+        //wifiBuilder.setIsAppInteractionRequired(true) //Only if internet is needed, needs Location permission
         val suggestion = wifiBuilder.build()
 
-        var wifiList = mutableListOf<WifiNetworkSuggestion>()
-        wifiList.add(suggestion)
+        val wifiList = listOf(suggestion)
+        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        val wifiManager = getApplicationContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-        //Checking if Wifi is enabled
-        if(!wifiManager.isWifiEnabled){
-            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_powerOnWifi), Toast.LENGTH_LONG)
+        val status = wifiManager.addNetworkSuggestions(wifiList)
+        if(status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS){
+            Log.d(tag, "Error adding network suggestion")
+        }else{
+            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_checkNotifications), Toast.LENGTH_LONG)
         }
 
-        muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_checkNotifications), Toast.LENGTH_LONG)
+        // Optional (Wait for post connection broadcast to one of your suggestions)
+        val intentFilter = IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
+        val broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (!intent.action.equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
+                    return
+                }
+                Log.d(tag, "Conexion establecida")
+            }
+        }
+        applicationContext.registerReceiver(broadcastReceiver, intentFilter);
+
+        //Checking if Wifi is enabled
+        //It should already be enabled by the user
+        /*if(!wifiManager.isWifiEnabled){
+            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_powerOnWifi), Toast.LENGTH_LONG)
+        }*/
+
+        /*muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_checkNotifications), Toast.LENGTH_LONG)
 
         val permissionHelper = PermissionHelper(this@ReadQrActivity,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -216,7 +258,7 @@ class ReadQrActivity : AppCompatActivity() {
                 // do post connect processing here
             }
         };
-        this@ReadQrActivity.registerReceiver(broadcastReceiver, intentFilter);
+        this@ReadQrActivity.registerReceiver(broadcastReceiver, intentFilter);*/
     }
 
     /**
@@ -254,7 +296,7 @@ class ReadQrActivity : AppCompatActivity() {
 
         Log.d(tag, "Intentando conectarse al wifi")
 
-        val wifiManager = getApplicationContext().getSystemService(WIFI_SERVICE) as WifiManager
+        val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
 
 
         if (!wifiManager.isWifiEnabled) {
@@ -376,5 +418,4 @@ class ReadQrActivity : AppCompatActivity() {
                 startActivity(Intent(applicationContext, MainActivity::class.java))
             }.show()
     }
-
 }

@@ -17,10 +17,7 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
 import android.util.Log
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -38,6 +35,7 @@ import androidx.print.PrintHelper
 import com.example.movil.MainActivity
 import com.example.movil.PermissionHelper
 import com.example.movil.R
+import com.example.movil.ZoomLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
@@ -105,7 +103,6 @@ class PrintActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_print)
@@ -123,76 +120,14 @@ class PrintActivity : AppCompatActivity() {
         webPreview.visibility = View.INVISIBLE
         imagePreview.visibility = View.INVISIBLE
 
-
         //Pinch gesture for zoom is set on the root layout
-        val rootLayout = findViewById<ConstraintLayout>(R.id.act_print_root)
-        var firstFingerY1 = 0F
-        var secondFingerY1 = 0F
-        var fingerDistanceY = 0F
-        var isZooming = false
-        var scale = 1F
-
-       rootLayout.setOnTouchListener(object : View.OnTouchListener {
-            override fun onTouch(view: View?, event: MotionEvent?): Boolean {
-
-                when (event!!.actionMasked) {
-                    MotionEvent.ACTION_DOWN -> {
-                        //First finger pressed
-                        Log.d(tag, "Action down")
-                        firstFingerY1 = event.y
-                        return true
-                    }
-                    MotionEvent.ACTION_POINTER_DOWN -> {
-                        //Second finger pressed, get initial distance between fingers
-                        Log.d(tag, "Action pointer down")
-                        secondFingerY1 = event.getY(1)
-                        fingerDistanceY = kotlin.math.abs(firstFingerY1 - secondFingerY1)
-                        isZooming = true
-                        Log.d(tag, "f1: $firstFingerY1, f2: $secondFingerY1, Distance $fingerDistanceY")
-                        return true
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        if (isZooming) {
-                            //calculating new distance between fingers
-                            val firstFingerY2 = event.getY(0)
-                            val secondFingerY2 = event.getY(1)
-                            val newDistanceY = kotlin.math.abs(firstFingerY2 - secondFingerY2)
-
-                            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
-                            scale = 1 + ((newDistanceY - fingerDistanceY) / screenHeight)
-                            scale = 0.1f.coerceAtLeast(scale.coerceAtMost(5.0f))
-                            Log.d(tag, "Scale: $scale, d1=$fingerDistanceY, d2=$newDistanceY")
-                            imagePreview.scaleX = scale
-                            imagePreview.scaleY = scale
-                        }
-                        return true
-                    }
-                    MotionEvent.ACTION_POINTER_UP ->{
-                        //Second finger lifted
-                        isZooming = false
-                        secondFingerY1 = 0F
-                        return true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        //Swipe finished
-                        Log.d(tag, "Action up")
-                        imagePreview.scaleX = 1f
-                        imagePreview.scaleY = 1f
-                        firstFingerY1 = 0F
-                        secondFingerY1 = 0F
-                        isZooming = false
-                        scale = 1F
-                        return true
-                    }
-                }
-                return true
-            }
-        })
+        val rootLayout = findViewById<ZoomLayout>(R.id.act_print_root)
+        rootLayout.setImageView(imagePreview)
 
         //ChooseFile button listener
         buttonChooseFile.setOnClickListener { getFile() }
 
-        //SendEmail button listener
+        //Share button listener
         buttonShare.setOnClickListener {
             //Nothing was selected
             if (viewModel.getType() == ResourceTypeEnum.NOT_DEFINED) {
@@ -213,7 +148,7 @@ class PrintActivity : AppCompatActivity() {
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "")
                 startActivity(Intent.createChooser(emailIntent, "Enviar"))
             }
-        }
+        }//Share
 
         //Print button listener
         buttonPrint.setOnClickListener {

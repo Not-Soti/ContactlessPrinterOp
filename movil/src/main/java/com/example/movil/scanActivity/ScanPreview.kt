@@ -18,10 +18,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.movil.BuildConfig
-import com.example.movil.MainActivity
-import com.example.movil.R
-import com.example.movil.ScanActivity
+import com.example.movil.*
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
 import java.io.File
@@ -77,6 +74,10 @@ class ScanPreview : AppCompatActivity() {
         discardButton = findViewById(R.id.act_scan_preview_dicardButton)
 
         askAccessAllFilesPermission()
+
+        //Pinch gesture for zoom is set on the root layout
+        val rootLayout = findViewById<ZoomLayout>(R.id.act_scan_preview_root)
+        rootLayout.setImageView(imagePreview)
 
         saveButton.setOnClickListener { saveFile() }
         discardButton.setOnClickListener{ discardFile() }

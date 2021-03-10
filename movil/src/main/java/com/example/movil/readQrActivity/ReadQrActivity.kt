@@ -9,6 +9,7 @@ import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSuggestion
 import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.os.Vibrator
 import android.provider.Settings
 import android.util.Log
@@ -99,7 +100,11 @@ class ReadQrActivity : AppCompatActivity() {
                         //The device vibrates if a code is detected
                         val vibrator: Vibrator =
                             applicationContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                        vibrator.vibrate(500)
+                        if(Build.VERSION.SDK_INT >= 26){
+                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+                        }else {
+                            vibrator.vibrate(200)
+                        }
 
                         //Reading QR message
                         val infoWifi = qrCodes.valueAt(0).rawValue

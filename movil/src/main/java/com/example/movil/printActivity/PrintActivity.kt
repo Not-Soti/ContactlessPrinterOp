@@ -1,9 +1,11 @@
 package com.example.movil.printActivity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.pdf.PdfRenderer
@@ -15,6 +17,8 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
 import android.util.Log
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebResourceRequest
@@ -24,9 +28,11 @@ import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.MotionEventCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.print.PrintHelper
 import com.example.movil.MainActivity
@@ -50,7 +56,6 @@ class PrintActivity : AppCompatActivity() {
     private lateinit var imagePreview: ImageView
     private lateinit var webPreview: WebView
     private lateinit var downloadFragment: DownloadingFileFragment
-
 
     private val chooseFileActRequestCode = 1 //Code used in the onActivityResult petition
     private val requestExternalStoragePermissionCode = 2 //Code used when asking for permissions
@@ -100,6 +105,7 @@ class PrintActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_print)
@@ -116,6 +122,72 @@ class PrintActivity : AppCompatActivity() {
 
         webPreview.visibility = View.INVISIBLE
         imagePreview.visibility = View.INVISIBLE
+
+
+        //Pinch gesture for zoom is set on the root layout
+        val rootLayout = findViewById<ConstraintLayout>(R.id.act_print_root)
+        var firstFingerY1 = 0F
+        var secondFingerY1 = 0F
+        var fingerDistanceY = 0F
+        var isZooming = false
+        var scale = 1F
+
+       rootLayout.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(view: View?, event: MotionEvent?): Boolean {
+
+                when (event!!.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        //First finger pressed
+                        Log.d(tag, "Action down")
+                        firstFingerY1 = event.y
+                        return true
+                    }
+                    MotionEvent.ACTION_POINTER_DOWN -> {
+                        //Second finger pressed, get initial distance between fingers
+                        Log.d(tag, "Action pointer down")
+                        secondFingerY1 = event.getY(1)
+                        fingerDistanceY = kotlin.math.abs(firstFingerY1 - secondFingerY1)
+                        isZooming = true
+                        Log.d(tag, "f1: $firstFingerY1, f2: $secondFingerY1, Distance $fingerDistanceY")
+                        return true
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        if (isZooming) {
+                            //calculating new distance between fingers
+                            val firstFingerY2 = event.getY(0)
+                            val secondFingerY2 = event.getY(1)
+                            val newDistanceY = kotlin.math.abs(firstFingerY2 - secondFingerY2)
+
+                            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+                            scale = 1 + ((newDistanceY - fingerDistanceY) / screenHeight)
+                            scale = 0.1f.coerceAtLeast(scale.coerceAtMost(5.0f))
+                            Log.d(tag, "Scale: $scale, d1=$fingerDistanceY, d2=$newDistanceY")
+                            imagePreview.scaleX = scale
+                            imagePreview.scaleY = scale
+                        }
+                        return true
+                    }
+                    MotionEvent.ACTION_POINTER_UP ->{
+                        //Second finger lifted
+                        isZooming = false
+                        secondFingerY1 = 0F
+                        return true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        //Swipe finished
+                        Log.d(tag, "Action up")
+                        imagePreview.scaleX = 1f
+                        imagePreview.scaleY = 1f
+                        firstFingerY1 = 0F
+                        secondFingerY1 = 0F
+                        isZooming = false
+                        scale = 1F
+                        return true
+                    }
+                }
+                return true
+            }
+        })
 
         //ChooseFile button listener
         buttonChooseFile.setOnClickListener { getFile() }
@@ -214,6 +286,8 @@ class PrintActivity : AppCompatActivity() {
         Log.d(tag, "extension  $extension")
         webPreview.visibility = View.INVISIBLE
         imagePreview.visibility = View.INVISIBLE
+        imagePreview.scaleX = 1F
+        imagePreview.scaleY = 1F
 
         //Continue depending on the file extension
         when (extension.toLowerCase(Locale.ROOT)) {

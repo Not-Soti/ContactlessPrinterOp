@@ -54,6 +54,10 @@ class PrintActivity : AppCompatActivity() {
     private lateinit var imagePreview: ImageView
     private lateinit var webPreview: WebView
     private lateinit var downloadFragment: DownloadingFileFragment
+    private lateinit var rootLayout : ZoomLayout
+
+    private var imageViewOrigX = 0F
+    private var imageViewOrigY = 0F
 
     private val chooseFileActRequestCode = 1 //Code used in the onActivityResult petition
     private val requestExternalStoragePermissionCode = 2 //Code used when asking for permissions
@@ -121,7 +125,9 @@ class PrintActivity : AppCompatActivity() {
         imagePreview.visibility = View.INVISIBLE
 
         //Pinch gesture for zoom is set on the root layout
-        val rootLayout = findViewById<ZoomLayout>(R.id.act_print_root)
+        imageViewOrigX = imagePreview.x
+        imageViewOrigY = imagePreview.y
+        rootLayout = findViewById<ZoomLayout>(R.id.act_print_root)
         rootLayout.setImageView(imagePreview)
 
         //ChooseFile button listener
@@ -219,10 +225,14 @@ class PrintActivity : AppCompatActivity() {
         viewModel.setUri(Uri.fromFile(file))
         val extension = file.extension
         Log.d(tag, "extension  $extension")
+
+        //reset previews
         webPreview.visibility = View.INVISIBLE
         imagePreview.visibility = View.INVISIBLE
         imagePreview.scaleX = 1F
         imagePreview.scaleY = 1F
+        imagePreview.x = imageViewOrigX
+        imagePreview.y = imageViewOrigY
 
         //Continue depending on the file extension
         when (extension.toLowerCase(Locale.ROOT)) {
@@ -234,6 +244,7 @@ class PrintActivity : AppCompatActivity() {
                 imagePreview.visibility = View.VISIBLE
                 imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
                 imagePreview.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
+                rootLayout.setImageView(imagePreview)
             }
             "pdf" -> {
                 viewModel.setType(ResourceTypeEnum.PDF)
@@ -263,6 +274,7 @@ class PrintActivity : AppCompatActivity() {
                 )
                 //Set the page on the imageView
                 imagePreview.setImageBitmap(bitmap)
+                rootLayout.setImageView(imagePreview)
 
                 pageToRender.close()
                 pdfRenderer.close()

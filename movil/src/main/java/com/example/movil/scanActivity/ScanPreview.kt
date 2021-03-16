@@ -77,6 +77,10 @@ class ScanPreview : AppCompatActivity() {
 
         askAccessAllFilesPermission()
 
+        if(currentIndex >= scanResultUris.size){
+            openNoPagesDialog()
+        }
+
         //Pinch gesture for zoom is set on the root layout
         val rootLayout = findViewById<ZoomLayout>(R.id.act_scan_preview_root)
         rootLayout.setImageView(imagePreview)
@@ -287,5 +291,27 @@ class ScanPreview : AppCompatActivity() {
         super.onBackPressed()
         discardAllFiles()
         startActivity(Intent(applicationContext, ScanActivity::class.java))
+    }
+
+    /**
+     * Fun that creates a dialog when no more scan results are aviable and closes the activity
+     */
+    private fun openNoPagesDialog(){
+        val alertDialog: AlertDialog = this.let {
+            val builder = AlertDialog.Builder(it)
+            builder.apply {
+
+                setTitle("Sin resultados")
+                setMessage("No hay mas resultados")
+
+                setPositiveButton(R.string.accept
+                ) { dialog, _ ->
+                    startActivity(Intent(context, ScanActivity::class.java))
+                }
+            }
+            // Create the AlertDialog
+            builder.create()
+        }
+        alertDialog.show()
     }
 }

@@ -211,9 +211,10 @@ class ScanOptFragment : Fragment() {
 
         //Source
         when(chosenSource){
-            ScanOptions.ScanSource.ADF ->{ ticket.inputSource = ScanValues.INPUT_SOURCE_ADF }
-            ScanOptions.ScanSource.PLATEN ->{ ticket.inputSource = ScanValues.INPUT_SOURCE_PLATEN }
-            ScanOptions.ScanSource.CAMERA ->{ ticket.inputSource = ScanValues.INPUT_SOURCE_CAMERA }
+            ScanOptions.ScanSource.ADF -> { ticket.inputSource = ScanValues.INPUT_SOURCE_ADF }
+            ScanOptions.ScanSource.PLATEN -> { ticket.inputSource = ScanValues.INPUT_SOURCE_PLATEN }
+            ScanOptions.ScanSource.CAMERA -> { ticket.inputSource = ScanValues.INPUT_SOURCE_CAMERA }
+            ScanOptions.ScanSource.AUTO -> { ticket.inputSource = ScanValues.INPUT_SOURCE_AUTO }
         }
 
         //Sheet faces
@@ -402,8 +403,14 @@ class ScanOptFragment : Fragment() {
      * Fun that set chosen options from the UI
      */
     private fun setChosenSettings(){
-        val source = sourceSpinner.selectedItem.toString()
-        val nFaces = facesSpinner.selectedItem.toString()
+
+        val auto = "auto"
+
+        val source = if(sourceSpinner.selectedItem != null) sourceSpinner.selectedItem.toString()
+                     else auto
+
+        val nFaces = if(facesSpinner.selectedItem != null) facesSpinner.selectedItem.toString()
+                     else auto
         val color = colorSpinner.selectedItem.toString()
         val format = formatSpinner.selectedItem.toString()
         //val resolution = resolutionSpinner.selectedItem.toString()
@@ -414,12 +421,14 @@ class ScanOptFragment : Fragment() {
             getString(R.string.ScanOption_source_adf) -> chosenSource = ScanOptions.ScanSource.ADF
             getString(R.string.ScanOption_source_platen) -> chosenSource = ScanOptions.ScanSource.PLATEN
             getString(R.string.ScanOption_source_camera) -> chosenSource = ScanOptions.ScanSource.CAMERA
+            else -> chosenSource = ScanOptions.ScanSource.AUTO
         }
 
         //set number of faces
         when(nFaces){
             getString(R.string.ScanOption_faces_1face) -> chosenNFaces = ScanOptions.Faces.ONE_FACE
             getString(R.string.ScanOption_faces_2face) -> chosenNFaces = ScanOptions.Faces.TWO_FACES
+            else -> chosenNFaces = ScanOptions.Faces.ONE_FACE
         }
 
         //set colot

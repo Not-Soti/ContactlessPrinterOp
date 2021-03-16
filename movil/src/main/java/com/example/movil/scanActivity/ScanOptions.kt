@@ -5,7 +5,8 @@ class ScanOptions {
     enum class ScanSource{
         ADF,
         PLATEN,
-        CAMERA
+        CAMERA,
+        AUTO
     }
 
     enum class Faces{

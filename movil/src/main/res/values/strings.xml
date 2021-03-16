@@ -23,7 +23,7 @@
     <string name="ReadQrAct_checkNotifications">Acepta la conexión en la barra de notificaciones</string>
 
    <!-- ReadQrHelpDialog -->
-    <string name="Dialog_qr_scanner_help" translatable="false">
+    <string name="Dialog_qr_scanner_help">
         Es posible que utilizando dispositivos modernos, la conexión a la red no pueda establecerse automáticamente.
         Pulse el botón para conectarse manualmente en caso de que ésto no sea posible.
     </string>
@@ -85,7 +85,6 @@
     </string>
     <string name="permission_camDenied_endAct">Se necesita acceso a la camara para seguir utilizando esta funcionalidad</string>
     <string name="permission_ExtStorageDenied_endAct">Se necesita acceso al almacenamiento para seguir utilizando esta funcionalidad</string>
-    <string name="ScanOption_source_adf">Alimentador</string>
     <string name="ScanOption_source_adf">Alimentador</string>
     <string name="ScanOption_source_platen">Bandeja</string>
     <string name="ScanOption_source_camera">Cámara</string>

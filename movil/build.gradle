@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 30 //probar 29
+    compileSdkVersion 30
     //buildToolsVersion "30.0.0"
 
     defaultConfig {
         applicationId "com.example.movil"
         minSdkVersion 21
-        targetSdkVersion 30 // probar 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -42,7 +42,7 @@ dependencies {
     implementation 'com.google.mlkit:barcode-scanning:16.0.3'
 
     //HTML to bitmap
-    implementation 'com.izettle:html2bitmap:1.9'
+    /*implementation 'com.izettle:html2bitmap:1.9'*/
 
     //WifiUtils
     implementation 'com.thanosfisherman.wifiutils:wifiutils:1.6.4'
@@ -55,7 +55,7 @@ dependencies {
     implementation 'com.github.HBiSoft:PickiT:0.1.14'
 
     //PDFBox to combine scanned pdfs
-    implementation 'org.apache.pdfbox:pdfbox:2.0.22'
+    implementation 'com.tom_roush:pdfbox-android:1.8.10.1' //TODO no es la ultima version
 
 
 }

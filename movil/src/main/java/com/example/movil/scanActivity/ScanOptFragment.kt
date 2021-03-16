@@ -11,19 +11,20 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.movil.R
-import com.example.movil.ScannerSearchAct
+import com.example.movil.ScannerSearchFragment
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.*
-import org.apache.pdfbox.io.MemoryUsageSetting
-import org.apache.pdfbox.multipdf.PDFMergerUtility
+import com.tom_roush.pdfbox.multipdf.PDFMergerUtility
+import com.tom_roush.pdfbox.util.PDFBoxResourceLoader
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import kotlin.math.log
 
-class ScanFragment : Fragment() {
+class ScanOptFragment : Fragment() {
 
     private val tempScanFolder = "TempScan"
-    private val TAG = "--- ScanActivity ---"
+    private val TAG = "--- ScanOptFragment ---"
 
     private var tempPathAux = ""
 
@@ -47,6 +48,7 @@ class ScanFragment : Fragment() {
     private lateinit var chosenNFaces : ScanOptions.Faces
     private lateinit var chosenColorMode : ScanOptions.ColorMode
     private lateinit var chosenFormat : ScanOptions.Format
+    private var combineFiles = false
     //private lateinit var chosenRes : List<Resolution>
 
     override fun onCreateView(
@@ -56,9 +58,11 @@ class ScanFragment : Fragment() {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        val theView = inflater.inflate(R.layout.activity_scan, container, false)
-        val chosenScanner = (activity as ScannerSearchAct).chosenScanner
-        val chosenTicket = (activity as ScannerSearchAct).chosenTicket
+        val theView = inflater.inflate(R.layout.fragment_scan_options, container, false)
+        val chosenScanner = (activity as ScanActivity).chosenScanner
+        val chosenTicket = (activity as ScanActivity).chosenTicket
+
+        Log.d(TAG, "AAAAAAAAAAAAAAAAAAAa")
 
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)
         if(tempFolder!=null && !tempFolder.exists()){
@@ -67,22 +71,24 @@ class ScanFragment : Fragment() {
             }
         }
 
-        scanButton = theView.findViewById(R.id.act_scan_button)
-        nameTv = theView.findViewById(R.id.act_scan_deviceName)
-        statusTv = theView.findViewById(R.id.act_scan_deviceStatus)
-        sourceSpinner = theView.findViewById(R.id.act_scan_sourceSpinner)
-        facesSpinner = theView.findViewById(R.id.act_scan_facesSpinner)
-        colorSpinner = theView.findViewById(R.id.act_scan_colorSpinner)
-        resolutionSpinner = theView.findViewById(R.id.act_scan_resSpinner)
-        formatSpinner = theView.findViewById(R.id.act_scan_formatSpinner)
-        combineCheckBox = theView.findViewById(R.id.act_scan_combineFiles)
+        PDFBoxResourceLoader.init(context) //Recommended to init
+
+        scanButton = theView.findViewById(R.id.frag_scan_op_button)
+        nameTv = theView.findViewById(R.id.frag_scan_op_deviceName)
+        statusTv = theView.findViewById(R.id.frag_scan_op_deviceStatus)
+        sourceSpinner = theView.findViewById(R.id.frag_scan_op_sourceSpinner)
+        facesSpinner = theView.findViewById(R.id.frag_scan_op_facesSpinner)
+        colorSpinner = theView.findViewById(R.id.frag_scan_op_colorSpinner)
+        resolutionSpinner = theView.findViewById(R.id.frag_scan_op_resSpinner)
+        formatSpinner = theView.findViewById(R.id.frag_scan_op_formatSpinner)
+        combineCheckBox = theView.findViewById(R.id.frag_scan_op_combineFiles)
 
         //Adapters for each spinner
-        sourceAdapter = ArrayAdapter<String>(activity as ScannerSearchAct, R.layout.support_simple_spinner_dropdown_item)
-        facesAdapter = ArrayAdapter<String>(activity as ScannerSearchAct, R.layout.support_simple_spinner_dropdown_item)
-        colorAdapter = ArrayAdapter<String>(activity as ScannerSearchAct, R.layout.support_simple_spinner_dropdown_item)
-        resolutionAdapter = ArrayAdapter<String>(activity as ScannerSearchAct, R.layout.support_simple_spinner_dropdown_item)
-        formatAdapter = ArrayAdapter<String>(activity as ScannerSearchAct, R.layout.support_simple_spinner_dropdown_item)
+        sourceAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        facesAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        colorAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        resolutionAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        formatAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
 
         sourceAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
         facesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
@@ -101,7 +107,7 @@ class ScanFragment : Fragment() {
 
         scanButton.setOnClickListener{
             setChosenSettings()
-            val newTicket = setTicketOptions(chosenTicket!!)
+            val newTicket = setTicketOptions(chosenTicket)
             validateTicket(chosenScanner, newTicket) //Validates ticket and prints
         }
 
@@ -180,7 +186,6 @@ class ScanFragment : Fragment() {
                 Log.d(TAG, "Error obteniendo las caracteristicas del escaner")
                 Log.e(TAG, exception?.message!!)
             }
-
         })
 
         //Other scanning options
@@ -206,15 +211,9 @@ class ScanFragment : Fragment() {
 
         //Source
         when(chosenSource){
-            ScanOptions.ScanSource.ADF ->{
-                ticket.inputSource = ScanValues.INPUT_SOURCE_ADF
-            }
-            ScanOptions.ScanSource.PLATEN ->{
-                ticket.inputSource = ScanValues.INPUT_SOURCE_PLATEN
-            }
-            ScanOptions.ScanSource.CAMERA ->{
-                ticket.inputSource = ScanValues.INPUT_SOURCE_CAMERA
-            }
+            ScanOptions.ScanSource.ADF ->{ ticket.inputSource = ScanValues.INPUT_SOURCE_ADF }
+            ScanOptions.ScanSource.PLATEN ->{ ticket.inputSource = ScanValues.INPUT_SOURCE_PLATEN }
+            ScanOptions.ScanSource.CAMERA ->{ ticket.inputSource = ScanValues.INPUT_SOURCE_CAMERA }
         }
 
         //Sheet faces
@@ -302,7 +301,7 @@ class ScanFragment : Fragment() {
         //Open scanning fragment
         val fragmentManager = activity?.supportFragmentManager!!
         val fragmentTransaction = fragmentManager.beginTransaction()
-        val scanningFragment = ScanningFragment()
+        val scanningFragment = PerformingScanFragment()
         scanningFragment.show(fragmentTransaction, "scanningFragment")
 
         //Create the temp file to save the scanning
@@ -330,7 +329,7 @@ class ScanFragment : Fragment() {
                     Log.d(tag, "Scanning completed")
 
 
-                    if (combineCheckBox.isChecked) {
+                    if (combineFiles) {
                         //Create inputStreams from the ScanPages
                         val resInStreams = mutableListOf<InputStream>()
                         scanResultUris.forEach {
@@ -343,7 +342,7 @@ class ScanFragment : Fragment() {
                         val combinedFile = File("combinedFile.pdf", tempScanFolder)
                         val outStream = FileOutputStream(combinedFile)
                         pdfMerger.destinationStream = outStream
-                        pdfMerger.mergeDocuments(MemoryUsageSetting.setupTempFileOnly())
+                        pdfMerger.mergeDocuments(false) //TODO ver que es el false
                         outStream.close()
 
                         //Delete all elements and insert the new one
@@ -441,6 +440,8 @@ class ScanFragment : Fragment() {
 
         //TODO res
         //Crear array de resoluciones posibles y coger de ahi directamente
+
+        combineFiles = combineCheckBox.isChecked
     }
 
 }

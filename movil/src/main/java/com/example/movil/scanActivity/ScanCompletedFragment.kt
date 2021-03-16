@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import com.example.movil.R
-import com.example.movil.ScannerSearchAct
+import com.example.movil.ScannerSearchFragment
 
 class ScanCompletedFragment : DialogFragment() {
     lateinit var button : Button
@@ -28,7 +28,7 @@ class ScanCompletedFragment : DialogFragment() {
     }
 
     private fun closeDialog() {
-        val parentAct = activity as ScannerSearchAct
+        val parentAct = activity as ScanActivity
         parentAct.supportFragmentManager.beginTransaction().remove(this@ScanCompletedFragment).commit()
     }
 }

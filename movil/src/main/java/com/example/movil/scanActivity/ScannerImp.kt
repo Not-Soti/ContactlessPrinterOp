@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.util.Log
-import com.example.movil.ScannerSearchAct
+import com.example.movil.ScannerSearchFragment
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
@@ -17,7 +17,7 @@ class ScannerImp(
     val name: String
 ) : Scanner{
 
-    lateinit var act : Activity
+
 
     override fun scan(p0: String?, p1: ScanTicket?, p2: ScanCapture.ScanningProgressListener?) {
         Log.d("ScannerImp", "escaneando")
@@ -38,12 +38,6 @@ class ScannerImp(
         document.close()
 
         Log.d("ScannerImp", "Archivo escrito")
-
-        lateinit var actAux: Activity
-
-        actAux = act as ScannerSearchAct
-        //actAux.scanningCompleted()
-
     }
 
     override fun cancelScanning() {

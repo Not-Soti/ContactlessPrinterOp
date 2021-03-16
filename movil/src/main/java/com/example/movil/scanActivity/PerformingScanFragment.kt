@@ -8,9 +8,8 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.movil.R
-import com.example.movil.ScannerSearchAct
 
-class ScanningFragment : DialogFragment() {
+class PerformingScanFragment : DialogFragment() {
 
     private val TAG = "---ScanningFragment---"
     private lateinit var button : Button
@@ -22,17 +21,17 @@ class ScanningFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val theView = inflater.inflate(R.layout.fragment_scanning, container, false)
+        val theView = inflater.inflate(R.layout.fragment_performing_scan, container, false)
 
-        button = theView.findViewById(R.id.frag_scanning_button)
-        textView = theView.findViewById(R.id.frag_scanning_status)
+        button = theView.findViewById(R.id.frag_performing_scan_button)
+        textView = theView.findViewById(R.id.frag_performing_scan_status)
         button.setOnClickListener { stopScanning() }
 
         return theView
     }
 
     private fun stopScanning(){
-        val parentAct = activity as ScannerSearchAct
+        val parentAct = activity as ScanActivity
         parentAct.chosenScanner.cancelScanning()
         //Toast.makeText(activity, "Escaneo cancelado", Toast.LENGTH_LONG).show()
         parentAct.supportFragmentManager.beginTransaction().remove(this).commit()

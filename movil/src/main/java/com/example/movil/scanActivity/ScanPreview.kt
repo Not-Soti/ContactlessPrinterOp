@@ -286,6 +286,6 @@ class ScanPreview : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         discardAllFiles()
-        startActivity(Intent(applicationContext, ScannerSearchAct::class.java))
+        startActivity(Intent(applicationContext, ScanActivity::class.java))
     }
 }

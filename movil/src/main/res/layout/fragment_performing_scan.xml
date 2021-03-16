@@ -6,18 +6,18 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/frag_scanning_status"
+        android:id="@+id/frag_performing_scan_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/fragScanningImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frag_scanning_progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/frag_performing_scan_progressBar"
         android:textColor="#000000"/>
 
     <Button
-        android:id="@+id/frag_scanning_button"
+        android:id="@+id/frag_performing_scan_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
@@ -25,10 +25,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frag_scanning_status" />
+        app:layout_constraintTop_toBottomOf="@+id/frag_performing_scan_status" />
 
     <ProgressBar
-        android:id="@+id/frag_scanning_progressBar"
+        android:id="@+id/frag_performing_scan_progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

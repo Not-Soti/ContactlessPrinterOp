@@ -29,7 +29,8 @@ class ScanOptFragment : Fragment() {
     private var tempPathAux = ""
 
     private lateinit var nameTv : TextView
-    private lateinit var statusTv : TextView
+    private lateinit var deviceStatusTv : TextView
+    private lateinit var adfStatusTv : TextView
     private lateinit var scanButton : Button
     private lateinit var sourceSpinner : Spinner
     private lateinit var facesSpinner : Spinner
@@ -75,7 +76,8 @@ class ScanOptFragment : Fragment() {
 
         scanButton = theView.findViewById(R.id.frag_scan_op_button)
         nameTv = theView.findViewById(R.id.frag_scan_op_deviceName)
-        statusTv = theView.findViewById(R.id.frag_scan_op_deviceStatus)
+        deviceStatusTv = theView.findViewById(R.id.frag_scan_op_deviceStatus)
+        adfStatusTv = theView.findViewById(R.id.frag_scan_op_adfStatus)
         sourceSpinner = theView.findViewById(R.id.frag_scan_op_sourceSpinner)
         facesSpinner = theView.findViewById(R.id.frag_scan_op_facesSpinner)
         colorSpinner = theView.findViewById(R.id.frag_scan_op_colorSpinner)
@@ -103,7 +105,6 @@ class ScanOptFragment : Fragment() {
         formatSpinner.adapter = formatAdapter
 
         nameTv.text = chosenScanner.humanReadableName
-        statusTv.text = "Va tirando"
 
         scanButton.setOnClickListener{
             setChosenSettings()
@@ -128,13 +129,48 @@ class ScanOptFragment : Fragment() {
                     combineCheckBox.isSelected = false
                 }
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
-
         }
 
         getScannerCapabilities(chosenScanner)
+
+        chosenScanner.monitorDeviceStatus(DeviceStatusMonitor.DEFAULT_MONITORING_PERIOD, object: DeviceStatusMonitor.ScannerStatusListener{
+            override fun onStatusChanged(scannerSta: Int, adfSta: Int) {
+                val scannerStr = when(scannerSta){
+                    DeviceStatusMonitor.SCANNER_STATUS_IDLE -> getString(R.string.SCANNER_STATUS_IDLE)
+                    DeviceStatusMonitor.SCANNER_STATUS_PROCESSING -> getString(R.string.SCANNER_STATUS_PROCESSING)
+                    DeviceStatusMonitor.SCANNER_STATUS_STOPPED -> getString(R.string.SCANNER_STATUS_STOPPED)
+                    DeviceStatusMonitor.SCANNER_STATUS_TESTING -> getString(R.string.SCANNER_STATUS_TESTING)
+                    DeviceStatusMonitor.SCANNER_STATUS_UNAVAILABLE -> getString(R.string.SCANNER_STATUS_UNAVAILABLE)
+                    DeviceStatusMonitor.SCANNER_STATUS_UNKNOWN -> getString(R.string.SCANNER_STATUS_UNKNOWN)
+                    else ->  getString(R.string.SCANNER_STATUS_UNKNOWN)
+                }
+                val adfStr = when(adfSta){
+                    DeviceStatusMonitor.ADF_STATUS_DUPLEX_PAGE_TOO_LONG -> getString(R.string.ADF_STATUS_DUPLEX_PAGE_TOO_LONG)
+                    DeviceStatusMonitor.ADF_STATUS_DUPLEX_PAGE_TOO_SHORT -> getString(R.string.ADF_STATUS_DUPLEX_PAGE_TOO_SHORT)
+                    DeviceStatusMonitor.ADF_STATUS_EMPTY -> getString(R.string.ADF_STATUS_EMPTY)
+                    DeviceStatusMonitor.ADF_STATUS_HATCH_OPEN -> getString(R.string.ADF_STATUS_HATCH_OPEN)
+                    DeviceStatusMonitor.ADF_STATUS_INPUT_TRAY_FAILED -> getString(R.string.ADF_STATUS_INPUT_TRAY_FAILED)
+                    DeviceStatusMonitor.ADF_STATUS_INPUT_TRAY_OVERLOADED -> getString(R.string.ADF_STATUS_INPUT_TRAY_OVERLOADED)
+                    DeviceStatusMonitor.ADF_STATUS_JAM -> getString(R.string.ADF_STATUS_JAM)
+                    DeviceStatusMonitor.ADF_STATUS_LOADED -> getString(R.string.ADF_STATUS_LOADED)
+                    DeviceStatusMonitor.ADF_STATUS_MISPICK -> getString(R.string.ADF_STATUS_MISPICK)
+                    DeviceStatusMonitor.ADF_STATUS_MULTIPICK_DETECTED -> getString(R.string.ADF_STATUS_MULTIPICK_DETECTED)
+                    DeviceStatusMonitor.ADF_STATUS_PROCESSING -> getString(R.string.ADF_STATUS_PROCESSING)
+                    DeviceStatusMonitor.ADF_STATUS_UNKNOWN -> getString(R.string.ADF_STATUS_UNKNOWN)
+                    DeviceStatusMonitor.ADF_STATUS_UNSUPPORTED -> getString(R.string.ADF_STATUS_UNSUPPORTED)
+                    else -> getString(R.string.ADF_STATUS_UNKNOWN)
+                }
+                deviceStatusTv.text = scannerStr
+                adfStatusTv.text = adfStr
+            }
+            override fun onStatusError(e: ScannerException?) {
+                if (e != null) {
+                    Log.e(TAG, e.message!!)
+                }
+            }
+        })
         return theView
     }
 

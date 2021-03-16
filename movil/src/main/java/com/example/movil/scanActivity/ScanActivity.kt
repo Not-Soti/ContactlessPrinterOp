@@ -52,6 +52,7 @@ class ScanActivity : AppCompatActivity() {
             }
             2 -> {
                 //Replace scanOptionsFragment with searchScannerFragment
+                chosenScanner.stopMonitoringDeviceStatus()
                 screenStatus = 1
                 val scanFrag = ScannerSearchFragment()
                 val trans = supportFragmentManager.beginTransaction()
@@ -62,5 +63,10 @@ class ScanActivity : AppCompatActivity() {
                 Log.d(TAG, "back 2")
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        chosenScanner.stopMonitoringDeviceStatus()
     }
 }

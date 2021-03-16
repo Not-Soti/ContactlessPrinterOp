@@ -98,5 +98,26 @@
     <string name="ScanOption_colorMode_grey16">Gris 16dpp</string>
     <string name="ScanOption_colorMode_color24">Color 24dpp</string>
     <string name="ScanOption_colorMode_color48">Color 48dpp</string>
+    <string name="ScanOption_scanner_label">Escáner:</string>
+    <string name="ScanOption_adf_label">Alimentador:</string>
+    <string name="ADF_STATUS_DUPLEX_PAGE_TOO_LONG">"La página es demasiado larga "</string>
+    <string name="ADF_STATUS_DUPLEX_PAGE_TOO_SHORT">La página es demasiado pequeña</string>
+    <string name="ADF_STATUS_EMPTY">El alimentador está vacío</string>
+    <string name="ADF_STATUS_HATCH_OPEN">Tapa abierta</string>
+    <string name="ADF_STATUS_INPUT_TRAY_FAILED">La bandeja del alimentador está rota</string>
+    <string name="ADF_STATUS_INPUT_TRAY_OVERLOADED">Bandeja saturada</string>
+    <string name="ADF_STATUS_JAM">El alimentador se ha atascado</string>
+    <string name="ADF_STATUS_LOADED">Cargado</string>
+    <string name="ADF_STATUS_MISPICK">ADF mispick occurred</string>
+    <string name="ADF_STATUS_MULTIPICK_DETECTED">Cogiendo varios elementos</string>
+    <string name="ADF_STATUS_PROCESSING">Procesando</string>
+    <string name="ADF_STATUS_UNKNOWN">Desconocido</string>
+    <string name="ADF_STATUS_UNSUPPORTED">No se ha detectado un alimentador</string>
+    <string name="SCANNER_STATUS_IDLE">Preparado</string>
+    <string name="SCANNER_STATUS_PROCESSING">Escaneo en curso</string>
+    <string name="SCANNER_STATUS_STOPPED">Detenido</string>
+    <string name="SCANNER_STATUS_TESTING">Preparando</string>
+    <string name="SCANNER_STATUS_UNAVAILABLE">No disponible</string>
+    <string name="SCANNER_STATUS_UNKNOWN">Desconocido</string>
 
 </resources>

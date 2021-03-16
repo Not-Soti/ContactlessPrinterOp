@@ -71,4 +71,25 @@
     <string name="ScanOption_colorMode_grey16">Grey 16dpp</string>
     <string name="ScanOption_colorMode_color24">Color 24dpp</string>
     <string name="ScanOption_colorMode_color48">Color 48dpp</string>
+    <string name="ScanOption_scanner_label">Scanner:</string>
+    <string name="ScanOption_adf_label">ADF:</string>
+    <string name="ADF_STATUS_DUPLEX_PAGE_TOO_LONG">Media is too long</string>
+    <string name="ADF_STATUS_DUPLEX_PAGE_TOO_SHORT">"Media is too "</string>
+    <string name="ADF_STATUS_EMPTY">There is no media in ADF input tray</string>
+    <string name="ADF_STATUS_HATCH_OPEN">Hatch opened</string>
+    <string name="ADF_STATUS_INPUT_TRAY_FAILED">ADF input tray is broken</string>
+    <string name="ADF_STATUS_INPUT_TRAY_OVERLOADED">ADF input tray is overloaded</string>
+    <string name="ADF_STATUS_JAM">Media is jammed in ADF</string>
+    <string name="ADF_STATUS_LOADED">Loaded</string>
+    <string name="ADF_STATUS_MISPICK">ADF mispick occurred</string>
+    <string name="ADF_STATUS_MULTIPICK_DETECTED">Picking few medias</string>
+    <string name="ADF_STATUS_PROCESSING">Processing</string>
+    <string name="ADF_STATUS_UNKNOWN">Unknown</string>
+    <string name="ADF_STATUS_UNSUPPORTED">ADF not detected</string>
+    <string name="SCANNER_STATUS_IDLE">Ready</string>
+    <string name="SCANNER_STATUS_PROCESSING">Scan in progress</string>
+    <string name="SCANNER_STATUS_STOPPED">Stopped</string>
+    <string name="SCANNER_STATUS_TESTING">Preparing</string>
+    <string name="SCANNER_STATUS_UNAVAILABLE">Unavailable</string>
+    <string name="SCANNER_STATUS_UNKNOWN">Unknown</string>
 </resources>

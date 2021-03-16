@@ -85,5 +85,19 @@
     </string>
     <string name="permission_camDenied_endAct">Se necesita acceso a la camara para seguir utilizando esta funcionalidad</string>
     <string name="permission_ExtStorageDenied_endAct">Se necesita acceso al almacenamiento para seguir utilizando esta funcionalidad</string>
+    <string name="ScanOption_source_adf">Alimentador</string>
+    <string name="ScanOption_source_adf">Alimentador</string>
+    <string name="ScanOption_source_platen">Bandeja</string>
+    <string name="ScanOption_source_camera">Cámara</string>
+    <string name="ScanOption_faces_1face">1 cara</string>
+    <string name="ScanOption_faces_2face">2 caras</string>
+    <string name="ScanOption_format_PDF">PDF</string>
+    <string name="ScanOption_format_JPEG">JPEG</string>
+    <string name="ScanOption_format_RAW">RAW</string>
+    <string name="ScanOption_colorMode_BW">B/N</string>
+    <string name="ScanOption_colorMode_grey8">Gris 8dpp</string>
+    <string name="ScanOption_colorMode_grey16">Gris 16dpp</string>
+    <string name="ScanOption_colorMode_color24">Color 24dpp</string>
+    <string name="ScanOption_colorMode_color48">Color 48dpp</string>
 
 </resources>

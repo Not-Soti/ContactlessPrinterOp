@@ -1,6 +1,5 @@
 package com.example.movil.scanActivity
 
-import android.bluetooth.le.ScanSettings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -47,8 +46,8 @@ class ScanFragment : Fragment() {
     private lateinit var chosenSource : ScanOptions.ScanSource
     private lateinit var chosenNFaces : ScanOptions.Faces
     private lateinit var chosenColorMode : ScanOptions.ColorMode
-    //private lateinit var chosenRes : ScanOptions.ColorMode
     private lateinit var chosenFormat : ScanOptions.Format
+    //private lateinit var chosenRes : List<Resolution>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,11 +100,33 @@ class ScanFragment : Fragment() {
         statusTv.text = "Va tirando"
 
         scanButton.setOnClickListener{
+            setChosenSettings()
             val newTicket = setTicketOptions(chosenTicket!!)
             validateTicket(chosenScanner, newTicket) //Validates ticket and prints
         }
 
-        //hacer que al elegir pdf se vea el checkbox de combinar
+        //If source is ADF, show combine files checkbox
+        sourceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val selectedSource = parent?.getItemAtPosition(position).toString()
+                val adfStr = context!!.getString(R.string.ScanOption_source_adf)
+                if(selectedSource == adfStr){
+                    combineCheckBox.visibility = View.VISIBLE
+                }else{
+                    combineCheckBox.visibility = View.INVISIBLE
+                    combineCheckBox.isSelected = false
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+
+        }
 
         getScannerCapabilities(chosenScanner)
         return theView
@@ -126,23 +147,23 @@ class ScanFragment : Fragment() {
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_SIMPLEX)){
                     if(!hasADF) {
                         hasADF = true
-                        sourceAdapter.add("Alimentador")
+                        sourceAdapter.add(getString(R.string.ScanOption_source_adf))
                         sourceAdapter.notifyDataSetChanged()
                     }
-                    facesAdapter.add("1 cara")
+                    facesAdapter.add(getString(R.string.ScanOption_faces_1face))
                     facesAdapter.notifyDataSetChanged()
                 }
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX)){
                     if(!hasADF) {
                         hasADF = true
-                        sourceAdapter.add("Alimentador")
+                        sourceAdapter.add(getString(R.string.ScanOption_source_adf))
                         sourceAdapter.notifyDataSetChanged()
                     }
-                    facesAdapter.add("2 caras")
+                    facesAdapter.add(getString(R.string.ScanOption_faces_2face))
                     facesAdapter.notifyDataSetChanged()
                 }
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_PLATEN)){
-                    sourceAdapter.add("Plancha")
+                    sourceAdapter.add(getString(R.string.ScanOption_source_platen))
                     sourceAdapter.notifyDataSetChanged()
                 }
 
@@ -164,23 +185,22 @@ class ScanFragment : Fragment() {
 
         //Other scanning options
         //Color
-        colorAdapter.add("B/W")
-        colorAdapter.add("Gris 8bpp")
-        colorAdapter.add("Gris 16bpp")
-        colorAdapter.add("Color 24bpp")
-        colorAdapter.add("Color 48bpp")
+        colorAdapter.add(getString(R.string.ScanOption_colorMode_BW))
+        colorAdapter.add(getString(R.string.ScanOption_colorMode_grey8))
+        colorAdapter.add(getString(R.string.ScanOption_colorMode_grey16))
+        colorAdapter.add(getString(R.string.ScanOption_colorMode_color24))
+        colorAdapter.add(getString(R.string.ScanOption_colorMode_color48))
         colorAdapter.notifyDataSetChanged()
 
         //File format
-        formatAdapter.add("PDF")
-        formatAdapter.add("JPEG")
-        formatAdapter.add("RAW")
+        formatAdapter.add(getString(R.string.ScanOption_format_PDF))
+        formatAdapter.add(getString(R.string.ScanOption_format_JPEG))
+        formatAdapter.add(getString(R.string.ScanOption_format_RAW))
         formatAdapter.notifyDataSetChanged()
     }
 
     /**
-     * Function that gets scanning options from the user and sets them
-     * in the scanTicket
+     * Function that gets scanning options from the chosen settings
      */
     private fun setTicketOptions(ticket : ScanTicket) : ScanTicket{
 
@@ -377,6 +397,50 @@ class ScanFragment : Fragment() {
             }
         }
         tempFileOrFolder.delete()
+    }
+
+    /**
+     * Fun that set chosen options from the UI
+     */
+    private fun setChosenSettings(){
+        val source = sourceSpinner.selectedItem.toString()
+        val nFaces = facesSpinner.selectedItem.toString()
+        val color = colorSpinner.selectedItem.toString()
+        val format = formatSpinner.selectedItem.toString()
+        //val resolution = resolutionSpinner.selectedItem.toString()
+        //TODO Resolucion
+
+        //set source
+        when(source){
+            getString(R.string.ScanOption_source_adf) -> chosenSource = ScanOptions.ScanSource.ADF
+            getString(R.string.ScanOption_source_platen) -> chosenSource = ScanOptions.ScanSource.PLATEN
+            getString(R.string.ScanOption_source_camera) -> chosenSource = ScanOptions.ScanSource.CAMERA
+        }
+
+        //set number of faces
+        when(nFaces){
+            getString(R.string.ScanOption_faces_1face) -> chosenNFaces = ScanOptions.Faces.ONE_FACE
+            getString(R.string.ScanOption_faces_2face) -> chosenNFaces = ScanOptions.Faces.TWO_FACES
+        }
+
+        //set colot
+        when(color){
+            getString(R.string.ScanOption_colorMode_BW) -> chosenColorMode = ScanOptions.ColorMode.BW
+            getString(R.string.ScanOption_colorMode_grey8) -> chosenColorMode = ScanOptions.ColorMode.GREY_8
+            getString(R.string.ScanOption_colorMode_grey16) -> chosenColorMode = ScanOptions.ColorMode.GREY_16
+            getString(R.string.ScanOption_colorMode_color24) -> chosenColorMode = ScanOptions.ColorMode.COLOR_24
+            getString(R.string.ScanOption_colorMode_color48) -> chosenColorMode = ScanOptions.ColorMode.COLOR_48
+        }
+
+        //set format
+        when(format){
+            getString(R.string.ScanOption_format_PDF) -> chosenFormat = ScanOptions.Format.PDF
+            getString(R.string.ScanOption_format_JPEG) -> chosenFormat = ScanOptions.Format.JPEG
+            getString(R.string.ScanOption_format_RAW) -> chosenFormat = ScanOptions.Format.RAW
+        }
+
+        //TODO res
+        //Crear array de resoluciones posibles y coger de ahi directamente
     }
 
 }

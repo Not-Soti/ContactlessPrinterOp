@@ -3,28 +3,23 @@ package com.example.movil
 import com.example.movil.scanActivity.*
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.hp.mobile.scan.sdk.AdfException
-import com.hp.mobile.scan.sdk.ScanCapture
+import androidx.fragment.app.commit
 import com.hp.mobile.scan.sdk.Scanner
-import com.hp.mobile.scan.sdk.ScannerException
 import com.hp.mobile.scan.sdk.browsing.ScannersBrowser
 import com.hp.mobile.scan.sdk.browsing.ScannersBrowser.ScannerAvailabilityListener
-import com.hp.mobile.scan.sdk.model.ScanPage
 import com.hp.mobile.scan.sdk.model.ScanTicket
-import java.io.File
 
-class ScanActivity : AppCompatActivity() {
+class ScannerSearchAct : AppCompatActivity() {
 
 
-    private val tempScanFolder = "TempScan"
-    private val tag = "--- ScanActivity ---"
+    //private val tempScanFolder = "TempScan"
+    private val tag = "--- ScannerSearchActivity ---"
     private lateinit var scannerListAdapter : ScannerListAdapter
     private lateinit var scannerListView : ListView
     private lateinit var scannerSearchButton : Button
@@ -33,9 +28,9 @@ class ScanActivity : AppCompatActivity() {
     private lateinit var scannerBrowser : ScannersBrowser
     private lateinit var progressBar : ProgressBar
     var scannerNumber = 0 //Debug
-    var scanResultUri : Uri? = null
+    //var scanResultUri : Uri? = null
 
-    private var tempPathAux = ""
+    //private var tempPathAux = ""
 
     lateinit var chosenScanner : Scanner
     var chosenTicket : ScanTicket? = null
@@ -56,23 +51,23 @@ class ScanActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scan)
+        setContentView(R.layout.activity_scanner_search)
 
 
-        scannerListView = findViewById(R.id.act_scan_deviceListView)
-        scannerSearchButton = findViewById(R.id.act_scan_searchScannerButton)
-        auxText = findViewById(R.id.act_scan_aux)
+        scannerListView = findViewById(R.id.act_scanner_search_deviceListView)
+        scannerSearchButton = findViewById(R.id.act_scanner_search_searchScannerButton)
+        auxText = findViewById(R.id.act_scanner_search_aux)
         scannerBrowser = ScannersBrowser(this)
-        progressBar = findViewById(R.id.act_scan_progressBar)
+        progressBar = findViewById(R.id.act_scanner_search_progressBar)
         scannerListAdapter = ScannerListAdapter(applicationContext)
         scannerListView.adapter = scannerListAdapter
 
-        val tempFolder = getExternalFilesDir(tempScanFolder)
+        /*val tempFolder = getExternalFilesDir(tempScanFolder)
         if(tempFolder!=null && !tempFolder.exists()){
             if(tempFolder.mkdirs()){
                 Log.d(tag, "temp folder created")
             }
-        }
+        }*/
 
         scannerSearchButton.setOnClickListener {
             if (!isSearching) {
@@ -103,7 +98,6 @@ class ScanActivity : AppCompatActivity() {
 
                 scannerListView.adapter=scannerListAdapter*/
 
-
             } else {
                 //Stop searching
                 stopSearching()
@@ -113,20 +107,12 @@ class ScanActivity : AppCompatActivity() {
         scannerListView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, _ -> //Stop searching
                 stopSearching()
-
                 chosenScanner = parent?.adapter?.getItem(position) as Scanner
-                /*Toast.makeText(
-                            this@ScanActivity,
-                            "Seleccionado el escaner ${chosenScanner.humanReadableName}",
-                            Toast.LENGTH_SHORT
-                        ).show()*/
-
                 //Show popup menu
                 if (view != null) {
                     showPopupChooseTicket(view)
                 }
             }
-
     }
 
     /**
@@ -150,7 +136,8 @@ class ScanActivity : AppCompatActivity() {
                             Log.d(tag, "Scan photo chosen")
                             chosenTicket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
                             //Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            startScanning()
+                            //startScanning()
+                            openScanFrag()
 
                             return true
                         }
@@ -161,7 +148,8 @@ class ScanActivity : AppCompatActivity() {
                             chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_AND_IMAGES)
                             //Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            startScanning()
+                            //startScanning()
+                            openScanFrag()
 
                             return true
                         }
@@ -173,7 +161,8 @@ class ScanActivity : AppCompatActivity() {
                             chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_DOCUMENT)
                             //Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            startScanning()
+                            //startScanning()
+                            openScanFrag()
 
                             return true
                         }
@@ -187,7 +176,11 @@ class ScanActivity : AppCompatActivity() {
         menu.show()
     }
 
-    private fun startScanning(){
+    private fun openScanFrag(){
+        supportFragmentManager.beginTransaction().add(R.id.act_scanner_search_fragContainer, ScanFragment::class.java, null).commit()
+    }
+
+    /*private fun startScanning(){
         //Log.d(tag, "startScanning()")
 
         //Open scanning fragment
@@ -242,7 +235,7 @@ class ScanActivity : AppCompatActivity() {
             }
 
         })
-    }
+    }*/
 
     //Stops the scanner searching over the network
     private fun stopSearching(){
@@ -257,12 +250,12 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    //TODO("Borrar")
+/*    //TODO("Borrar")
     fun scanningCompleted(){
-        val i = Intent(this@ScanActivity, ScanPreview::class.java)
+        val i = Intent(this@ScannerSearchAct, ScanPreview::class.java)
         i.putExtra("tempPath", tempPathAux)
         startActivity(i)
-    }
+    }*/
 
     override fun onBackPressed() {
         super.onBackPressed()

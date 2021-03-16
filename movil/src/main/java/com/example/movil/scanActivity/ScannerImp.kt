@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.util.Log
-import com.example.movil.ScanActivity
+import com.example.movil.ScannerSearchAct
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.ScanTicket
 import java.io.File
@@ -41,8 +41,8 @@ class ScannerImp(
 
         lateinit var actAux: Activity
 
-        actAux = act as ScanActivity
-        actAux.scanningCompleted()
+        actAux = act as ScannerSearchAct
+        //actAux.scanningCompleted()
 
     }
 
@@ -67,7 +67,6 @@ class ScannerImp(
     }
 
     override fun fetchCapabilities(p0: ScannerCapabilitiesFetcher.ScannerCapabilitiesListener?) {
-        TODO("Not yet implemented")
     }
 
     override fun isFetchingCapabilities(): Boolean {

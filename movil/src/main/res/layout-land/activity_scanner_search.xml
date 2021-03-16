@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_scan_root"
+    android:id="@+id/activity_scanner_search_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/act_scan_searchScannerButton"
+        android:id="@+id/act_scanner_search_searchScannerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
@@ -19,25 +19,25 @@
         android:background="@drawable/scan_act_button_bg"/>
 
     <TextView
-        android:id="@+id/act_scan_aux"
+        android:id="@+id/act_scanner_search_aux"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="@+id/act_scan_progressBar"
-        app:layout_constraintEnd_toStartOf="@+id/act_scan_progressBar"
-        app:layout_constraintStart_toStartOf="@+id/act_scan_searchScannerButton"
-        app:layout_constraintTop_toTopOf="@+id/act_scan_progressBar" />
+        app:layout_constraintBottom_toBottomOf="@+id/act_scanner_search_progressBar"
+        app:layout_constraintEnd_toStartOf="@+id/act_scanner_search_progressBar"
+        app:layout_constraintStart_toStartOf="@+id/act_scanner_search_searchScannerButton"
+        app:layout_constraintTop_toTopOf="@+id/act_scanner_search_progressBar" />
 
     <ProgressBar
-        android:id="@+id/act_scan_progressBar"
+        android:id="@+id/act_scanner_search_progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/act_scan_searchScannerButton"
-        app:layout_constraintEnd_toEndOf="@+id/act_scan_searchScannerButton" />
+        app:layout_constraintBottom_toTopOf="@+id/act_scanner_search_searchScannerButton"
+        app:layout_constraintEnd_toEndOf="@+id/act_scanner_search_searchScannerButton" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,7 +49,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ListView
-            android:id="@+id/act_scan_deviceListView"
+            android:id="@+id/act_scanner_search_deviceListView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

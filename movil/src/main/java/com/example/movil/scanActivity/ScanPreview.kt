@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.*
@@ -32,20 +33,21 @@ class ScanPreview : AppCompatActivity() {
     private lateinit var imagePreview : ImageView
     private lateinit var saveButton : Button
     private lateinit var discardButton: Button
+    private lateinit var chosenFormat : ScanOptions.Format
 
-    private lateinit var tempFilePath : String
-    private var tempFileUri : Uri? = null
+    //private lateinit var tempFilePath : String
+    //private var currentTempUri : Uri? = null //Used to get each file if there are more than 1
+    private var currentIndex = 0 //Used to get each temp file if there is more than 1
+    var scanResultUris = arrayListOf<Uri>()
     private lateinit var pickit : PickiT
     private val pickitListener = object: PickiTCallbacks {
         override fun PickiTonUriReturned() {
             //Used when the file is picked from the Cloud
             Log.d(tag, "Pickit on uri returned (Descargando archivo)")
         }
-
         override fun PickiTonStartListener() {
             Log.d(tag, "Pickit on start listener (Creando archivo de descarga)")
         }
-
         override fun PickiTonProgressUpdate(progress: Int) {
             Log.d(tag, "Pickit on progress update (Progreso de descarga $progress")
         }
@@ -58,9 +60,9 @@ class ScanPreview : AppCompatActivity() {
             Reason: String?
         ) {
             Log.d(tag, "Pickit on complete listener Ruta: $path")
-            Toast.makeText(applicationContext, "Ruta: $path", Toast.LENGTH_LONG).show()
+            //Toast.makeText(applicationContext, "Ruta: $path", Toast.LENGTH_LONG).show()
 
-            Log.d(tag, "PickiT path: $path")
+            //Log.d(tag, "PickiT path: $path")
             copyTempToPath(File(path!!))
         }
     }
@@ -79,21 +81,48 @@ class ScanPreview : AppCompatActivity() {
         val rootLayout = findViewById<ZoomLayout>(R.id.act_scan_preview_root)
         rootLayout.setImageView(imagePreview)
 
-        saveButton.setOnClickListener { saveFile() }
-        discardButton.setOnClickListener{ discardFile() }
-
         val bundle = intent.extras
         if (bundle != null) {
-            tempFileUri = Uri.parse(bundle.getString("tempUri", ""))
-            tempFilePath = tempFileUri?.path!!
-            Log.d(tag, "Temp file uri: $tempFileUri")
-            Log.d(tag, "Temp file path: $tempFilePath")
+            //tempFileUri = Uri.parse(bundle.getString("tempUri", ""))
+            //scanResultUris = bundle.getSerializable("tempUris") as ArrayList<Uri?>
+            scanResultUris = bundle.getParcelableArrayList<Uri>("tempUris") as ArrayList<Uri>
+            //tempFilePath = tempFileUri?.path!!
+            chosenFormat = bundle.getSerializable("chosenFormat") as ScanOptions.Format
         }
-
         pickit = PickiT(this, pickitListener, this)
 
+        saveButton.setOnClickListener { askPermissions() }
+        discardButton.setOnClickListener{
+            discardFile(scanResultUris[currentIndex])
+            //++currentIndex //done in discard file
+        }
+
+        when(chosenFormat){
+            ScanOptions.Format.PDF -> {
+                previewPdf(scanResultUris[currentIndex])
+            }
+            ScanOptions.Format.JPEG -> {
+                previewImage(scanResultUris[currentIndex])
+            }
+            ScanOptions.Format.RAW -> {
+                Toast.makeText(this, "Formato RAW", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun previewImage(uri : Uri){
+        val file = File(uri.path!!)
+        imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+        imagePreview.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
+        //rootLayout.setImageView(imagePreview)
+        //imagePreview.invalidate()
+    }
+
+    private fun previewPdf(uri : Uri){
+        val firstFile = uri.path
+
         //render pdf
-        val file = File(tempFilePath)
+        val file = File(firstFile!!)
         imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
             file,
@@ -120,13 +149,7 @@ class ScanPreview : AppCompatActivity() {
         fileDescriptor.close()
     }
 
-    private fun discardFile(){
-        val tempFile = File(tempFilePath)
-        tempFile.delete()
-        startActivity(Intent(this, ScanActivity::class.java))
-    }
-
-    private fun saveFile(){
+    private fun askPermissions(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
             //In android 11 manage all files permission is needed
             if(Environment.isExternalStorageManager()){
@@ -135,19 +158,6 @@ class ScanPreview : AppCompatActivity() {
                 askAccessAllFilesPermission()
             }
         }else {
-           /* if(ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED){
-                askDirectory()
-            }else {
-                val permissionHelper = PermissionHelper(
-                    this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    writeExternalStoragePermissionCode,
-                    "Acceso al almacenamiendo necesario",
-                    "Acceso al almacenamiento necesario para crear el archivo escaneado"
-                )
-                permissionHelper.checkAndAskForPermission()
-            }*/
             when {
                 ContextCompat.checkSelfPermission(
                     applicationContext,
@@ -188,13 +198,17 @@ class ScanPreview : AppCompatActivity() {
     }
 
     private fun askDirectory(){
-        Log.d(tag, "askDirectory()")
+
+        val ext = when(chosenFormat){
+            ScanOptions.Format.RAW -> "application/octet-stream"
+            ScanOptions.Format.PDF -> "application/pdf"
+            ScanOptions.Format.JPEG -> "image/jpeg"
+        }
+
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
             addCategory(Intent.CATEGORY_OPENABLE)
-
-            type = "application/pdf"
-            //type = "text/plain"
-            putExtra(Intent.EXTRA_TITLE, "ArchivoPrueba1")
+            type = ext
+            putExtra(Intent.EXTRA_TITLE, "")
         }
         startActivityForResult(intent, createDocumentActCode)
     }
@@ -234,25 +248,44 @@ class ScanPreview : AppCompatActivity() {
     }
 
     private fun copyTempToPath(destFile : File){
-        val temp = File(tempFilePath)
+        val temp = File(scanResultUris[currentIndex].path!!)
         Log.d(tag, "Copiando archivo")
         temp.copyTo(destFile, true, 2048)
         Log.d(tag, "Archivo copiado")
         temp.delete()
         Log.d(tag, "Temporal borrado")
-        startActivity(Intent(this, ScanActivity::class.java))
+        //startActivity(Intent(this, ScannerSearchAct::class.java))
+        ++currentIndex
+        recreate()
     }
 
     private fun endActivityNoPermission(){
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.permission_ExtStorageDenied_endAct))
             .setPositiveButton(android.R.string.ok){ _, _ ->
+                discardAllFiles()
                 startActivity(Intent(applicationContext, MainActivity::class.java))
             }.show()
     }
 
+    private fun discardFile(uri : Uri){
+        val tempFile = File(uri.path!!)
+        if(tempFile.exists()) {
+            tempFile.delete()
+        }
+        ++currentIndex
+        recreate()
+    }
+
+    private fun discardAllFiles(){
+        scanResultUris.forEach{
+            discardFile(it)
+        }
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
-        discardFile()
+        discardAllFiles()
+        startActivity(Intent(applicationContext, ScannerSearchAct::class.java))
     }
 }

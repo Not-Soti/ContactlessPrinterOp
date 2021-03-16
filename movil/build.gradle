@@ -49,11 +49,15 @@ dependencies {
 
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
 
     //Get real path from Uris
     implementation 'com.github.HBiSoft:PickiT:0.1.14'
 
-    implementation "androidx.fragment:fragment-ktx:1.2.5"
+    //PDFBox to combine scanned pdfs
+    implementation 'org.apache.pdfbox:pdfbox:2.0.22'
+
+
 }
 repositories {
     mavenCentral()

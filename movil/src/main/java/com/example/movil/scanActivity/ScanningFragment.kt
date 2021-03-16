@@ -1,16 +1,14 @@
 package com.example.movil.scanActivity
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.movil.R
-import com.example.movil.ScanActivity
+import com.example.movil.ScannerSearchAct
 
 class ScanningFragment : DialogFragment() {
 
@@ -34,7 +32,7 @@ class ScanningFragment : DialogFragment() {
     }
 
     private fun stopScanning(){
-        val parentAct = activity as ScanActivity
+        val parentAct = activity as ScannerSearchAct
         parentAct.chosenScanner.cancelScanning()
         //Toast.makeText(activity, "Escaneo cancelado", Toast.LENGTH_LONG).show()
         parentAct.supportFragmentManager.beginTransaction().remove(this).commit()

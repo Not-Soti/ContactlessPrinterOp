@@ -133,8 +133,6 @@ class ScanOptFragment : Fragment() {
             }
         }
 
-        getScannerCapabilities(chosenScanner)
-
         chosenScanner.monitorDeviceStatus(DeviceStatusMonitor.DEFAULT_MONITORING_PERIOD, object: DeviceStatusMonitor.ScannerStatusListener{
             override fun onStatusChanged(scannerSta: Int, adfSta: Int) {
                 val scannerStr = when(scannerSta){
@@ -170,7 +168,9 @@ class ScanOptFragment : Fragment() {
                     Log.e(TAG, e.message!!)
                 }
             }
-        })
+        })//Monitoring device status
+
+        getScannerCapabilities(chosenScanner)
         return theView
     }
 

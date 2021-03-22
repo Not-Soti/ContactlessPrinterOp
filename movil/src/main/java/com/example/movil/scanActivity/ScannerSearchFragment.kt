@@ -75,7 +75,7 @@ class ScannerSearchFragment : Fragment() {
                 Log.d(tag, "Searching for scanners")
                 scannerBrowser.start(scannerBrowserListener)
 
-                val sc1 = ScannerImp("Scanner $scannerNumber")
+                /*val sc1 = ScannerImp("Scanner $scannerNumber")
                 scannerListAdapter.add(sc1)
                 Log.d(tag, "Added scanner $scannerNumber")
                 ++scannerNumber
@@ -83,7 +83,7 @@ class ScannerSearchFragment : Fragment() {
                 scannerListAdapter.add(sc2)
                 Log.d(tag, "Added scanner $scannerNumber")
                 ++scannerNumber
-                scannerListView.adapter=scannerListAdapter
+                scannerListView.adapter=scannerListAdapter*/
 
             } else {
                 //Stop searching

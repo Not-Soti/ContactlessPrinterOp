@@ -45,7 +45,9 @@ class ScanOptFragment : Fragment() {
     private lateinit var chosenColorMode : ScanOptions.ColorMode
     private lateinit var chosenFormat : ScanOptions.Format
     private var combineFiles = false
-    //private lateinit var chosenRes : List<Resolution>
+    private lateinit var chosenRes : Resolution
+    private lateinit var resolutionList : List<Resolution> //List of res given by the scannerCapabilities
+    private var resSelected = false //Control when a resolution is selected
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,8 +59,6 @@ class ScanOptFragment : Fragment() {
         val theView = inflater.inflate(R.layout.fragment_scan_options, container, false)
         val chosenScanner = (activity as ScanActivity).chosenScanner
         val chosenTicket = (activity as ScanActivity).chosenTicket
-
-        //Log.d(TAG, "AAAAAAAAAAAAAAAAAAAa")
 
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)
         if(tempFolder!=null && !tempFolder.exists()){
@@ -203,10 +203,14 @@ class ScanOptFragment : Fragment() {
                 }
 
                 //Resolution
-                val resCap : ResolutionCapability = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS) as ResolutionCapability
-                val resolutions = resCap.discreteResolutions
-                resolutions.forEach{
-                    resolutionAdapter.add(it.toString())
+                if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS)){
+                    val resCap : ResolutionCapability = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS) as ResolutionCapability
+                    val resolutionList = resCap.discreteResolutions
+                    resolutionList.forEach{
+                        resolutionAdapter.add(it.toString())
+                    }
+                }else{
+                    resolutionAdapter.add("AUTO")
                 }
                 resolutionAdapter.notifyDataSetChanged()
             }
@@ -267,7 +271,9 @@ class ScanOptFragment : Fragment() {
             ScanOptions.Format.RAW -> ticket.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_RAW)
         }
 
-        //TODO Resolucion
+        if(resSelected){ //A resolution was selected
+            ticket.setSetting(ScanTicket.SCAN_SETTING_RESOLUTION, chosenRes)
+        }
 
         return ticket
     }
@@ -340,7 +346,6 @@ class ScanOptFragment : Fragment() {
 
          val tempPathAux = tempFolder.absolutePath
 
-
         theScanner.scan(
             tempFolder.absolutePath,
             theTicket,
@@ -412,27 +417,30 @@ class ScanOptFragment : Fragment() {
 
         val nFaces = if(facesSpinner.selectedItem != null) facesSpinner.selectedItem.toString()
                      else auto
+
+        val resolution = if(resolutionSpinner.selectedItem != null) resolutionSpinner.selectedItem.toString()
+                    else auto
+
         val color = colorSpinner.selectedItem.toString()
         val format = formatSpinner.selectedItem.toString()
-        //val resolution = resolutionSpinner.selectedItem.toString()
-        //TODO Resolucion
+
 
         //set source
-        when(source){
-            getString(R.string.ScanOption_source_adf) -> chosenSource = ScanOptions.ScanSource.ADF
-            getString(R.string.ScanOption_source_platen) -> chosenSource = ScanOptions.ScanSource.PLATEN
-            getString(R.string.ScanOption_source_camera) -> chosenSource = ScanOptions.ScanSource.CAMERA
-            else -> chosenSource = ScanOptions.ScanSource.AUTO
+        chosenSource = when(source){
+            getString(R.string.ScanOption_source_adf) -> ScanOptions.ScanSource.ADF
+            getString(R.string.ScanOption_source_platen) -> ScanOptions.ScanSource.PLATEN
+            getString(R.string.ScanOption_source_camera) -> ScanOptions.ScanSource.CAMERA
+            else -> ScanOptions.ScanSource.AUTO
         }
 
         //set number of faces
-        when(nFaces){
-            getString(R.string.ScanOption_faces_1face) -> chosenNFaces = ScanOptions.Faces.ONE_FACE
-            getString(R.string.ScanOption_faces_2face) -> chosenNFaces = ScanOptions.Faces.TWO_FACES
-            else -> chosenNFaces = ScanOptions.Faces.ONE_FACE
+        chosenNFaces = when(nFaces){
+            getString(R.string.ScanOption_faces_1face) -> ScanOptions.Faces.ONE_FACE
+            getString(R.string.ScanOption_faces_2face) -> ScanOptions.Faces.TWO_FACES
+            else -> ScanOptions.Faces.ONE_FACE
         }
 
-        //set colot
+        //set color
         when(color){
             getString(R.string.ScanOption_colorMode_BW) -> chosenColorMode = ScanOptions.ColorMode.BW
             getString(R.string.ScanOption_colorMode_grey8) -> chosenColorMode = ScanOptions.ColorMode.GREY_8
@@ -448,8 +456,17 @@ class ScanOptFragment : Fragment() {
             getString(R.string.ScanOption_format_RAW) -> chosenFormat = ScanOptions.Format.RAW
         }
 
-        //TODO res
+        //set resolution
         //Crear array de resoluciones posibles y coger de ahi directamente
+        when(resolution){
+            auto -> {/*Do nothing*/}
+            "AUTO" -> {/*Do nothing*/}
+            else -> {
+                resSelected = true
+                val chosenResPosition = resolutionSpinner.selectedItemPosition
+                chosenRes = resolutionList[chosenResPosition]
+            }
+        }
 
         combineFiles = combineCheckBox.isChecked
     }

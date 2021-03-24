@@ -11,22 +11,17 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.movil.R
-import com.example.movil.ScannerSearchFragment
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.*
-import com.tom_roush.pdfbox.multipdf.PDFMergerUtility
-import com.tom_roush.pdfbox.util.PDFBoxResourceLoader
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import kotlin.math.log
+
 
 class ScanOptFragment : Fragment() {
 
     private val tempScanFolder = "TempScan"
     private val TAG = "--- ScanOptFragment ---"
 
-    private var tempPathAux = ""
+    //private var tempPathAux = ""
 
     private lateinit var nameTv : TextView
     private lateinit var deviceStatusTv : TextView
@@ -63,7 +58,7 @@ class ScanOptFragment : Fragment() {
         val chosenScanner = (activity as ScanActivity).chosenScanner
         val chosenTicket = (activity as ScanActivity).chosenTicket
 
-        Log.d(TAG, "AAAAAAAAAAAAAAAAAAAa")
+        //Log.d(TAG, "AAAAAAAAAAAAAAAAAAAa")
 
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)
         if(tempFolder!=null && !tempFolder.exists()){
@@ -71,8 +66,6 @@ class ScanOptFragment : Fragment() {
                 Log.d(tag, "temp folder created")
             }
         }
-
-        PDFBoxResourceLoader.init(context) //Recommended to init
 
         scanButton = theView.findViewById(R.id.frag_scan_op_button)
         nameTv = theView.findViewById(R.id.frag_scan_op_deviceName)
@@ -343,12 +336,10 @@ class ScanOptFragment : Fragment() {
 
         //Create the temp file to save the scanning
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)!!
-        //val tempFile = File(tempFolder, "tempScanFile")
         val scanResultUris = arrayListOf<Uri>()
 
-        //tempPathAux = tempFile.absolutePath
-        tempPathAux = tempFolder.absolutePath
-        //Log.d(tag, "Temp file abs path: $tempPathAux")
+         val tempPathAux = tempFolder.absolutePath
+
 
         theScanner.scan(
             tempFolder.absolutePath,
@@ -364,32 +355,6 @@ class ScanOptFragment : Fragment() {
                 override fun onScanningComplete() {
                     //Toast.makeText(this@ScanActivity, "Escaneo completado", Toast.LENGTH_LONG).show()
                     Log.d(tag, "Scanning completed")
-
-
-                    if (combineFiles) {
-                        //Create inputStreams from the ScanPages
-                        val resInStreams = mutableListOf<InputStream>()
-                        scanResultUris.forEach {
-                            val inStream = context!!.contentResolver.openInputStream(it)
-                            resInStreams.add(inStream!!)
-                        }
-
-                        val pdfMerger = PDFMergerUtility()
-                        resInStreams.forEach { pdfMerger.addSource(it) }
-                        val combinedFile = File("combinedFile.pdf", tempScanFolder)
-                        val outStream = FileOutputStream(combinedFile)
-                        pdfMerger.destinationStream = outStream
-                        pdfMerger.mergeDocuments(false) //TODO ver que es el false
-                        outStream.close()
-
-                        //Delete all elements and insert the new one
-                        scanResultUris.forEach{
-                            File(it.path!!).delete()
-                        }
-                        scanResultUris.clear()
-                        scanResultUris.add(Uri.fromFile(combinedFile))
-                        Log.d(tag, "COMBINED FILE URI: ${Uri.fromFile(combinedFile)}")
-                    }
 
                     val i = Intent(activity?.applicationContext, ScanPreview::class.java)
                     //i.putExtra("tempUris", scanResultUris)

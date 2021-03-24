@@ -23,8 +23,10 @@ import com.example.movil.*
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
-class ScanPreview : AppCompatActivity() {
+ class ScanPreview : AppCompatActivity() {
 
     private val tag = "ScanPreview"
     private val requestExternalStoragePermissionCode = 0
@@ -35,10 +37,7 @@ class ScanPreview : AppCompatActivity() {
     private lateinit var discardButton: Button
     private lateinit var chosenFormat : ScanOptions.Format
 
-    //private lateinit var tempFilePath : String
-    //private var currentTempUri : Uri? = null //Used to get each file if there are more than 1
-    private var currentIndex = 0 //Used to get each temp file if there is more than 1
-    var scanResultUris = arrayListOf<Uri>()
+    private lateinit var scanResultUris : Queue<Uri>
     private lateinit var pickit : PickiT
     private val pickitListener = object: PickiTCallbacks {
         override fun PickiTonUriReturned() {
@@ -60,10 +59,12 @@ class ScanPreview : AppCompatActivity() {
             Reason: String?
         ) {
             Log.d(tag, "Pickit on complete listener Ruta: $path")
-            //Toast.makeText(applicationContext, "Ruta: $path", Toast.LENGTH_LONG).show()
-
-            //Log.d(tag, "PickiT path: $path")
-            copyTempToPath(File(path!!))
+            if(path == null){
+                Log.d(tag, "No se ha podido obtener la ruta")
+                //TODO excepcion
+            }else {
+                copyTempToPath(File(path))
+            }
         }
     }
 
@@ -76,10 +77,7 @@ class ScanPreview : AppCompatActivity() {
         discardButton = findViewById(R.id.act_scan_preview_dicardButton)
 
         askAccessAllFilesPermission()
-
-        if(currentIndex >= scanResultUris.size){
-            openNoPagesDialog()
-        }
+        pickit = PickiT(this, pickitListener, this)
 
         //Pinch gesture for zoom is set on the root layout
         val rootLayout = findViewById<ZoomLayout>(R.id.act_scan_preview_root)
@@ -87,39 +85,61 @@ class ScanPreview : AppCompatActivity() {
 
         val bundle = intent.extras
         if (bundle != null) {
-            //tempFileUri = Uri.parse(bundle.getString("tempUri", ""))
-            //scanResultUris = bundle.getSerializable("tempUris") as ArrayList<Uri?>
-            scanResultUris = bundle.getParcelableArrayList<Uri>("tempUris") as ArrayList<Uri>
-            //tempFilePath = tempFileUri?.path!!
+            val uriList = bundle.getParcelableArrayList<Uri>("tempUris") as ArrayList<Uri>
+            scanResultUris = LinkedList(uriList)
             chosenFormat = bundle.getSerializable("chosenFormat") as ScanOptions.Format
         }
-        pickit = PickiT(this, pickitListener, this)
 
         saveButton.setOnClickListener { askPermissions() }
+
         discardButton.setOnClickListener{
-            discardFile(scanResultUris[currentIndex])
-            //++currentIndex //done in discard file
+            val discard = scanResultUris.poll()
+            if(discard != null) {
+                discardFile(discard)
+            }else{
+                openNoPagesDialog()
+            }
         }
 
-        when(chosenFormat){
-            ScanOptions.Format.PDF -> {
-                previewPdf(scanResultUris[currentIndex])
-            }
-            ScanOptions.Format.JPEG -> {
-                previewImage(scanResultUris[currentIndex])
-            }
-            ScanOptions.Format.RAW -> {
-                Toast.makeText(this, "Formato RAW", Toast.LENGTH_SHORT).show()
-            }
-        }
+        useNextFile()
     }
+
+     /**
+      * Renders the next file in the scanResultUris list if available
+      */
+     private fun useNextFile(){
+         if (scanResultUris.size == 0){
+             openNoPagesDialog()
+         }else {
+             //Check format in order to render it
+             when (chosenFormat) {
+                 ScanOptions.Format.PDF -> {
+                     val currentUri = scanResultUris.peek()
+                     if (currentUri != null) {
+                         previewPdf(currentUri)
+                     } else {
+                         openNoPagesDialog()
+                     }
+                 }
+                 ScanOptions.Format.JPEG -> {
+                     val currentUri = scanResultUris.peek()
+                     if (currentUri != null) {
+                         previewImage(currentUri)
+                     } else {
+                         openNoPagesDialog()
+                     }
+                 }
+                 ScanOptions.Format.RAW -> {
+                     Toast.makeText(this, "Formato RAW", Toast.LENGTH_SHORT).show()
+                 }
+             }
+         }
+     }
 
     private fun previewImage(uri : Uri){
         val file = File(uri.path!!)
         imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         imagePreview.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
-        //rootLayout.setImageView(imagePreview)
-        //imagePreview.invalidate()
     }
 
     private fun previewPdf(uri : Uri){
@@ -162,6 +182,7 @@ class ScanPreview : AppCompatActivity() {
                 askAccessAllFilesPermission()
             }
         }else {
+            //Android >11 permissions
             when {
                 ContextCompat.checkSelfPermission(
                     applicationContext,
@@ -202,17 +223,15 @@ class ScanPreview : AppCompatActivity() {
     }
 
     private fun askDirectory(){
-
         val ext = when(chosenFormat){
             ScanOptions.Format.RAW -> "application/octet-stream"
             ScanOptions.Format.PDF -> "application/pdf"
             ScanOptions.Format.JPEG -> "image/jpeg"
         }
-
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
             addCategory(Intent.CATEGORY_OPENABLE)
             type = ext
-            putExtra(Intent.EXTRA_TITLE, "")
+            //putExtra(Intent.EXTRA_TITLE, "") //file suggested name
         }
         startActivityForResult(intent, createDocumentActCode)
     }
@@ -245,27 +264,32 @@ class ScanPreview : AppCompatActivity() {
                     Log.d(tag, "Uri del nuevo archivo: $newDocUri")
                     pickit.getPath(newDocUri, Build.VERSION.SDK_INT)
                 }else{
-                    Log.d(tag, "Create document cancelado")
+                    Log.d(tag, "Create document canceled")
                 }
             }
         }
     }
 
+     /**
+      * Copies the file from the temporal folder to the
+      * one created by the user
+      */
     private fun copyTempToPath(destFile : File){
-        val temp = File(scanResultUris[currentIndex].path!!)
-        Log.d(tag, "Copiando archivo")
+        val tempUri = scanResultUris.peek()
+        if(tempUri == null){
+            openNoPagesDialog()
+        }
+        val temp = File(tempUri!!.path!!)
         temp.copyTo(destFile, true, 2048)
-        Log.d(tag, "Archivo copiado")
         temp.delete()
-        Log.d(tag, "Temporal borrado")
-        //startActivity(Intent(this, ScannerSearchAct::class.java))
-        ++currentIndex
-        recreate()
+        scanResultUris.remove() //Delete from the queue
+        useNextFile()
     }
 
     private fun endActivityNoPermission(){
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.permission_ExtStorageDenied_endAct))
+            .setCancelable(false)
             .setPositiveButton(android.R.string.ok){ _, _ ->
                 discardAllFiles()
                 startActivity(Intent(applicationContext, MainActivity::class.java))
@@ -277,8 +301,7 @@ class ScanPreview : AppCompatActivity() {
         if(tempFile.exists()) {
             tempFile.delete()
         }
-        ++currentIndex
-        recreate()
+        useNextFile()
     }
 
     private fun discardAllFiles(){
@@ -301,11 +324,13 @@ class ScanPreview : AppCompatActivity() {
             val builder = AlertDialog.Builder(it)
             builder.apply {
 
+                setCancelable(false)
                 setTitle("Sin resultados")
                 setMessage("No hay mas resultados")
 
                 setPositiveButton(R.string.accept
-                ) { dialog, _ ->
+                ) { _, _ ->
+                    discardAllFiles()
                     startActivity(Intent(context, ScanActivity::class.java))
                 }
             }

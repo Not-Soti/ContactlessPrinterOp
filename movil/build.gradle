@@ -55,8 +55,10 @@ dependencies {
     implementation 'com.github.HBiSoft:PickiT:0.1.14'
 
     //PDFBox to combine scanned pdfs
-    implementation 'com.tom_roush:pdfbox-android:1.8.10.1' //TODO no es la ultima version
+   /* implementation 'com.tom_roush:pdfbox-android:1.8.10.1' //TODO no es la ultima version*/
 
+    //PDFViewer
+    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
 
 }
 repositories {

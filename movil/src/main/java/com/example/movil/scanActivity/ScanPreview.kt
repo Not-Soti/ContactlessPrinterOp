@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.movil.*
+import com.github.barteksc.pdfviewer.PDFView
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
 import java.io.File
@@ -35,6 +36,7 @@ import kotlin.collections.ArrayList
     private lateinit var imagePreview : ImageView
     private lateinit var saveButton : Button
     private lateinit var discardButton: Button
+    private lateinit var pdfView : PDFView
     private lateinit var chosenFormat : ScanOptions.Format
 
     private lateinit var scanResultUris : Queue<Uri>
@@ -73,6 +75,7 @@ import kotlin.collections.ArrayList
         setContentView(R.layout.scan_preview)
 
         imagePreview = findViewById(R.id.act_scan_preview_ImageView)
+        pdfView = findViewById(R.id.act_scan_preview_PDFView)
         saveButton = findViewById(R.id.act_scan_preview_saveButton)
         discardButton = findViewById(R.id.act_scan_preview_dicardButton)
 
@@ -97,7 +100,7 @@ import kotlin.collections.ArrayList
             if(discard != null) {
                 discardFile(discard)
             }else{
-                openNoPagesDialog()
+                showNoFilesDialog()
             }
         }
 
@@ -109,7 +112,7 @@ import kotlin.collections.ArrayList
       */
      private fun useNextFile(){
          if (scanResultUris.size == 0){
-             openNoPagesDialog()
+             showNoFilesDialog()
          }else {
              //Check format in order to render it
              when (chosenFormat) {
@@ -118,7 +121,7 @@ import kotlin.collections.ArrayList
                      if (currentUri != null) {
                          previewPdf(currentUri)
                      } else {
-                         openNoPagesDialog()
+                         showNoFilesDialog()
                      }
                  }
                  ScanOptions.Format.JPEG -> {
@@ -126,7 +129,7 @@ import kotlin.collections.ArrayList
                      if (currentUri != null) {
                          previewImage(currentUri)
                      } else {
-                         openNoPagesDialog()
+                         showNoFilesDialog()
                      }
                  }
                  ScanOptions.Format.RAW -> {
@@ -143,7 +146,9 @@ import kotlin.collections.ArrayList
     }
 
     private fun previewPdf(uri : Uri){
-        val firstFile = uri.path
+        pdfView.fromUri(uri). load()
+
+        /*val firstFile = uri.path
 
         //render pdf
         val file = File(firstFile!!)
@@ -170,7 +175,7 @@ import kotlin.collections.ArrayList
 
         pageToRender.close()
         pdfRenderer.close()
-        fileDescriptor.close()
+        fileDescriptor.close()*/
     }
 
     private fun askPermissions(){
@@ -277,7 +282,7 @@ import kotlin.collections.ArrayList
     private fun copyTempToPath(destFile : File){
         val tempUri = scanResultUris.peek()
         if(tempUri == null){
-            openNoPagesDialog()
+            showNoFilesDialog()
         }
         val temp = File(tempUri!!.path!!)
         temp.copyTo(destFile, true, 2048)
@@ -319,7 +324,7 @@ import kotlin.collections.ArrayList
     /**
      * Fun that creates a dialog when no more scan results are aviable and closes the activity
      */
-    private fun openNoPagesDialog(){
+    private fun showNoFilesDialog(){
         val alertDialog: AlertDialog = this.let {
             val builder = AlertDialog.Builder(it)
             builder.apply {

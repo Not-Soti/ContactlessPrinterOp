@@ -20,6 +20,27 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 
+    <com.github.barteksc.pdfviewer.PDFView
+        android:id="@+id/act_scan_preview_PDFView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.github.barteksc.pdfviewer.PDFView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/act_scan_preview_shareFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:clickable="true"
+        android:contentDescription="@string/PrintAct_shareFab_cd"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@+id/act_scan_preview_saveButton"
+        app:layout_constraintEnd_toEndOf="@+id/act_scan_preview_saveButton"
+        app:maxImageSize="@dimen/print_act_fab_icon_size"
+        app:srcCompat="@android:drawable/ic_menu_share" />
+
     <Button
         android:id="@+id/act_scan_preview_saveButton"
         android:layout_width="wrap_content"

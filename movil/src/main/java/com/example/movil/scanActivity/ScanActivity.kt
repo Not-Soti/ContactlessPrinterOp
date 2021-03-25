@@ -3,7 +3,6 @@ package com.example.movil.scanActivity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movil.MainActivity
 import com.example.movil.R
@@ -44,15 +43,13 @@ class ScanActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         when(screenStatus){
-            0 -> {
-                startActivity(Intent(this, MainActivity::class.java)); Log.d(TAG, "back 0")
-            }
-            1 -> {
-                startActivity(Intent(this, MainActivity::class.java)); Log.d(TAG, "back 1")
-            }
+            0 -> startActivity(Intent(this, MainActivity::class.java))
+            1 -> startActivity(Intent(this, MainActivity::class.java))
             2 -> {
                 //Replace scanOptionsFragment with searchScannerFragment
-                chosenScanner.stopMonitoringDeviceStatus()
+                if (chosenScanner != null) {
+                    chosenScanner.stopMonitoringDeviceStatus()
+                }
                 screenStatus = 1
                 val scanFrag = ScannerSearchFragment()
                 val trans = supportFragmentManager.beginTransaction()
@@ -67,6 +64,8 @@ class ScanActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        chosenScanner.stopMonitoringDeviceStatus()
+        if(chosenScanner!=null) {
+            chosenScanner.stopMonitoringDeviceStatus()
+        }
     }
 }

@@ -183,15 +183,4 @@ class ScannerSearchFragment : Fragment() {
         }
     }
 
-/*    //TODO("Borrar")
-    fun scanningCompleted(){
-        val i = Intent(this@ScannerSearchAct, ScanPreview::class.java)
-        i.putExtra("tempPath", tempPathAux)
-        startActivity(i)
-    }*/
-
-/*    override fun onBackPressed() {
-        super.onBackPressed()
-        startActivity(Intent(this, MainActivity::class.java))
-    }*/
 }

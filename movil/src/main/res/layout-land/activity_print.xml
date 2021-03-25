@@ -47,11 +47,22 @@
         app:layout_constraintEnd_toStartOf="@+id/act_print_chooseFileButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView">
-
     </WebView>
 
+    <com.github.barteksc.pdfviewer.PDFView
+        android:id="@+id/act_print_PDFView"
+        android:layout_width="538dp"
+        android:layout_height="338dp"
+        android:layout_marginEnd="209dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/act_print_chooseFileButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.652" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/act_print_shareFab"
+        android:id="@+id/act_scan_preview_shareFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"

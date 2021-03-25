@@ -1,18 +1,14 @@
 package com.example.movil.printActivity
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.ParcelFileDescriptor
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
@@ -25,15 +21,12 @@ import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.view.MotionEventCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.print.PrintHelper
 import com.example.movil.MainActivity
-import com.example.movil.PermissionHelper
 import com.example.movil.R
 import com.example.movil.ZoomLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -43,6 +36,7 @@ import java.io.File
 import java.util.*
 
 import com.example.movil.printActivity.PrintActViewModel.ResourceTypeEnum
+import com.github.barteksc.pdfviewer.PDFView
 
 class PrintActivity : AppCompatActivity() {
 
@@ -55,6 +49,7 @@ class PrintActivity : AppCompatActivity() {
     private lateinit var webPreview: WebView
     private lateinit var downloadFragment: DownloadingFileFragment
     private lateinit var rootLayout : ZoomLayout
+    private lateinit var pdfView : PDFView
 
     private var imageViewOrigX = 0F
     private var imageViewOrigY = 0F
@@ -115,9 +110,10 @@ class PrintActivity : AppCompatActivity() {
 
         buttonChooseFile = findViewById(R.id.act_print_chooseFileButton)
         buttonPrint = findViewById(R.id.act_print_printFab)
-        buttonShare = findViewById(R.id.act_print_shareFab)
+        buttonShare = findViewById(R.id.act_scan_preview_shareFab)
         imagePreview = findViewById(R.id.act_print_imagePreview)
         webPreview = findViewById(R.id.act_print_webPreview)
+        pdfView = findViewById(R.id.act_print_PDFView)
 
         pickit = PickiT(this, pickitListener, this)
 
@@ -227,8 +223,9 @@ class PrintActivity : AppCompatActivity() {
         Log.d(tag, "extension  $extension")
 
         //reset previews
-        webPreview.visibility = View.INVISIBLE
-        imagePreview.visibility = View.INVISIBLE
+        webPreview.visibility = View.GONE
+        imagePreview.visibility = View.GONE
+        pdfView.visibility = View.GONE
         imagePreview.scaleX = 1F
         imagePreview.scaleY = 1F
         imagePreview.x = imageViewOrigX
@@ -250,10 +247,14 @@ class PrintActivity : AppCompatActivity() {
                 viewModel.setType(ResourceTypeEnum.PDF)
 
                 //Make the image preview bigger
-                imagePreview.visibility = View.VISIBLE
-                imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                pdfView.visibility = View.VISIBLE
+                pdfView.fromFile(file).load()
+                //pdfView.recycle()
 
-                /* Render the first page of the document */
+
+ /*               *//* Render the first page of the document *//*
+                 imagePreview.visibility = View.VISIBLE
+                imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
                 // This is the PdfRenderer we use to render the PDF.
                 val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
                     file,
@@ -278,7 +279,7 @@ class PrintActivity : AppCompatActivity() {
 
                 pageToRender.close()
                 pdfRenderer.close()
-                fileDescriptor.close()
+                fileDescriptor.close()*/
             }
             "html" ->{
                 viewModel.setType(ResourceTypeEnum.HTML)

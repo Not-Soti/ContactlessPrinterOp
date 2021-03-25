@@ -19,8 +19,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.example.movil.*
+import com.example.movil.printActivity.PrintActViewModel
 import com.github.barteksc.pdfviewer.PDFView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
 import java.io.File
@@ -34,7 +37,8 @@ import kotlin.collections.ArrayList
     private val createDocumentActCode = 1
 
     private lateinit var imagePreview : ImageView
-    private lateinit var saveButton : Button
+    private lateinit var saveButton : FloatingActionButton
+    private lateinit var shareButton : FloatingActionButton
     private lateinit var discardButton: Button
     private lateinit var pdfView : PDFView
     private lateinit var chosenFormat : ScanOptions.Format
@@ -76,7 +80,8 @@ import kotlin.collections.ArrayList
 
         imagePreview = findViewById(R.id.act_scan_preview_ImageView)
         pdfView = findViewById(R.id.act_scan_preview_PDFView)
-        saveButton = findViewById(R.id.act_scan_preview_saveButton)
+        saveButton = findViewById(R.id.act_scan_preview_saveFab)
+        shareButton = findViewById(R.id.act_scan_preview_shareFab)
         discardButton = findViewById(R.id.act_scan_preview_dicardButton)
 
         askAccessAllFilesPermission()
@@ -104,6 +109,26 @@ import kotlin.collections.ArrayList
             }
         }
 
+        shareButton.setOnClickListener{
+            val filePath = scanResultUris.peek()!!.path
+            if(filePath == null){
+                showNoFilesDialog()
+            }else {
+                val file = File(filePath)
+                val uriAux =
+                    FileProvider.getUriForFile(applicationContext, "$packageName.provider", file)
+
+                //Open email app and load info
+                val emailIntent = Intent(Intent.ACTION_SEND)
+                emailIntent.type = "*/*"
+
+                val to: Array<String> = emptyArray()
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, to)
+                emailIntent.putExtra(Intent.EXTRA_STREAM, uriAux)
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "")
+                startActivity(Intent.createChooser(emailIntent, "Enviar"))
+            }
+        }
         useNextFile()
     }
 
@@ -147,35 +172,6 @@ import kotlin.collections.ArrayList
 
     private fun previewPdf(uri : Uri){
         pdfView.fromUri(uri). load()
-
-        /*val firstFile = uri.path
-
-        //render pdf
-        val file = File(firstFile!!)
-        imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-        val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
-            file,
-            ParcelFileDescriptor.MODE_READ_ONLY
-        )
-        val pdfRenderer = PdfRenderer(fileDescriptor)
-        val pageToRender: PdfRenderer.Page = pdfRenderer.openPage(0)
-        val bitmap = Bitmap.createBitmap(
-            pageToRender.width,
-            pageToRender.height,
-            Bitmap.Config.ARGB_8888
-        )
-        pageToRender.render(
-            bitmap,
-            null,
-            null,
-            PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
-        )
-        //Set the page on the imageView
-        imagePreview.setImageBitmap(bitmap)
-
-        pageToRender.close()
-        pdfRenderer.close()
-        fileDescriptor.close()*/
     }
 
     private fun askPermissions(){

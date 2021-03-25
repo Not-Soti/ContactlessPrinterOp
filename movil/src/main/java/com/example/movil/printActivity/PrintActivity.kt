@@ -245,41 +245,8 @@ class PrintActivity : AppCompatActivity() {
             }
             "pdf" -> {
                 viewModel.setType(ResourceTypeEnum.PDF)
-
-                //Make the image preview bigger
                 pdfView.visibility = View.VISIBLE
                 pdfView.fromFile(file).load()
-                //pdfView.recycle()
-
-
- /*               *//* Render the first page of the document *//*
-                 imagePreview.visibility = View.VISIBLE
-                imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                // This is the PdfRenderer we use to render the PDF.
-                val fileDescriptor: ParcelFileDescriptor = ParcelFileDescriptor.open(
-                    file,
-                    ParcelFileDescriptor.MODE_READ_ONLY
-                )
-                val pdfRenderer = PdfRenderer(fileDescriptor)
-                val pageToRender: PdfRenderer.Page = pdfRenderer.openPage(0)
-                val bitmap = Bitmap.createBitmap(
-                    pageToRender.width,
-                    pageToRender.height,
-                    Bitmap.Config.ARGB_8888
-                )
-                pageToRender.render(
-                    bitmap,
-                    null,
-                    null,
-                    PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
-                )
-                //Set the page on the imageView
-                imagePreview.setImageBitmap(bitmap)
-                rootLayout.setImageView(imagePreview)
-
-                pageToRender.close()
-                pdfRenderer.close()
-                fileDescriptor.close()*/
             }
             "html" ->{
                 viewModel.setType(ResourceTypeEnum.HTML)

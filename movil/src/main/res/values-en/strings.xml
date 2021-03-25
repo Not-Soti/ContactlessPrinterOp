@@ -4,9 +4,9 @@
     <string name="help">Help</string>
     <string name="close">Close</string>
     <string name="stop">Stop</string>
-    <string name="MainAct_readQr_text">Read QR code</string>
-    <string name="MainAct_print_text">Print file</string>
-    <string name="MainAct_scan_text">Scan</string>
+    <string name="MainAct_readQr_title">Read QR code</string>
+    <string name="MainAct_print_title">Print file</string>
+    <string name="MainAct_scan_title">Scan</string>
     <string name="MainAct_readQr_cd">Read QR code</string>
     <string name="MainAct_print_cd">Print file</string>
     <string name="MainAct_scan_cd">Scan</string>
@@ -92,4 +92,7 @@
     <string name="SCANNER_STATUS_TESTING">Preparing</string>
     <string name="SCANNER_STATUS_UNAVAILABLE">Unavailable</string>
     <string name="SCANNER_STATUS_UNKNOWN">Unknown</string>
+    <string name="MainAct_readQr_exp">Connect to the network scanning a QR code</string>
+    <string name="MainAct_scan_exp">Choose a close scanner to work with</string>
+    <string name="MainAct_print_exp">Pick a file and print it in a nearby device</string>
 </resources>

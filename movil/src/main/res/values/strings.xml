@@ -8,9 +8,9 @@
     <string name="stop">Detener</string>
 
     <!-- MainActivity -->
-    <string name="MainAct_readQr_text">Leer código QR</string>
-    <string name="MainAct_print_text">Imprimir archivo</string>
-    <string name="MainAct_scan_text">Escanear</string>
+    <string name="MainAct_readQr_title">Leer código QR</string>
+    <string name="MainAct_print_title">Imprimir archivo</string>
+    <string name="MainAct_scan_title">Escanear</string>
     <string name="MainAct_readQr_cd">Leer código QR</string>
     <string name="MainAct_print_cd">Imprimir archivo</string>
     <string name="MainAct_scan_cd">Escanear</string>
@@ -119,5 +119,8 @@
     <string name="SCANNER_STATUS_TESTING">Preparando</string>
     <string name="SCANNER_STATUS_UNAVAILABLE">No disponible</string>
     <string name="SCANNER_STATUS_UNKNOWN">Desconocido</string>
+    <string name="MainAct_readQr_exp">Conéctate a la red escaneando un código QR</string>
+    <string name="MainAct_scan_exp">Selecciona algún escáner cercano para operar con él</string>
+    <string name="MainAct_print_exp">Escoge un archivo e imprímelo en un dispositivo cercano</string>
 
 </resources>

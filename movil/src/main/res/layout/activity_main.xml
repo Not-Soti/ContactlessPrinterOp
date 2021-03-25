@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linearLayout"
+    android:id="@+id/act_main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
@@ -10,12 +10,14 @@
 
     <LinearLayout
         android:id="@+id/act_main_print_LinLay"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="170dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="128dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/main_button_bg"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -26,70 +28,127 @@
             android:contentDescription="@string/MainAct_print_cd"
             app:srcCompat="@drawable/icon_printer" />
 
-        <TextView
-            android:id="@+id/act_main_print_text"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/MainAct_print_text"
-            android:textColor="@color/blueHP" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/act_main_print_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/MainAct_print_title"
+                android:textColor="@color/blueHP"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/MainAct_print_exp" />
+        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/act_main_scan_LinLay"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="170dp"
-        android:layout_marginEnd="50dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
         android:background="@drawable/main_button_bg"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/act_main_readQr_LinLay"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/act_main_print_LinLay">
 
         <ImageView
             android:id="@+id/act_main_scan_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_scanner"
-            android:contentDescription="@string/MainAct_scan_cd" />
+            android:contentDescription="@string/MainAct_scan_cd"
+            app:srcCompat="@drawable/icon_scanner" />
 
-        <TextView
-            android:id="@+id/act_main_scan_text"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/MainAct_scan_text"
-            android:textColor="@color/blueHP" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/act_main_scan_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/MainAct_scan_title"
+                android:textColor="@color/blueHP"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/MainAct_scan_exp" />
+        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/act_main_readQr_LinLay"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="96dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="128dp"
         android:background="@drawable/main_button_bg"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/act_main_scan_LinLay"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_scan_LinLay">
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/act_main_readQr_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_qr"
-            android:contentDescription="@string/MainAct_readQr_cd" />
+            android:contentDescription="@string/MainAct_readQr_cd"
+            app:srcCompat="@drawable/icon_qr" />
 
-        <TextView
-            android:id="@+id/act_main_readQr_text"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/MainAct_readQr_text"
-            android:textColor="@color/blueHP" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp">
 
+            <TextView
+                android:id="@+id/act_main_readQr_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/MainAct_readQr_title"
+                android:textColor="@color/blueHP"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/MainAct_readQr_exp" />
+        </LinearLayout>
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

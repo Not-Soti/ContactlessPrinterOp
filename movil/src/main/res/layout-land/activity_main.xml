@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linearLayout"
+    android:id="@+id/act_main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
@@ -10,62 +10,6 @@
 
     <LinearLayout
         android:id="@+id/act_main_print_LinLay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="65dp"
-        android:background="@drawable/main_button_bg"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/act_main_print_icon"
-            android:layout_width="@dimen/main_act_button_size"
-            android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_printer"
-            android:contentDescription="@string/MainAct_print_cd" />
-
-        <TextView
-            android:id="@+id/act_main_print_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/MainAct_print_text"
-            android:textColor="@color/blueHP" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/act_main_scan_LinLay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/main_button_bg"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/act_main_print_LinLay"
-        app:layout_constraintStart_toEndOf="@+id/act_main_readQr_LinLay"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/act_main_scan_icon"
-            android:layout_width="@dimen/main_act_button_size"
-            android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_scanner"
-            android:contentDescription="@string/MainAct_scan_cd" />
-
-        <TextView
-            android:id="@+id/act_main_scan_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/MainAct_scan_text"
-            android:textColor="@color/blueHP" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/act_main_readQr_LinLay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="65dp"
@@ -76,18 +20,77 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/act_main_print_icon"
+            android:layout_width="@dimen/main_act_button_size"
+            android:layout_height="@dimen/main_act_button_size"
+            android:contentDescription="@string/MainAct_print_cd"
+            app:srcCompat="@drawable/icon_printer" />
+
+        <TextView
+            android:id="@+id/act_main_print_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/MainAct_print_title"
+            android:textColor="@color/blueHP" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/act_main_scan_LinLay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/main_button_bg"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/act_main_readQr_LinLay"
+        app:layout_constraintStart_toEndOf="@+id/act_main_print_LinLay"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/act_main_scan_icon"
+            android:layout_width="@dimen/main_act_button_size"
+            android:layout_height="@dimen/main_act_button_size"
+            android:contentDescription="@string/MainAct_scan_cd"
+            app:srcCompat="@drawable/icon_scanner" />
+
+        <TextView
+            android:id="@+id/act_main_scan_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/MainAct_scan_title"
+            android:textColor="@color/blueHP" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/act_main_readQr_LinLay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="65dp"
+        android:background="@drawable/main_button_bg"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
             android:id="@+id/act_main_readQr_icon"
             android:layout_width="@dimen/main_act_button_size"
             android:layout_height="@dimen/main_act_button_size"
-            app:srcCompat="@drawable/icon_qr"
-            android:contentDescription="@string/MainAct_readQr_cd" />
+            android:contentDescription="@string/MainAct_readQr_cd"
+            app:srcCompat="@drawable/icon_qr" />
 
         <TextView
             android:id="@+id/act_main_readQr_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/MainAct_readQr_text"
+            android:text="@string/MainAct_readQr_title"
             android:textColor="@color/blueHP" />
 
     </LinearLayout>

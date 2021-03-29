@@ -209,7 +209,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
+<!--            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -224,7 +224,7 @@
                     android:text="Combinar archivos"
                     android:visibility="invisible" />
 
-            </LinearLayout>
+            </LinearLayout>-->
 
             <Button
                 android:id="@+id/frag_scan_op_button"

@@ -104,6 +104,7 @@ import kotlin.collections.ArrayList
             val discard = scanResultUris.poll()
             if(discard != null) {
                 discardFile(discard)
+                useNextFile()
             }else{
                 showNoFilesDialog()
             }
@@ -136,7 +137,7 @@ import kotlin.collections.ArrayList
       * Renders the next file in the scanResultUris list if available
       */
      private fun useNextFile(){
-         if (scanResultUris.size == 0){
+         if (scanResultUris.isEmpty()){
              showNoFilesDialog()
          }else {
              //Check format in order to render it
@@ -171,7 +172,7 @@ import kotlin.collections.ArrayList
     }
 
     private fun previewPdf(uri : Uri){
-        pdfView.fromUri(uri). load()
+        pdfView.fromUri(uri).load()
     }
 
     private fun askPermissions(){
@@ -283,7 +284,7 @@ import kotlin.collections.ArrayList
         val temp = File(tempUri!!.path!!)
         temp.copyTo(destFile, true, 2048)
         temp.delete()
-        scanResultUris.remove() //Delete from the queue
+        scanResultUris.poll() //Delete from the queue
         useNextFile()
     }
 
@@ -302,7 +303,6 @@ import kotlin.collections.ArrayList
         if(tempFile.exists()) {
             tempFile.delete()
         }
-        useNextFile()
     }
 
     private fun discardAllFiles(){

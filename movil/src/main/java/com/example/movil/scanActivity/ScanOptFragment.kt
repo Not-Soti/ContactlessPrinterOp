@@ -32,7 +32,7 @@ class ScanOptFragment : Fragment() {
     private lateinit var colorSpinner : Spinner
     private lateinit var resolutionSpinner : Spinner
     private lateinit var formatSpinner : Spinner
-    private lateinit var combineCheckBox : CheckBox
+    //private lateinit var combineCheckBox : CheckBox
 
     private lateinit var sourceAdapter : ArrayAdapter<String>
     private lateinit var facesAdapter : ArrayAdapter<String>
@@ -44,7 +44,7 @@ class ScanOptFragment : Fragment() {
     private lateinit var chosenNFaces : ScanOptions.Faces
     private lateinit var chosenColorMode : ScanOptions.ColorMode
     private lateinit var chosenFormat : ScanOptions.Format
-    private var combineFiles = false
+    //private var combineFiles = false
     private lateinit var chosenRes : Resolution
     private lateinit var resolutionList : List<Resolution> //List of res given by the scannerCapabilities
     private var resSelected = false //Control when a resolution is selected
@@ -76,7 +76,7 @@ class ScanOptFragment : Fragment() {
         colorSpinner = theView.findViewById(R.id.frag_scan_op_colorSpinner)
         resolutionSpinner = theView.findViewById(R.id.frag_scan_op_resSpinner)
         formatSpinner = theView.findViewById(R.id.frag_scan_op_formatSpinner)
-        combineCheckBox = theView.findViewById(R.id.frag_scan_op_combineFiles)
+        //combineCheckBox = theView.findViewById(R.id.frag_scan_op_combineFiles)
 
         //Adapters for each spinner
         sourceAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
@@ -115,12 +115,12 @@ class ScanOptFragment : Fragment() {
             ) {
                 val selectedSource = parent?.getItemAtPosition(position).toString()
                 val adfStr = context!!.getString(R.string.ScanOption_source_adf)
-                if(selectedSource == adfStr){
+                /*if(selectedSource == adfStr){
                     combineCheckBox.visibility = View.VISIBLE
                 }else{
                     combineCheckBox.visibility = View.INVISIBLE
                     combineCheckBox.isSelected = false
-                }
+                }*/
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -354,7 +354,9 @@ class ScanOptFragment : Fragment() {
                     //Toast.makeText(this@ScanActivity, "Pagina escaneada", Toast.LENGTH_LONG).show()
                     Log.d(tag, "Page scanned")
                     //scanResultUris = p0?.uri
-                    scanResultUris.add(p0?.uri!!)
+                    if(p0 != null) {
+                        scanResultUris.add(p0.uri!!)
+                    }
                 }
 
                 override fun onScanningComplete() {
@@ -362,7 +364,6 @@ class ScanOptFragment : Fragment() {
                     Log.d(tag, "Scanning completed")
 
                     val i = Intent(activity?.applicationContext, ScanPreview::class.java)
-                    //i.putExtra("tempUris", scanResultUris)
                     i.putParcelableArrayListExtra("tempUris", scanResultUris)
                     i.putExtra("chosenFormat", chosenFormat)
                     startActivity(i)
@@ -468,7 +469,7 @@ class ScanOptFragment : Fragment() {
             }
         }
 
-        combineFiles = combineCheckBox.isChecked
+        //combineFiles = combineCheckBox.isChecked
     }
 
 }

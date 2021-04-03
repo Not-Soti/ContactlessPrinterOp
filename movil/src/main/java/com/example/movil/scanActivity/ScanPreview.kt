@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.*
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
@@ -166,12 +167,17 @@ import kotlin.collections.ArrayList
      }
 
     private fun previewImage(uri : Uri){
+        //TODO Jugar con las visibility de las previewspdf y de imagen
+        imagePreview.visibility = View.VISIBLE
+        pdfView.visibility = View.GONE
         val file = File(uri.path!!)
         imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         imagePreview.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
     }
 
     private fun previewPdf(uri : Uri){
+        imagePreview.visibility = View.GONE
+        pdfView.visibility = View.VISIBLE
         pdfView.fromUri(uri).load()
     }
 

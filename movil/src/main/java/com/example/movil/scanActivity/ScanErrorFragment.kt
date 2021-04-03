@@ -22,7 +22,7 @@ class ScanErrorFragment : DialogFragment() {
 
         val theView = inflater.inflate(R.layout.fragment_scan_error, container, false)
 
-        button = theView.findViewById(R.id.frag_scan_comp_button)
+        button = theView.findViewById(R.id.frag_scan_error_button)
 
         button.setOnClickListener { closeDialog() }
         return theView

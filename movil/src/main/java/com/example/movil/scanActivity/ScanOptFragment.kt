@@ -57,7 +57,8 @@ class ScanOptFragment : Fragment() {
         super.onCreateView(inflater, container, savedInstanceState)
 
         val theView = inflater.inflate(R.layout.fragment_scan_options, container, false)
-        val chosenScanner = (activity as ScanActivity).chosenScanner
+
+        val chosenScanner = (activity as ScanActivity).chosenScanner //TODO check null
         val chosenTicket = (activity as ScanActivity).chosenTicket
 
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)
@@ -213,6 +214,30 @@ class ScanOptFragment : Fragment() {
                     resolutionAdapter.add("AUTO")
                 }
                 resolutionAdapter.notifyDataSetChanged()
+
+                //Color
+                if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES)){
+                    val colorCap = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES) as Collection<*>
+                    if(colorCap.contains(ScanValues.COLOR_MODE_RGB_48)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color48))
+                    if(colorCap.contains(ScanValues.COLOR_MODE_RGB_24)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color24))
+                    if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_16)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey16))
+                    if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_8)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey8))
+                    if(colorCap.contains(ScanValues.COLOR_MODE_BLACK_AND_WHITE)) colorAdapter.add(getString(R.string.ScanOption_colorMode_BW))
+                }else{
+                    colorAdapter.add("AUTO")
+                }
+                colorAdapter.notifyDataSetChanged()
+
+                //Format
+                if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS)){
+                    val formatCap = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS) as Collection<*>
+                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_PDF)) formatAdapter.add(getString(R.string.ScanOption_format_PDF))
+                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_JPEG)) formatAdapter.add(getString(R.string.ScanOption_format_JPEG))
+                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_RAW)) formatAdapter.add(getString(R.string.ScanOption_format_RAW))
+                }else{
+                    formatAdapter.add("AUTO")
+                }
+                formatAdapter.notifyDataSetChanged()
             }
 
             override fun onFetchCapabilitiesError(exception: ScannerException?) {
@@ -220,21 +245,6 @@ class ScanOptFragment : Fragment() {
                 Log.e(TAG, exception?.message!!)
             }
         })
-
-        //Other scanning options
-        //Color
-        colorAdapter.add(getString(R.string.ScanOption_colorMode_BW))
-        colorAdapter.add(getString(R.string.ScanOption_colorMode_grey8))
-        colorAdapter.add(getString(R.string.ScanOption_colorMode_grey16))
-        colorAdapter.add(getString(R.string.ScanOption_colorMode_color24))
-        colorAdapter.add(getString(R.string.ScanOption_colorMode_color48))
-        colorAdapter.notifyDataSetChanged()
-
-        //File format
-        formatAdapter.add(getString(R.string.ScanOption_format_PDF))
-        formatAdapter.add(getString(R.string.ScanOption_format_JPEG))
-        formatAdapter.add(getString(R.string.ScanOption_format_RAW))
-        formatAdapter.notifyDataSetChanged()
     }
 
     /**
@@ -298,6 +308,7 @@ class ScanOptFragment : Fragment() {
                             message = "Error en el ADF.\n Estado: ${e.adfStatus}"
                         }else {
                             when (e!!.reason) {
+                                //TODO
                                 ScannerException.REASON_AUTHENTICATION_REQUIRED -> message = "AUTHENTICATION_REQUIRED"
                                 ScannerException.REASON_CANCELED_BY_DEVICE -> message = "CANCELED_BY_DEVICE"
                                 ScannerException.REASON_CANCELED_BY_USER -> message = "CANCELED_BY_USER"
@@ -312,7 +323,7 @@ class ScanOptFragment : Fragment() {
                                 ScannerException.REASON_SCAN_RESULT_WRITE_ERROR -> message = "RESULT_WRITE_ERROR"
                             }
                         }
-
+                        //TODO
                         setTitle("ERROR")
                         setMessage(message)
                         setNeutralButton(R.string.accept
@@ -336,7 +347,7 @@ class ScanOptFragment : Fragment() {
 
         //Open scanning fragment
         val fragmentManager = activity?.supportFragmentManager!!
-        val fragmentTransaction = fragmentManager.beginTransaction()
+        var fragmentTransaction = fragmentManager.beginTransaction()
         val scanningFragment = PerformingScanFragment()
         scanningFragment.show(fragmentTransaction, "scanningFragment")
 
@@ -379,7 +390,9 @@ class ScanOptFragment : Fragment() {
                         scanningFragment.dismiss()
                         //supportFragmentManager.beginTransaction().remove(scanningFragment)
                         val scanErrorFragment = ScanErrorFragment()
+                        fragmentTransaction = fragmentManager.beginTransaction()
                         scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")
+
 
                         throw theException!!
 
@@ -422,8 +435,11 @@ class ScanOptFragment : Fragment() {
         val resolution = if(resolutionSpinner.selectedItem != null) resolutionSpinner.selectedItem.toString()
                     else auto
 
-        val color = colorSpinner.selectedItem.toString()
-        val format = formatSpinner.selectedItem.toString()
+        val color = if(colorSpinner.selectedItem != null) colorSpinner.selectedItem.toString()
+                    else auto
+
+        val format = if(formatSpinner.selectedItem != null) formatSpinner.selectedItem.toString()
+                    else auto
 
 
         //set source

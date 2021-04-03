@@ -45,12 +45,12 @@
     <string name="fragDownloadFile_downloadingFile">Descargando archivo</string>
 
     <!-- Fragment scan completed -->
-    <string name="fragScanCompletedImage">Error en el escaneo</string>
-    <string name="fragScanCompletedLabel">Error en el escaneo</string>
+    <string name="fragScanCompletedImage">Escaneo completado</string>
+    <string name="fragScanCompletedLabel">Escaneo completado</string>
 
     <!-- Fragment scan error -->
-    <string name="fragScanErrorImage">Escaneo completado</string>
-    <string name="fragScanErrorLabel">Escaneo completado</string>
+    <string name="fragScanErrorImage">Error en el escaneo</string>
+    <string name="fragScanErrorLabel">Se ha producido un error en el escaneo.</string>
 
     <!-- Fragment scanning -->
     <string name="fragScanningImage">Escaneando</string>
@@ -122,5 +122,19 @@
     <string name="MainAct_readQr_exp">Conéctate a la red escaneando un código QR</string>
     <string name="MainAct_scan_exp">Selecciona algún escáner cercano para operar con él</string>
     <string name="MainAct_print_exp">Escoge un archivo e imprímelo en un dispositivo cercano</string>
+    <string name="reason">Razón:</string>
+    <string name="REASON_AUTHENTICATION_REQUIRED">Se requiere autenticación</string>
+    <string name="REASON_CANCELED_BY_DEVICE">El escaner ha cancelado el proceso</string>
+    <string name="REASON_CANCELED_BY_USER">Proceso cancelado por el usuario</string>
+    <string name="REASON_CONNECTION_ERROR">Error en la conexión</string>
+    <string name="REASON_CONNECTION_TIMEOUT">El escáner no responde</string>
+    <string name="REASON_DEVICE_BUSY">El escáner está ocupado</string>
+    <string name="REASON_DEVICE_INTERNAL_ERROR">Error interno en el escáner</string>
+    <string name="REASON_DEVICE_STOPPED">El escáner está detenido</string>
+    <string name="REASON_DEVICE_UNAVAILABLE">El escáner no puede realizar el trabajo en este momento</string>
+    <string name="REASON_INVALID_SCAN_TICKET">Opciones de escaneo inválidas</string>
+    <string name="REASON_OPERATION_IS_ALREADY_STARTED">El trabajo ya ha comenzado</string>
+    <string name="REASON_SCAN_RESULT_WRITE_ERROR">No se puede escribir en el archivo de destino</string>
+    <string name="REASON_UNKNOWN">Desconocido</string>
 
 </resources>

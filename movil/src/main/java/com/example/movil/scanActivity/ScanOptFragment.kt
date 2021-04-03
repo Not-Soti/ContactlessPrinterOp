@@ -138,22 +138,7 @@ class ScanOptFragment : Fragment() {
                     DeviceStatusMonitor.SCANNER_STATUS_UNKNOWN -> getString(R.string.SCANNER_STATUS_UNKNOWN)
                     else ->  getString(R.string.SCANNER_STATUS_UNKNOWN)
                 }
-                val adfStr = when(adfSta){
-                    DeviceStatusMonitor.ADF_STATUS_DUPLEX_PAGE_TOO_LONG -> getString(R.string.ADF_STATUS_DUPLEX_PAGE_TOO_LONG)
-                    DeviceStatusMonitor.ADF_STATUS_DUPLEX_PAGE_TOO_SHORT -> getString(R.string.ADF_STATUS_DUPLEX_PAGE_TOO_SHORT)
-                    DeviceStatusMonitor.ADF_STATUS_EMPTY -> getString(R.string.ADF_STATUS_EMPTY)
-                    DeviceStatusMonitor.ADF_STATUS_HATCH_OPEN -> getString(R.string.ADF_STATUS_HATCH_OPEN)
-                    DeviceStatusMonitor.ADF_STATUS_INPUT_TRAY_FAILED -> getString(R.string.ADF_STATUS_INPUT_TRAY_FAILED)
-                    DeviceStatusMonitor.ADF_STATUS_INPUT_TRAY_OVERLOADED -> getString(R.string.ADF_STATUS_INPUT_TRAY_OVERLOADED)
-                    DeviceStatusMonitor.ADF_STATUS_JAM -> getString(R.string.ADF_STATUS_JAM)
-                    DeviceStatusMonitor.ADF_STATUS_LOADED -> getString(R.string.ADF_STATUS_LOADED)
-                    DeviceStatusMonitor.ADF_STATUS_MISPICK -> getString(R.string.ADF_STATUS_MISPICK)
-                    DeviceStatusMonitor.ADF_STATUS_MULTIPICK_DETECTED -> getString(R.string.ADF_STATUS_MULTIPICK_DETECTED)
-                    DeviceStatusMonitor.ADF_STATUS_PROCESSING -> getString(R.string.ADF_STATUS_PROCESSING)
-                    DeviceStatusMonitor.ADF_STATUS_UNKNOWN -> getString(R.string.ADF_STATUS_UNKNOWN)
-                    DeviceStatusMonitor.ADF_STATUS_UNSUPPORTED -> getString(R.string.ADF_STATUS_UNSUPPORTED)
-                    else -> getString(R.string.ADF_STATUS_UNKNOWN)
-                }
+                val adfStr = getAdfStatusFromInt(adfSta)
                 deviceStatusTv.text = scannerStr
                 adfStatusTv.text = adfStr
             }
@@ -385,12 +370,12 @@ class ScanOptFragment : Fragment() {
 
                         theScanner.cancelScanning()
                         deleteTempFiles(tempFolder)
-                        //Toast.makeText(applicationContext, "Error, ${theException!!.message}", Toast.LENGTH_LONG).show()
 
                         scanningFragment.dismiss()
                         //supportFragmentManager.beginTransaction().remove(scanningFragment)
                         val scanErrorFragment = ScanErrorFragment()
                         fragmentTransaction = fragmentManager.beginTransaction()
+                        scanErrorFragment.setReason(getReasonFromException(theException))
                         scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")
 
 
@@ -488,4 +473,50 @@ class ScanOptFragment : Fragment() {
         //combineFiles = combineCheckBox.isChecked
     }
 
+
+    fun getReasonFromException(e: ScannerException?) : String{
+        var message = getString(R.string.REASON_UNKNOWN)
+
+        if(e == null){
+            return message
+        }else if(e is AdfException){
+            message = "Error en el ADF:\n  ${getAdfStatusFromInt(e.adfStatus)}"
+        }else {
+            when (e.reason) {
+                ScannerException.REASON_AUTHENTICATION_REQUIRED -> message = getString(R.string.REASON_AUTHENTICATION_REQUIRED)
+                ScannerException.REASON_CANCELED_BY_DEVICE -> message = getString(R.string.REASON_CANCELED_BY_DEVICE)
+                ScannerException.REASON_CANCELED_BY_USER -> message = getString(R.string.REASON_CANCELED_BY_USER)
+                ScannerException.REASON_CONNECTION_ERROR -> message = getString(R.string.REASON_CONNECTION_ERROR)
+                ScannerException.REASON_CONNECTION_TIMEOUT -> message = getString(R.string.REASON_CONNECTION_TIMEOUT)
+                ScannerException.REASON_DEVICE_BUSY -> message = getString(R.string.REASON_DEVICE_BUSY)
+                ScannerException.REASON_DEVICE_INTERNAL_ERROR -> message = getString(R.string.REASON_DEVICE_INTERNAL_ERROR)
+                ScannerException.REASON_DEVICE_STOPPED -> message = getString(R.string.REASON_DEVICE_STOPPED)
+                ScannerException.REASON_DEVICE_UNAVAILABLE -> message = getString(R.string.REASON_DEVICE_UNAVAILABLE)
+                ScannerException.REASON_INVALID_SCAN_TICKET -> message = getString(R.string.REASON_INVALID_SCAN_TICKET)
+                ScannerException.REASON_OPERATION_IS_ALREADY_STARTED -> message = getString(R.string.REASON_OPERATION_IS_ALREADY_STARTED)
+                ScannerException.REASON_SCAN_RESULT_WRITE_ERROR -> message = getString(R.string.REASON_SCAN_RESULT_WRITE_ERROR)
+            }
+        }
+
+        return message
+    }
+
+    fun getAdfStatusFromInt(sta : Int) : String{
+        return when(sta){
+            DeviceStatusMonitor.ADF_STATUS_DUPLEX_PAGE_TOO_LONG -> getString(R.string.ADF_STATUS_DUPLEX_PAGE_TOO_LONG)
+            DeviceStatusMonitor.ADF_STATUS_DUPLEX_PAGE_TOO_SHORT -> getString(R.string.ADF_STATUS_DUPLEX_PAGE_TOO_SHORT)
+            DeviceStatusMonitor.ADF_STATUS_EMPTY -> getString(R.string.ADF_STATUS_EMPTY)
+            DeviceStatusMonitor.ADF_STATUS_HATCH_OPEN -> getString(R.string.ADF_STATUS_HATCH_OPEN)
+            DeviceStatusMonitor.ADF_STATUS_INPUT_TRAY_FAILED -> getString(R.string.ADF_STATUS_INPUT_TRAY_FAILED)
+            DeviceStatusMonitor.ADF_STATUS_INPUT_TRAY_OVERLOADED -> getString(R.string.ADF_STATUS_INPUT_TRAY_OVERLOADED)
+            DeviceStatusMonitor.ADF_STATUS_JAM -> getString(R.string.ADF_STATUS_JAM)
+            DeviceStatusMonitor.ADF_STATUS_LOADED -> getString(R.string.ADF_STATUS_LOADED)
+            DeviceStatusMonitor.ADF_STATUS_MISPICK -> getString(R.string.ADF_STATUS_MISPICK)
+            DeviceStatusMonitor.ADF_STATUS_MULTIPICK_DETECTED -> getString(R.string.ADF_STATUS_MULTIPICK_DETECTED)
+            DeviceStatusMonitor.ADF_STATUS_PROCESSING -> getString(R.string.ADF_STATUS_PROCESSING)
+            DeviceStatusMonitor.ADF_STATUS_UNKNOWN -> getString(R.string.ADF_STATUS_UNKNOWN)
+            DeviceStatusMonitor.ADF_STATUS_UNSUPPORTED -> getString(R.string.ADF_STATUS_UNSUPPORTED)
+            else -> getString(R.string.ADF_STATUS_UNKNOWN)
+        }
+    }
 }

@@ -93,7 +93,7 @@
     <string name="ScanOption_format_PDF">PDF</string>
     <string name="ScanOption_format_JPEG">JPEG</string>
     <string name="ScanOption_format_RAW">RAW</string>
-    <string name="ScanOption_colorMode_BW">B/N</string>
+    <string name="ScanOption_colorMode_BW">Blanco/Negro</string>
     <string name="ScanOption_colorMode_grey8">Gris 8dpp</string>
     <string name="ScanOption_colorMode_grey16">Gris 16dpp</string>
     <string name="ScanOption_colorMode_color24">Color 24dpp</string>

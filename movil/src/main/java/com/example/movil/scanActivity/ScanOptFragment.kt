@@ -44,7 +44,6 @@ class ScanOptFragment : Fragment() {
     private lateinit var chosenNFaces : ScanOptions.Faces
     private lateinit var chosenColorMode : ScanOptions.ColorMode
     private lateinit var chosenFormat : ScanOptions.Format
-    //private var combineFiles = false
     private lateinit var chosenRes : Resolution
     private lateinit var resolutionList : List<Resolution> //List of res given by the scannerCapabilities
     private var resSelected = false //Control when a resolution is selected
@@ -155,8 +154,14 @@ class ScanOptFragment : Fragment() {
         theScanner.fetchCapabilities(object :
             ScannerCapabilitiesFetcher.ScannerCapabilitiesListener {
             override fun onFetchCapabilities(cap: ScannerCapabilities?) {
+
+                if(cap == null){
+                    //TODO
+                    return
+                }
+
                 var hasADF = false //check if adf was already added
-                val capabilities = cap!!.capabilities //Map
+                val capabilities = cap.capabilities //Map
 
                 //Get sources
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_SIMPLEX)){
@@ -183,9 +188,19 @@ class ScanOptFragment : Fragment() {
                 }
 
                 //Resolution
-                if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS)){
+
+                /*if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS)){
                     val resCap : ResolutionCapability = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS) as ResolutionCapability
                     val resolutionList = resCap.discreteResolutions
+                    resolutionList.forEach{
+                        resolutionAdapter.add(it.toString())
+                    }
+                }else{
+                    resolutionAdapter.add("AUTO")
+                }*/
+                val resCap = cap.get(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS) as ResolutionCapability
+                if(resCap != null){
+                    resolutionList = resCap.discreteResolutions
                     resolutionList.forEach{
                         resolutionAdapter.add(it.toString())
                     }
@@ -195,8 +210,19 @@ class ScanOptFragment : Fragment() {
                 resolutionAdapter.notifyDataSetChanged()
 
                 //Color
-                if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES)){
+                /*if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES)){
                     val colorCap = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES) as Collection<*>
+                    if(colorCap.contains(ScanValues.COLOR_MODE_RGB_48)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color48))
+                    if(colorCap.contains(ScanValues.COLOR_MODE_RGB_24)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color24))
+                    if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_16)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey16))
+                    if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_8)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey8))
+                    if(colorCap.contains(ScanValues.COLOR_MODE_BLACK_AND_WHITE)) colorAdapter.add(getString(R.string.ScanOption_colorMode_BW))
+                }else{
+                    colorAdapter.add("AUTO")
+                }*/
+                @Suppress("UNCHECKED_CAST")
+                val colorCap = cap.get(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES) as Collection<Int>
+                if(colorCap != null){
                     if(colorCap.contains(ScanValues.COLOR_MODE_RGB_48)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color48))
                     if(colorCap.contains(ScanValues.COLOR_MODE_RGB_24)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color24))
                     if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_16)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey16))
@@ -208,8 +234,18 @@ class ScanOptFragment : Fragment() {
                 colorAdapter.notifyDataSetChanged()
 
                 //Format
-                if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS)){
+                /*if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS)){
                     val formatCap = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS) as Collection<*>
+                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_PDF)) formatAdapter.add(getString(R.string.ScanOption_format_PDF))
+                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_JPEG)) formatAdapter.add(getString(R.string.ScanOption_format_JPEG))
+                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_RAW)) formatAdapter.add(getString(R.string.ScanOption_format_RAW))
+                }else{
+                    formatAdapter.add("AUTO")
+                }*/
+
+                @Suppress("UNCHECKED_CAST")
+                val formatCap = cap.get(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS) as Collection<Int>
+                if(formatCap != null){
                     if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_PDF)) formatAdapter.add(getString(R.string.ScanOption_format_PDF))
                     if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_JPEG)) formatAdapter.add(getString(R.string.ScanOption_format_JPEG))
                     if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_RAW)) formatAdapter.add(getString(R.string.ScanOption_format_RAW))
@@ -432,7 +468,6 @@ class ScanOptFragment : Fragment() {
         }
 
         //set resolution
-        //Crear array de resoluciones posibles y coger de ahi directamente
         when(resolution){
             auto -> {/*Do nothing*/}
             "AUTO" -> {/*Do nothing*/}
@@ -443,7 +478,6 @@ class ScanOptFragment : Fragment() {
             }
         }
 
-        //combineFiles = combineCheckBox.isChecked
     }
 
 

@@ -116,12 +116,6 @@ class ScanOptFragment : Fragment() {
             ) {
                 val selectedSource = parent?.getItemAtPosition(position).toString()
                 val adfStr = context!!.getString(R.string.ScanOption_source_adf)
-                /*if(selectedSource == adfStr){
-                    combineCheckBox.visibility = View.VISIBLE
-                }else{
-                    combineCheckBox.visibility = View.INVISIBLE
-                    combineCheckBox.isSelected = false
-                }*/
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -287,29 +281,9 @@ class ScanOptFragment : Fragment() {
                     val builder = AlertDialog.Builder(activity!!)
                     builder.apply {
 
-                        var message = "Desconocido"
+                        val message = getReasonFromException(e)
 
-                        if(e is AdfException){
-                            message = "Error en el ADF.\n Estado: ${e.adfStatus}"
-                        }else {
-                            when (e!!.reason) {
-                                //TODO
-                                ScannerException.REASON_AUTHENTICATION_REQUIRED -> message = "AUTHENTICATION_REQUIRED"
-                                ScannerException.REASON_CANCELED_BY_DEVICE -> message = "CANCELED_BY_DEVICE"
-                                ScannerException.REASON_CANCELED_BY_USER -> message = "CANCELED_BY_USER"
-                                ScannerException.REASON_CONNECTION_ERROR -> message = "CONNECTION ERROR"
-                                ScannerException.REASON_CONNECTION_TIMEOUT -> message = "CONNECTION_TIMEOUT"
-                                ScannerException.REASON_DEVICE_BUSY -> message = "DEVICE_BUSY"
-                                ScannerException.REASON_DEVICE_INTERNAL_ERROR -> message = "DEVICE_INTERNAL_ERROR"
-                                ScannerException.REASON_DEVICE_STOPPED -> message = "DEVICE_STOPPED"
-                                ScannerException.REASON_DEVICE_UNAVAILABLE -> message = "DEVICE_UNAVAILABLE"
-                                ScannerException.REASON_INVALID_SCAN_TICKET -> message = "INVALID_SCAN_TICKET"
-                                ScannerException.REASON_OPERATION_IS_ALREADY_STARTED -> message = "OPERATION_IS_ALREADY_STARTED"
-                                ScannerException.REASON_SCAN_RESULT_WRITE_ERROR -> message = "RESULT_WRITE_ERROR"
-                            }
-                        }
-                        //TODO
-                        setTitle("ERROR")
+                        setTitle(getString(R.string.fragScanErrorLabel))
                         setMessage(message)
                         setNeutralButton(R.string.accept
                         ) { dialog, _ ->
@@ -378,8 +352,7 @@ class ScanOptFragment : Fragment() {
                         scanErrorFragment.setReason(getReasonFromException(theException))
                         scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")
 
-
-                        throw theException!!
+                        //throw theException!!
 
                     } catch (e: AdfException) {
                         Log.d(tag, "AdfException\n Status: ${e.adfStatus}")

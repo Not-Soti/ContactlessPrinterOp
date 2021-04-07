@@ -157,6 +157,7 @@ class ScanOptFragment : Fragment() {
 
                 if(cap == null){
                     //TODO
+                    Log.d(TAG, "Scanner Capabilities == null")
                     return
                 }
 
@@ -184,6 +185,12 @@ class ScanOptFragment : Fragment() {
                 }
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_PLATEN)){
                     sourceAdapter.add(getString(R.string.ScanOption_source_platen))
+                    sourceAdapter.notifyDataSetChanged()
+                }
+
+                //TODO Puesto para ver si se añade aunque no la tenga
+                if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA)){
+                    sourceAdapter.add("\"CAMARA\"")
                     sourceAdapter.notifyDataSetChanged()
                 }
 
@@ -258,6 +265,24 @@ class ScanOptFragment : Fragment() {
             override fun onFetchCapabilitiesError(exception: ScannerException?) {
                 Log.d(TAG, "Error obteniendo las caracteristicas del escaner")
                 Log.e(TAG, exception?.message!!)
+
+                val alertDialog: AlertDialog = this.let {
+                    val builder = AlertDialog.Builder(activity!!)
+                    builder.apply {
+
+                        val message = getReasonFromException(exception)
+
+                        setTitle(getString(R.string.fragScanCapabilitiesErrorLabel))
+                        setMessage(message)
+                        setNeutralButton(R.string.accept) { _, _ ->
+                            startActivity(Intent(context, ScanActivity::class.java))
+                        }
+                        setCancelable(false)
+                    }
+                    // Create the AlertDialog
+                    builder.create()
+                }
+                alertDialog.show()
             }
         })
     }
@@ -359,7 +384,6 @@ class ScanOptFragment : Fragment() {
                 override fun onScanningPageDone(p0: ScanPage?) {
                     //Toast.makeText(this@ScanActivity, "Pagina escaneada", Toast.LENGTH_LONG).show()
                     Log.d(tag, "Page scanned")
-                    //scanResultUris = p0?.uri
                     if(p0 != null) {
                         scanResultUris.add(p0.uri!!)
                     }

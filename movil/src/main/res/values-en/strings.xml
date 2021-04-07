@@ -109,4 +109,5 @@
     <string name="REASON_OPERATION_IS_ALREADY_STARTED">This scan job has already started</string>
     <string name="REASON_SCAN_RESULT_WRITE_ERROR">Unable to write on the destiny file</string>
     <string name="REASON_UNKNOWN">Unknown</string>
+    <string name="fragScanCapabilitiesErrorLabel">Error getting scanner capabilities</string>
 </resources>

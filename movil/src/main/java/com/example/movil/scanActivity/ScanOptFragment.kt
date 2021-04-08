@@ -190,7 +190,7 @@ class ScanOptFragment : Fragment() {
 
                 //TODO Puesto para ver si se añade aunque no la tenga
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA)){
-                    sourceAdapter.add("\"CAMARA\"")
+                    sourceAdapter.add("CAMARA")
                     sourceAdapter.notifyDataSetChanged()
                 }
 

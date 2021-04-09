@@ -10,10 +10,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.example.movil.R
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.*
 import java.io.File
+import java.lang.Exception
 
 
 class ScanOptFragment : Fragment() {
@@ -21,7 +23,7 @@ class ScanOptFragment : Fragment() {
     private val tempScanFolder = "TempScan"
     private val TAG = "--- ScanOptFragment ---"
 
-    //private var tempPathAux = ""
+    private lateinit var viewModel : ScanOptFragmentViewModel
 
     private lateinit var nameTv : TextView
     private lateinit var deviceStatusTv : TextView
@@ -40,13 +42,13 @@ class ScanOptFragment : Fragment() {
     private lateinit var resolutionAdapter : ArrayAdapter<String>
     private lateinit var formatAdapter : ArrayAdapter<String>
 
-    private lateinit var chosenSource : ScanOptions.ScanSource
+    /*private lateinit var chosenSource : ScanOptions.ScanSource
     private lateinit var chosenNFaces : ScanOptions.Faces
     private lateinit var chosenColorMode : ScanOptions.ColorMode
     private lateinit var chosenFormat : ScanOptions.Format
-    private lateinit var chosenRes : Resolution
-    private lateinit var resolutionList : List<Resolution> //List of res given by the scannerCapabilities
-    private var resSelected = false //Control when a resolution is selected
+    private lateinit var chosenRes : Resolution*/
+    //private lateinit var resolutionList : List<Resolution> //List of res given by the scannerCapabilities
+    //private var isResSelected = false //Control when a resolution is selected
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,10 +57,12 @@ class ScanOptFragment : Fragment() {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
+        viewModel = ViewModelProvider(this).get(ScanOptFragmentViewModel::class.java)
+
         val theView = inflater.inflate(R.layout.fragment_scan_options, container, false)
 
-        val chosenScanner = (activity as ScanActivity).chosenScanner //TODO check null
-        val chosenTicket = (activity as ScanActivity).chosenTicket
+        viewModel.chosenScanner = (activity as ScanActivity).chosenScanner //TODO check null
+        viewModel.chosenTicket = (activity as ScanActivity).chosenTicket
 
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)
         if(tempFolder!=null && !tempFolder.exists()){
@@ -97,15 +101,15 @@ class ScanOptFragment : Fragment() {
         resolutionSpinner.adapter = resolutionAdapter
         formatSpinner.adapter = formatAdapter
 
-        nameTv.text = chosenScanner.humanReadableName
+        nameTv.text = viewModel.chosenScanner.humanReadableName
 
         scanButton.setOnClickListener{
             setChosenSettings()
-            val newTicket = setTicketOptions(chosenTicket)
-            validateTicket(chosenScanner, newTicket) //Validates ticket and prints
+            val newTicket = viewModel.setTicketOptions()
+            validateTicket(viewModel.chosenScanner, newTicket) //Validates ticket and prints
         }
 
-        //If source is ADF, show combine files checkbox
+        //Refresh settings depending on the source
         sourceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -113,14 +117,28 @@ class ScanOptFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                val selectedSource = parent?.getItemAtPosition(position).toString()
-                val adfStr = context!!.getString(R.string.ScanOption_source_adf)
-            }
+                    val source = parent?.getItemAtPosition(position).toString()
+                    val nFaces = facesSpinner.selectedItem.toString()
+
+                    if(source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_1face)){
+                        viewModel.setSource(ScanOptions.ScanSource.ADF_SIMPLEX)
+                    }else if (source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_2face)){
+                        viewModel.setSource(ScanOptions.ScanSource.ADF_DUPLEX)
+                    }else if(source == getString(R.string.ScanOption_source_platen)){
+                        viewModel.setSource(ScanOptions.ScanSource.PLATEN)
+                    }else if(source == getString(R.string.ScanOption_source_camera)){
+                        viewModel.setSource(ScanOptions.ScanSource.CAMERA)
+                    }else {
+                        viewModel.chosenSource = ScanOptions.ScanSource.AUTO
+                    }
+                    updateSettings()
+                }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
 
-        chosenScanner.monitorDeviceStatus(DeviceStatusMonitor.DEFAULT_MONITORING_PERIOD, object: DeviceStatusMonitor.ScannerStatusListener{
+        viewModel.chosenScanner.monitorDeviceStatus(DeviceStatusMonitor.DEFAULT_MONITORING_PERIOD, object: DeviceStatusMonitor.ScannerStatusListener{
             override fun onStatusChanged(scannerSta: Int, adfSta: Int) {
                 val scannerStr = when(scannerSta){
                     DeviceStatusMonitor.SCANNER_STATUS_IDLE -> getString(R.string.SCANNER_STATUS_IDLE)
@@ -142,7 +160,7 @@ class ScanOptFragment : Fragment() {
             }
         })//Monitoring device status
 
-        getScannerCapabilities(chosenScanner)
+        getScannerCapabilities(viewModel.chosenScanner)
         return theView
     }
 
@@ -163,103 +181,71 @@ class ScanOptFragment : Fragment() {
 
                 var hasADF = false //check if adf was already added
                 val capabilities = cap.capabilities //Map
+                var isSettingsSet = false //Used to set the 1st source options
+
 
                 //Get sources
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_SIMPLEX)){
+                    viewModel.adfSimplex = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_SIMPLEX] as MutableMap<String, Any>
                     if(!hasADF) {
                         hasADF = true
                         sourceAdapter.add(getString(R.string.ScanOption_source_adf))
                         sourceAdapter.notifyDataSetChanged()
                     }
+
                     facesAdapter.add(getString(R.string.ScanOption_faces_1face))
                     facesAdapter.notifyDataSetChanged()
+
+                    if(!isSettingsSet){
+                        viewModel.setSource(ScanOptions.ScanSource.ADF_SIMPLEX)
+                        updateSettings()
+                        isSettingsSet = true
+                    }
                 }
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX)){
+                    viewModel.adfDuplex = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX] as MutableMap<String, Any>
                     if(!hasADF) {
                         hasADF = true
                         sourceAdapter.add(getString(R.string.ScanOption_source_adf))
                         sourceAdapter.notifyDataSetChanged()
                     }
+
                     facesAdapter.add(getString(R.string.ScanOption_faces_2face))
                     facesAdapter.notifyDataSetChanged()
+
+                    if(!isSettingsSet){
+                        viewModel.setSource(ScanOptions.ScanSource.ADF_DUPLEX)
+                        updateSettings()
+                        isSettingsSet = true
+                    }
                 }
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_PLATEN)){
+                    viewModel.platen = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_PLATEN] as MutableMap<String, Any>
                     sourceAdapter.add(getString(R.string.ScanOption_source_platen))
                     sourceAdapter.notifyDataSetChanged()
+
+                    if(!isSettingsSet){
+                        viewModel.setSource(ScanOptions.ScanSource.PLATEN)
+                        updateSettings()
+                        isSettingsSet = true
+                    }
                 }
 
-                //TODO Puesto para ver si se añade aunque no la tenga
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA)){
-                    sourceAdapter.add("CAMARA")
+                    viewModel.camera = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA] as MutableMap<String, Any>
+                    sourceAdapter.add("CAMARA") //TODO string
                     sourceAdapter.notifyDataSetChanged()
-                }
 
-                //Resolution
-
-                /*if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS)){
-                    val resCap : ResolutionCapability = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS) as ResolutionCapability
-                    val resolutionList = resCap.discreteResolutions
-                    resolutionList.forEach{
-                        resolutionAdapter.add(it.toString())
+                    if(!isSettingsSet){
+                        viewModel.setSource(ScanOptions.ScanSource.CAMERA)
+                        updateSettings()
+                        isSettingsSet = true
                     }
-                }else{
-                    resolutionAdapter.add("AUTO")
-                }*/
-                val resCap = cap.get(ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS) as ResolutionCapability
-                if(resCap != null){
-                    resolutionList = resCap.discreteResolutions
-                    resolutionList.forEach{
-                        resolutionAdapter.add(it.toString())
-                    }
-                }else{
-                    resolutionAdapter.add("AUTO")
                 }
-                resolutionAdapter.notifyDataSetChanged()
 
-                //Color
-                /*if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES)){
-                    val colorCap = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES) as Collection<*>
-                    if(colorCap.contains(ScanValues.COLOR_MODE_RGB_48)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color48))
-                    if(colorCap.contains(ScanValues.COLOR_MODE_RGB_24)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color24))
-                    if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_16)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey16))
-                    if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_8)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey8))
-                    if(colorCap.contains(ScanValues.COLOR_MODE_BLACK_AND_WHITE)) colorAdapter.add(getString(R.string.ScanOption_colorMode_BW))
-                }else{
-                    colorAdapter.add("AUTO")
-                }*/
-                @Suppress("UNCHECKED_CAST")
-                val colorCap = cap.get(ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES) as Collection<Int>
-                if(colorCap != null){
-                    if(colorCap.contains(ScanValues.COLOR_MODE_RGB_48)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color48))
-                    if(colorCap.contains(ScanValues.COLOR_MODE_RGB_24)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color24))
-                    if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_16)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey16))
-                    if(colorCap.contains(ScanValues.COLOR_MODE_GRAYSCALE_8)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey8))
-                    if(colorCap.contains(ScanValues.COLOR_MODE_BLACK_AND_WHITE)) colorAdapter.add(getString(R.string.ScanOption_colorMode_BW))
-                }else{
-                    colorAdapter.add("AUTO")
-                }
-                colorAdapter.notifyDataSetChanged()
+                //TODO
+                //Añadir opcion AUTO y que se cojan las settings de lo que ya tenga el scanTicket
 
-                //Format
-                /*if(capabilities.containsKey(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS)){
-                    val formatCap = capabilities.getValue(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS) as Collection<*>
-                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_PDF)) formatAdapter.add(getString(R.string.ScanOption_format_PDF))
-                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_JPEG)) formatAdapter.add(getString(R.string.ScanOption_format_JPEG))
-                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_RAW)) formatAdapter.add(getString(R.string.ScanOption_format_RAW))
-                }else{
-                    formatAdapter.add("AUTO")
-                }*/
-
-                @Suppress("UNCHECKED_CAST")
-                val formatCap = cap.get(ScannerCapabilities.SOURCE_CAPABILITY_FORMATS) as Collection<Int>
-                if(formatCap != null){
-                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_PDF)) formatAdapter.add(getString(R.string.ScanOption_format_PDF))
-                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_JPEG)) formatAdapter.add(getString(R.string.ScanOption_format_JPEG))
-                    if(formatCap.contains(ScanValues.DOCUMENT_FORMAT_RAW)) formatAdapter.add(getString(R.string.ScanOption_format_RAW))
-                }else{
-                    formatAdapter.add("AUTO")
-                }
-                formatAdapter.notifyDataSetChanged()
             }
 
             override fun onFetchCapabilitiesError(exception: ScannerException?) {
@@ -288,45 +274,31 @@ class ScanOptFragment : Fragment() {
     }
 
     /**
-     * Function that gets scanning options from the chosen settings
+     * Sets source available settings on the UI
      */
-    private fun setTicketOptions(ticket : ScanTicket) : ScanTicket{
+    private fun updateSettings(){
 
-        //Source
-        when(chosenSource){
-            ScanOptions.ScanSource.ADF -> { ticket.inputSource = ScanValues.INPUT_SOURCE_ADF }
-            ScanOptions.ScanSource.PLATEN -> { ticket.inputSource = ScanValues.INPUT_SOURCE_PLATEN }
-            ScanOptions.ScanSource.CAMERA -> { ticket.inputSource = ScanValues.INPUT_SOURCE_CAMERA }
-            ScanOptions.ScanSource.AUTO -> { ticket.inputSource = ScanValues.INPUT_SOURCE_AUTO }
+        //Resolution
+        viewModel.resolutionList.forEach{
+            resolutionAdapter.add(it.toString())
         }
+        resolutionAdapter.notifyDataSetChanged()
 
-        //Sheet faces
-        if (chosenNFaces == ScanOptions.Faces.ONE_FACE){
-            ticket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, false)
-        }else{
-            ticket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, true)
-        }
+        //Color
+        if(viewModel.colorModes.contains(ScanValues.COLOR_MODE_RGB_48)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color48))
+        if(viewModel.colorModes.contains(ScanValues.COLOR_MODE_RGB_24)) colorAdapter.add(getString(R.string.ScanOption_colorMode_color24))
+        if(viewModel.colorModes.contains(ScanValues.COLOR_MODE_GRAYSCALE_16)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey16))
+        if(viewModel.colorModes.contains(ScanValues.COLOR_MODE_GRAYSCALE_8)) colorAdapter.add(getString(R.string.ScanOption_colorMode_grey8))
+        if(viewModel.colorModes.contains(ScanValues.COLOR_MODE_BLACK_AND_WHITE)) colorAdapter.add(getString(R.string.ScanOption_colorMode_BW))
+        colorAdapter.notifyDataSetChanged()
 
-        when(chosenColorMode){
-            ScanOptions.ColorMode.BW -> ticket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_BLACK_AND_WHITE)
-            ScanOptions.ColorMode.GREY_8 -> ticket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_GRAYSCALE_8)
-            ScanOptions.ColorMode.GREY_16 -> ticket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_GRAYSCALE_16)
-            ScanOptions.ColorMode.COLOR_24 -> ticket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_RGB_24)
-            ScanOptions.ColorMode.COLOR_48 -> ticket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_RGB_48)
-        }
-
-        when(chosenFormat){
-            ScanOptions.Format.JPEG -> ticket.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_JPEG)
-            ScanOptions.Format.PDF -> ticket.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_PDF)
-            ScanOptions.Format.RAW -> ticket.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_RAW)
-        }
-
-        if(resSelected){ //A resolution was selected
-            ticket.setSetting(ScanTicket.SCAN_SETTING_RESOLUTION, chosenRes)
-        }
-
-        return ticket
+        //Format
+        if(viewModel.resultFormats.contains(ScanValues.DOCUMENT_FORMAT_PDF)) formatAdapter.add(getString(R.string.ScanOption_format_PDF))
+        if(viewModel.resultFormats.contains(ScanValues.DOCUMENT_FORMAT_JPEG)) formatAdapter.add(getString(R.string.ScanOption_format_JPEG))
+        if(viewModel.resultFormats.contains(ScanValues.DOCUMENT_FORMAT_RAW)) formatAdapter.add(getString(R.string.ScanOption_format_RAW))
+        formatAdapter.notifyDataSetChanged()
     }
+
 
     /**
      * Fun that validates chosen options with the scanner
@@ -382,7 +354,6 @@ class ScanOptFragment : Fragment() {
             theTicket,
             object : ScanCapture.ScanningProgressListener {
                 override fun onScanningPageDone(p0: ScanPage?) {
-                    //Toast.makeText(this@ScanActivity, "Pagina escaneada", Toast.LENGTH_LONG).show()
                     Log.d(tag, "Page scanned")
                     if(p0 != null) {
                         scanResultUris.add(p0.uri!!)
@@ -390,12 +361,11 @@ class ScanOptFragment : Fragment() {
                 }
 
                 override fun onScanningComplete() {
-                    //Toast.makeText(this@ScanActivity, "Escaneo completado", Toast.LENGTH_LONG).show()
                     Log.d(tag, "Scanning completed")
 
                     val i = Intent(activity?.applicationContext, ScanPreview::class.java)
                     i.putParcelableArrayListExtra("tempUris", scanResultUris)
-                    i.putExtra("chosenFormat", chosenFormat)
+                    i.putExtra("chosenFormat", viewModel.chosenFormat)
                     startActivity(i)
                 }
 
@@ -419,6 +389,8 @@ class ScanOptFragment : Fragment() {
 
                     } catch (e: ScannerException) {
                         Log.d(tag, "ScannerException\n Reason: ${e.reason}")
+                    } catch (e: Exception){
+                        Log.d(tag, "Excepcion no controlada")
                     }
                 }
 
@@ -461,7 +433,7 @@ class ScanOptFragment : Fragment() {
 
 
         //set source
-        chosenSource = when(source){
+/*        chosenSource = when(source){
             getString(R.string.ScanOption_source_adf) -> ScanOptions.ScanSource.ADF
             getString(R.string.ScanOption_source_platen) -> ScanOptions.ScanSource.PLATEN
             getString(R.string.ScanOption_source_camera) -> ScanOptions.ScanSource.CAMERA
@@ -473,22 +445,34 @@ class ScanOptFragment : Fragment() {
             getString(R.string.ScanOption_faces_1face) -> ScanOptions.Faces.ONE_FACE
             getString(R.string.ScanOption_faces_2face) -> ScanOptions.Faces.TWO_FACES
             else -> ScanOptions.Faces.ONE_FACE
+        }*/
+
+        if(source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_1face)){
+            viewModel.chosenSource = ScanOptions.ScanSource.ADF_SIMPLEX
+        }else if (source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_2face)){
+            viewModel.chosenSource = ScanOptions.ScanSource.ADF_DUPLEX
+        }else if(source == getString(R.string.ScanOption_source_platen)){
+            viewModel.chosenSource = ScanOptions.ScanSource.PLATEN
+        }else if(source == getString(R.string.ScanOption_source_camera)){
+            viewModel.chosenSource = ScanOptions.ScanSource.CAMERA
+        }else {
+            viewModel.chosenSource = ScanOptions.ScanSource.AUTO
         }
 
         //set color
         when(color){
-            getString(R.string.ScanOption_colorMode_BW) -> chosenColorMode = ScanOptions.ColorMode.BW
-            getString(R.string.ScanOption_colorMode_grey8) -> chosenColorMode = ScanOptions.ColorMode.GREY_8
-            getString(R.string.ScanOption_colorMode_grey16) -> chosenColorMode = ScanOptions.ColorMode.GREY_16
-            getString(R.string.ScanOption_colorMode_color24) -> chosenColorMode = ScanOptions.ColorMode.COLOR_24
-            getString(R.string.ScanOption_colorMode_color48) -> chosenColorMode = ScanOptions.ColorMode.COLOR_48
+            getString(R.string.ScanOption_colorMode_BW) -> viewModel.chosenColorMode = ScanOptions.ColorMode.BW
+            getString(R.string.ScanOption_colorMode_grey8) -> viewModel.chosenColorMode = ScanOptions.ColorMode.GREY_8
+            getString(R.string.ScanOption_colorMode_grey16) -> viewModel.chosenColorMode = ScanOptions.ColorMode.GREY_16
+            getString(R.string.ScanOption_colorMode_color24) -> viewModel.chosenColorMode = ScanOptions.ColorMode.COLOR_24
+            getString(R.string.ScanOption_colorMode_color48) -> viewModel.chosenColorMode = ScanOptions.ColorMode.COLOR_48
         }
 
         //set format
         when(format){
-            getString(R.string.ScanOption_format_PDF) -> chosenFormat = ScanOptions.Format.PDF
-            getString(R.string.ScanOption_format_JPEG) -> chosenFormat = ScanOptions.Format.JPEG
-            getString(R.string.ScanOption_format_RAW) -> chosenFormat = ScanOptions.Format.RAW
+            getString(R.string.ScanOption_format_PDF) -> viewModel.chosenFormat = ScanOptions.Format.PDF
+            getString(R.string.ScanOption_format_JPEG) -> viewModel.chosenFormat = ScanOptions.Format.JPEG
+            getString(R.string.ScanOption_format_RAW) -> viewModel.chosenFormat = ScanOptions.Format.RAW
         }
 
         //set resolution
@@ -496,9 +480,9 @@ class ScanOptFragment : Fragment() {
             auto -> {/*Do nothing*/}
             "AUTO" -> {/*Do nothing*/}
             else -> {
-                resSelected = true
+                viewModel.isResSelected = true
                 val chosenResPosition = resolutionSpinner.selectedItemPosition
-                chosenRes = resolutionList[chosenResPosition]
+                viewModel.chosenRes = viewModel.resolutionList[chosenResPosition]
             }
         }
 

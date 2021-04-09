@@ -3,7 +3,8 @@ package com.example.movil.scanActivity
 class ScanOptions {
 
     enum class ScanSource{
-        ADF,
+        ADF_DUPLEX,
+        ADF_SIMPLEX,
         PLATEN,
         CAMERA,
         AUTO

@@ -1,6 +1,5 @@
 package com.example.movil.scanActivity
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.hp.mobile.scan.sdk.Scanner
 import com.hp.mobile.scan.sdk.model.*
@@ -20,7 +19,7 @@ class ScanOptFragmentViewModel : ViewModel() {
     var colorModes: List<Int> = mutableListOf()
 
     lateinit var chosenSource: ScanOptions.ScanSource
-    lateinit var chosenNFaces : ScanOptions.Faces
+    private lateinit var chosenNFaces : ScanOptions.Faces
     lateinit var chosenColorMode : ScanOptions.ColorMode
     lateinit var chosenFormat : ScanOptions.Format
     lateinit var chosenRes : Resolution

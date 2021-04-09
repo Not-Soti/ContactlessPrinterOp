@@ -34,7 +34,6 @@ class ScanOptFragment : Fragment() {
     private lateinit var colorSpinner : Spinner
     private lateinit var resolutionSpinner : Spinner
     private lateinit var formatSpinner : Spinner
-    //private lateinit var combineCheckBox : CheckBox
 
     private lateinit var sourceAdapter : ArrayAdapter<String>
     private lateinit var facesAdapter : ArrayAdapter<String>
@@ -192,7 +191,6 @@ class ScanOptFragment : Fragment() {
                         sourceAdapter.add(getString(R.string.ScanOption_source_adf))
                         sourceAdapter.notifyDataSetChanged()
                     }
-
                     facesAdapter.add(getString(R.string.ScanOption_faces_1face))
                     facesAdapter.notifyDataSetChanged()
 
@@ -205,11 +203,9 @@ class ScanOptFragment : Fragment() {
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX)){
                     viewModel.adfDuplex = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX] as MutableMap<String, Any>
                     if(!hasADF) {
-                        hasADF = true
                         sourceAdapter.add(getString(R.string.ScanOption_source_adf))
                         sourceAdapter.notifyDataSetChanged()
                     }
-
                     facesAdapter.add(getString(R.string.ScanOption_faces_2face))
                     facesAdapter.notifyDataSetChanged()
 
@@ -233,7 +229,7 @@ class ScanOptFragment : Fragment() {
 
                 if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA)){
                     viewModel.camera = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA] as MutableMap<String, Any>
-                    sourceAdapter.add("CAMARA") //TODO string
+                    sourceAdapter.add(getString(R.string.ScanOption_source_camera))
                     sourceAdapter.notifyDataSetChanged()
 
                     if(!isSettingsSet){
@@ -243,8 +239,11 @@ class ScanOptFragment : Fragment() {
                     }
                 }
 
-                //TODO
-                //Añadir opcion AUTO y que se cojan las settings de lo que ya tenga el scanTicket
+                //Scanner returned 0 sources
+                if(!isSettingsSet){
+                    viewModel.setSource(ScanOptions.ScanSource.AUTO)
+                    updateSettings()
+                }
 
             }
 
@@ -346,8 +345,6 @@ class ScanOptFragment : Fragment() {
         //Create the temp file to save the scanning
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)!!
         val scanResultUris = arrayListOf<Uri>()
-
-         val tempPathAux = tempFolder.absolutePath
 
         theScanner.scan(
             tempFolder.absolutePath,
@@ -492,24 +489,28 @@ class ScanOptFragment : Fragment() {
     fun getReasonFromException(e: ScannerException?) : String{
         var message = getString(R.string.REASON_UNKNOWN)
 
-        if(e == null){
-            return message
-        }else if(e is AdfException){
-            message = "Error en el ADF:\n  ${getAdfStatusFromInt(e.adfStatus)}"
-        }else {
-            when (e.reason) {
-                ScannerException.REASON_AUTHENTICATION_REQUIRED -> message = getString(R.string.REASON_AUTHENTICATION_REQUIRED)
-                ScannerException.REASON_CANCELED_BY_DEVICE -> message = getString(R.string.REASON_CANCELED_BY_DEVICE)
-                ScannerException.REASON_CANCELED_BY_USER -> message = getString(R.string.REASON_CANCELED_BY_USER)
-                ScannerException.REASON_CONNECTION_ERROR -> message = getString(R.string.REASON_CONNECTION_ERROR)
-                ScannerException.REASON_CONNECTION_TIMEOUT -> message = getString(R.string.REASON_CONNECTION_TIMEOUT)
-                ScannerException.REASON_DEVICE_BUSY -> message = getString(R.string.REASON_DEVICE_BUSY)
-                ScannerException.REASON_DEVICE_INTERNAL_ERROR -> message = getString(R.string.REASON_DEVICE_INTERNAL_ERROR)
-                ScannerException.REASON_DEVICE_STOPPED -> message = getString(R.string.REASON_DEVICE_STOPPED)
-                ScannerException.REASON_DEVICE_UNAVAILABLE -> message = getString(R.string.REASON_DEVICE_UNAVAILABLE)
-                ScannerException.REASON_INVALID_SCAN_TICKET -> message = getString(R.string.REASON_INVALID_SCAN_TICKET)
-                ScannerException.REASON_OPERATION_IS_ALREADY_STARTED -> message = getString(R.string.REASON_OPERATION_IS_ALREADY_STARTED)
-                ScannerException.REASON_SCAN_RESULT_WRITE_ERROR -> message = getString(R.string.REASON_SCAN_RESULT_WRITE_ERROR)
+        when (e) {
+            null -> {
+                return message
+            }
+            is AdfException -> {
+                message = "Error en el ADF:\n  ${getAdfStatusFromInt(e.adfStatus)}"
+            }
+            else -> {
+                when (e.reason) {
+                    ScannerException.REASON_AUTHENTICATION_REQUIRED -> message = getString(R.string.REASON_AUTHENTICATION_REQUIRED)
+                    ScannerException.REASON_CANCELED_BY_DEVICE -> message = getString(R.string.REASON_CANCELED_BY_DEVICE)
+                    ScannerException.REASON_CANCELED_BY_USER -> message = getString(R.string.REASON_CANCELED_BY_USER)
+                    ScannerException.REASON_CONNECTION_ERROR -> message = getString(R.string.REASON_CONNECTION_ERROR)
+                    ScannerException.REASON_CONNECTION_TIMEOUT -> message = getString(R.string.REASON_CONNECTION_TIMEOUT)
+                    ScannerException.REASON_DEVICE_BUSY -> message = getString(R.string.REASON_DEVICE_BUSY)
+                    ScannerException.REASON_DEVICE_INTERNAL_ERROR -> message = getString(R.string.REASON_DEVICE_INTERNAL_ERROR)
+                    ScannerException.REASON_DEVICE_STOPPED -> message = getString(R.string.REASON_DEVICE_STOPPED)
+                    ScannerException.REASON_DEVICE_UNAVAILABLE -> message = getString(R.string.REASON_DEVICE_UNAVAILABLE)
+                    ScannerException.REASON_INVALID_SCAN_TICKET -> message = getString(R.string.REASON_INVALID_SCAN_TICKET)
+                    ScannerException.REASON_OPERATION_IS_ALREADY_STARTED -> message = getString(R.string.REASON_OPERATION_IS_ALREADY_STARTED)
+                    ScannerException.REASON_SCAN_RESULT_WRITE_ERROR -> message = getString(R.string.REASON_SCAN_RESULT_WRITE_ERROR)
+                }
             }
         }
 

@@ -62,7 +62,7 @@ class ScanOptFragment : Fragment() {
 
         viewModel = ViewModelProvider(this).get(ScanActivityViewModel::class.java)
 
-        /*viewModel.chosenScanner = (activity as ScanActivity).chosenScanner //TODO check null
+        /*viewModel.chosenScanner = (activity as ScanActivity).chosenScanner
         viewModel.chosenTicket = (activity as ScanActivity).chosenTicket*/
         if(viewModel.chosenScanner == null || viewModel.chosenTicket == null){
             showNoScannerDialog()
@@ -84,7 +84,6 @@ class ScanOptFragment : Fragment() {
         colorSpinner = theView.findViewById(R.id.frag_scan_op_colorSpinner)
         resolutionSpinner = theView.findViewById(R.id.frag_scan_op_resSpinner)
         formatSpinner = theView.findViewById(R.id.frag_scan_op_formatSpinner)
-        //combineCheckBox = theView.findViewById(R.id.frag_scan_op_combineFiles)
 
         //Adapters for each spinner
         sourceAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
@@ -109,8 +108,10 @@ class ScanOptFragment : Fragment() {
 
         scanButton.setOnClickListener{
             setChosenSettings()
-            val newTicket = viewModel.setTicketOptions()
-            validateTicket(viewModel.chosenScanner, newTicket) //Validates ticket and prints
+            //val newTicket = viewModel.setTicketOptions()
+            //validateTicket(viewModel.chosenScanner, newTicket) //Validates ticket and prints
+            viewModel.setTicketOptions()
+            validateTicket()
         }
 
         //Refresh settings depending on the source
@@ -126,14 +127,21 @@ class ScanOptFragment : Fragment() {
 
                     if(source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_1face)){
                         viewModel.setSource(ScanOptions.ScanSource.ADF_SIMPLEX)
+                        viewModel.chosenNFaces = ScanOptions.Faces.ONE_FACE
+                        facesSpinner.isFocusable = true
                     }else if (source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_2face)){
                         viewModel.setSource(ScanOptions.ScanSource.ADF_DUPLEX)
+                        viewModel.chosenNFaces = ScanOptions.Faces.TWO_FACES
+                        facesSpinner.isFocusable = true
                     }else if(source == getString(R.string.ScanOption_source_platen)){
                         viewModel.setSource(ScanOptions.ScanSource.PLATEN)
+                        facesSpinner.isFocusable = false
                     }else if(source == getString(R.string.ScanOption_source_camera)){
                         viewModel.setSource(ScanOptions.ScanSource.CAMERA)
+                        facesSpinner.isFocusable = false
                     }else {
                         viewModel.chosenSource = ScanOptions.ScanSource.AUTO
+                        facesSpinner.isFocusable = false
                     }
                     updateSettings()
                 }
@@ -164,7 +172,7 @@ class ScanOptFragment : Fragment() {
             }
         })//Monitoring device status
 
-        getScannerCapabilities(viewModel.chosenScanner)
+        getScannerCapabilities()
         return theView
     }
 
@@ -172,8 +180,8 @@ class ScanOptFragment : Fragment() {
      * Fun that gets the chosen scanner capabilities and set
      * them on the screen options
      */
-    private fun getScannerCapabilities(theScanner : Scanner){
-        theScanner.fetchCapabilities(object :
+    private fun getScannerCapabilities(){
+        viewModel.chosenScanner.fetchCapabilities(object :
             ScannerCapabilitiesFetcher.ScannerCapabilitiesListener {
             override fun onFetchCapabilities(cap: ScannerCapabilities?) {
 
@@ -307,10 +315,10 @@ class ScanOptFragment : Fragment() {
     /**
      * Fun that validates chosen options with the scanner
      */
-    private fun validateTicket(scanner : Scanner, ticket : ScanTicket){
-        scanner.validateTicket(ticket, object : ScanTicketValidator.ScanTicketValidationListener{
+    private fun validateTicket(){
+        viewModel.chosenScanner.validateTicket(viewModel.chosenTicket, object : ScanTicketValidator.ScanTicketValidationListener{
             override fun onScanTicketValidationComplete(p0: ScanTicket?) {
-                startScanning(scanner, ticket)
+                startScanning()
             }
 
             override fun onScanTicketValidationError(e: ScannerException?) {
@@ -338,7 +346,7 @@ class ScanOptFragment : Fragment() {
     /**
      * Function that performs the scan
      */
-    private fun startScanning(theScanner : Scanner, theTicket : ScanTicket){
+    private fun startScanning(){
         //Log.d(tag, "startScanning()")
 
         //Open scanning fragment
@@ -351,9 +359,9 @@ class ScanOptFragment : Fragment() {
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)!!
         val scanResultUris = arrayListOf<Uri>()
 
-        theScanner.scan(
+        viewModel.chosenScanner.scan(
             tempFolder.absolutePath,
-            theTicket,
+            viewModel.chosenTicket,
             object : ScanCapture.ScanningProgressListener {
                 override fun onScanningPageDone(p0: ScanPage?) {
                     Log.d(tag, "Page scanned")
@@ -374,17 +382,14 @@ class ScanOptFragment : Fragment() {
                 override fun onScanningError(theException: ScannerException?) {
                     try {
 
-                        theScanner.cancelScanning()
+                        viewModel.chosenScanner.cancelScanning()
                         deleteTempFiles(tempFolder)
 
                         scanningFragment.dismiss()
-                        //supportFragmentManager.beginTransaction().remove(scanningFragment)
                         val scanErrorFragment = ScanErrorFragment()
                         fragmentTransaction = fragmentManager.beginTransaction()
                         scanErrorFragment.setReason(getReasonFromException(theException))
                         scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")
-
-                        //throw theException!!
 
                     } catch (e: AdfException) {
                         Log.d(tag, "AdfException\n Status: ${e.adfStatus}")
@@ -395,7 +400,6 @@ class ScanOptFragment : Fragment() {
                         Log.d(tag, "Excepcion no controlada")
                     }
                 }
-
             })
     }
 
@@ -451,10 +455,13 @@ class ScanOptFragment : Fragment() {
 
         if(source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_1face)){
             viewModel.chosenSource = ScanOptions.ScanSource.ADF_SIMPLEX
+            viewModel.chosenNFaces = ScanOptions.Faces.ONE_FACE
         }else if (source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_2face)){
             viewModel.chosenSource = ScanOptions.ScanSource.ADF_DUPLEX
+            viewModel.chosenNFaces = ScanOptions.Faces.TWO_FACES
         }else if(source == getString(R.string.ScanOption_source_platen)){
             viewModel.chosenSource = ScanOptions.ScanSource.PLATEN
+
         }else if(source == getString(R.string.ScanOption_source_camera)){
             viewModel.chosenSource = ScanOptions.ScanSource.CAMERA
         }else {

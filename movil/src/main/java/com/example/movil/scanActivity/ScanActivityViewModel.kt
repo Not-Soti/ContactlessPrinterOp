@@ -15,11 +15,11 @@ class ScanActivityViewModel : ViewModel() {
     var camera: MutableMap<String, Any>? = null
     private lateinit var resolutions: ResolutionCapability
     lateinit var resolutionList : List<Resolution>
-    var resultFormats: List<Int> = mutableListOf()
-    var colorModes: List<Int> = mutableListOf()
+    var resultFormats: Collection<Int> = mutableListOf()
+    var colorModes: Collection<Int> = mutableListOf()
 
     lateinit var chosenSource: ScanOptions.ScanSource
-    private lateinit var chosenNFaces : ScanOptions.Faces
+    lateinit var chosenNFaces : ScanOptions.Faces
     lateinit var chosenColorMode : ScanOptions.ColorMode
     lateinit var chosenFormat : ScanOptions.Format
     lateinit var chosenRes : Resolution
@@ -48,19 +48,17 @@ class ScanActivityViewModel : ViewModel() {
             colorModes = listOf(theColor)
         }else{
 
-            //TODO NFACES
-
             resolutions = theSource[ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS] as ResolutionCapability
             resolutionList = resolutions.discreteResolutions
-            resultFormats = theSource[ScannerCapabilities.SOURCE_CAPABILITY_FORMATS] as ArrayList<Int>
-            colorModes = theSource[ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES] as ArrayList<Int>
+            resultFormats = theSource[ScannerCapabilities.SOURCE_CAPABILITY_FORMATS] as Collection<Int>
+            colorModes = theSource[ScannerCapabilities.SOURCE_CAPABILITY_COLOR_MODES] as Collection<Int>
         }
     }
 
     /**
      * Function that gets scanning options from the chosen settings
      */
-    fun setTicketOptions() : ScanTicket{
+    fun setTicketOptions(){
         //Source
         when(chosenSource){
             ScanOptions.ScanSource.ADF_SIMPLEX -> { chosenTicket.inputSource = ScanValues.INPUT_SOURCE_ADF }
@@ -71,10 +69,11 @@ class ScanActivityViewModel : ViewModel() {
         }
 
         //Sheet faces
-        if (chosenNFaces == ScanOptions.Faces.ONE_FACE){ //TODO AQUI PETA
-            chosenTicket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, false)
-        }else{
-            chosenTicket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, true)
+        if ((chosenSource == ScanOptions.ScanSource.ADF_DUPLEX) || (chosenSource == ScanOptions.ScanSource.ADF_SIMPLEX)) {
+            when(chosenNFaces){
+                ScanOptions.Faces.ONE_FACE -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, false)
+                ScanOptions.Faces.TWO_FACES -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, true)
+            }
         }
         //Color mode
         when(chosenColorMode){
@@ -94,8 +93,6 @@ class ScanActivityViewModel : ViewModel() {
         if(isResSelected){ //A resolution was selected
             chosenTicket.setSetting(ScanTicket.SCAN_SETTING_RESOLUTION, chosenRes)
         }
-
-        return chosenTicket
     }
 
 

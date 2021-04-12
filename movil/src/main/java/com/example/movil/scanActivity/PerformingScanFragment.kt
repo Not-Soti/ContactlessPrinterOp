@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import com.example.movil.R
 
 class PerformingScanFragment : DialogFragment() {
@@ -14,6 +15,7 @@ class PerformingScanFragment : DialogFragment() {
     private val TAG = "---ScanningFragment---"
     private lateinit var button : Button
     private lateinit var textView : TextView
+    private lateinit var viewModel : ScanActivityViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,6 +24,8 @@ class PerformingScanFragment : DialogFragment() {
     ): View? {
 
         val theView = inflater.inflate(R.layout.fragment_performing_scan, container, false)
+
+        viewModel = ViewModelProvider(requireActivity()).get(ScanActivityViewModel::class.java)
 
         button = theView.findViewById(R.id.frag_performing_scan_button)
         textView = theView.findViewById(R.id.frag_performing_scan_status)
@@ -32,8 +36,7 @@ class PerformingScanFragment : DialogFragment() {
 
     private fun stopScanning(){
         val parentAct = activity as ScanActivity
-        parentAct.chosenScanner.cancelScanning()
-        //Toast.makeText(activity, "Escaneo cancelado", Toast.LENGTH_LONG).show()
+        viewModel.chosenScanner.cancelScanning()
         parentAct.supportFragmentManager.beginTransaction().remove(this).commit()
     }
 

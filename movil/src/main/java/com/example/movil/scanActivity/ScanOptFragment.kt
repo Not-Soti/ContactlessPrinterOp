@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.example.movil.R
 import com.hp.mobile.scan.sdk.*
@@ -552,7 +551,8 @@ class ScanOptFragment : Fragment() {
         val alertDialog: AlertDialog = this.let {
             val builder = AlertDialog.Builder(requireActivity())
             builder.apply {
-                setTitle(getString(R.string.ScannerLost))
+                setTitle(getString(R.string.ScannerLostTitle))
+                setMessage(getString(R.string.ScannerLostMessage))
                 setNeutralButton(R.string.accept
                 ) { _, _ ->
                     requireActivity().recreate()

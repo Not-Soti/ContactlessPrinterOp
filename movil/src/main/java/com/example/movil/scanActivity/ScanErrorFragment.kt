@@ -37,7 +37,7 @@ class ScanErrorFragment : DialogFragment() {
     }
 
     fun setReason(reason : String){
-        val aux = getString(R.string.reason) +": "+ reason
+        val aux = getString(R.string.reason) + reason
         reasonTv.text = aux
     }
 }

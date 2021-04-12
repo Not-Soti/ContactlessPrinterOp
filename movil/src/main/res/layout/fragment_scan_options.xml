@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -19,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Nombre"
+            android:text="@string/ScanOption_scanner_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -30,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="48dp"
-            android:text="deviceStatus"
+            android:text="@string/SCANNER_STATUS_UNKNOWN"
             app:layout_constraintBottom_toBottomOf="@+id/textView2"
             app:layout_constraintStart_toEndOf="@+id/textView2"
             app:layout_constraintTop_toTopOf="@+id/textView2" />
@@ -40,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Escaner: "
+            android:text="@string/ScanOption_scanner_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/frag_scan_op_deviceName" />
 
@@ -49,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Almentador:"
+            android:text="@string/ScanOption_adf_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -57,7 +56,7 @@
             android:id="@+id/frag_scan_op_adfStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="adfStatus"
+            android:text="@string/ADF_STATUS_UNKNOWN"
             app:layout_constraintBottom_toBottomOf="@+id/textView4"
             app:layout_constraintStart_toStartOf="@+id/frag_scan_op_deviceStatus"
             app:layout_constraintTop_toTopOf="@+id/textView4" />
@@ -93,7 +92,7 @@
                     android:id="@+id/frag_scan_op_aux1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Fuente:"
+                    android:text="@string/ScanOption_source_label"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -119,7 +118,7 @@
                     android:id="@+id/frag_scan_op_aux2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Caras:"
+                    android:text="@string/ScanOption_faces_label"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -144,7 +143,7 @@
                     android:id="@+id/frag_scan_op_aux3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Color:"
+                    android:text="@string/ScanOption_color_label"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -170,7 +169,7 @@
                     android:id="@+id/frag_scan_op_aux4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Resolucion:"
+                    android:text="@string/ScanOption_resolution_label"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -195,7 +194,7 @@
                     android:id="@+id/frag_scan_op_aux5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Formato:"
+                    android:text="@string/ScanOption_format_label"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -209,28 +208,11 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp">
-
-                <CheckBox
-                    android:id="@+id/frag_scan_op_combineFiles"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Combinar archivos"
-                    android:visibility="invisible" />
-
-            </LinearLayout>-->
-
             <Button
                 android:id="@+id/frag_scan_op_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Escanear" />
+                android:text="@string/ScanOptions_scanButton_label" />
 
         </LinearLayout>
 

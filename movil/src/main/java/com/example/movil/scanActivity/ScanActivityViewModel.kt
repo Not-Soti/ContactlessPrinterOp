@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.hp.mobile.scan.sdk.Scanner
 import com.hp.mobile.scan.sdk.model.*
 
-class ScanOptFragmentViewModel : ViewModel() {
+class ScanActivityViewModel : ViewModel() {
 
     lateinit var chosenTicket : ScanTicket
     lateinit var chosenScanner : Scanner
@@ -47,6 +47,9 @@ class ScanOptFragmentViewModel : ViewModel() {
             val theColor : Int = chosenTicket.getSetting(ScanTicket.SCAN_SETTING_COLOR_MODE) as Int
             colorModes = listOf(theColor)
         }else{
+
+            //TODO NFACES
+
             resolutions = theSource[ScannerCapabilities.SOURCE_CAPABILITY_RESOLUTIONS] as ResolutionCapability
             resolutionList = resolutions.discreteResolutions
             resultFormats = theSource[ScannerCapabilities.SOURCE_CAPABILITY_FORMATS] as ArrayList<Int>
@@ -68,7 +71,7 @@ class ScanOptFragmentViewModel : ViewModel() {
         }
 
         //Sheet faces
-        if (chosenNFaces == ScanOptions.Faces.ONE_FACE){
+        if (chosenNFaces == ScanOptions.Faces.ONE_FACE){ //TODO AQUI PETA
             chosenTicket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, false)
         }else{
             chosenTicket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, true)

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.example.movil.R
 import com.hp.mobile.scan.sdk.*
@@ -23,7 +24,7 @@ class ScanOptFragment : Fragment() {
     private val tempScanFolder = "TempScan"
     private val TAG = "--- ScanOptFragment ---"
 
-    private lateinit var viewModel : ScanOptFragmentViewModel
+    private lateinit var viewModel : ScanActivityViewModel
 
     private lateinit var nameTv : TextView
     private lateinit var deviceStatusTv : TextView
@@ -56,12 +57,16 @@ class ScanOptFragment : Fragment() {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        viewModel = ViewModelProvider(this).get(ScanOptFragmentViewModel::class.java)
 
         val theView = inflater.inflate(R.layout.fragment_scan_options, container, false)
 
-        viewModel.chosenScanner = (activity as ScanActivity).chosenScanner //TODO check null
-        viewModel.chosenTicket = (activity as ScanActivity).chosenTicket
+        viewModel = ViewModelProvider(this).get(ScanActivityViewModel::class.java)
+
+        /*viewModel.chosenScanner = (activity as ScanActivity).chosenScanner //TODO check null
+        viewModel.chosenTicket = (activity as ScanActivity).chosenTicket*/
+        if(viewModel.chosenScanner == null || viewModel.chosenTicket == null){
+            showNoScannerDialog()
+        }
 
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)
         if(tempFolder!=null && !tempFolder.exists()){
@@ -534,5 +539,22 @@ class ScanOptFragment : Fragment() {
             DeviceStatusMonitor.ADF_STATUS_UNSUPPORTED -> getString(R.string.ADF_STATUS_UNSUPPORTED)
             else -> getString(R.string.ADF_STATUS_UNKNOWN)
         }
+    }
+
+    private fun showNoScannerDialog(){
+        val alertDialog: AlertDialog = this.let {
+            val builder = AlertDialog.Builder(requireActivity())
+            builder.apply {
+                setTitle(getString(R.string.ScannerLost))
+                setNeutralButton(R.string.accept
+                ) { _, _ ->
+                    requireActivity().recreate()
+                }
+                setCancelable(false)
+            }
+            // Create the AlertDialog
+            builder.create()
+        }
+        alertDialog.show()
     }
 }

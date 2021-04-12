@@ -4,17 +4,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.movil.MainActivity
 import com.example.movil.R
 import com.example.movil.ScannerSearchFragment
-import com.hp.mobile.scan.sdk.Scanner
-import com.hp.mobile.scan.sdk.model.ScanTicket
 
 class ScanActivity : AppCompatActivity() {
 
     private val TAG = "--- ScanActivity ---"
-    lateinit var chosenScanner : Scanner
-    lateinit var chosenTicket : ScanTicket
+    private lateinit var viewModel : ScanActivityViewModel
+
     var screenStatus = 0 //Check what to do on onBackPressed
                          //0 activity, 1 scannerSearchFragment, 2 ScanOptFragment
 
@@ -22,6 +21,8 @@ class ScanActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_scan)
+
+        viewModel = ViewModelProvider(this).get(ScanActivityViewModel::class.java)
 
         screenStatus = 1
         supportFragmentManager.beginTransaction().add(R.id.act_scan_root, ScannerSearchFragment::class.java, null).commit()
@@ -47,8 +48,8 @@ class ScanActivity : AppCompatActivity() {
             1 -> startActivity(Intent(this, MainActivity::class.java))
             2 -> {
                 //Replace scanOptionsFragment with searchScannerFragment
-                if (chosenScanner != null) {
-                    chosenScanner.stopMonitoringDeviceStatus()
+                if (viewModel.chosenScanner != null) {
+                    viewModel.chosenScanner.stopMonitoringDeviceStatus()
                 }
                 screenStatus = 1
                 val scanFrag = ScannerSearchFragment()
@@ -64,8 +65,8 @@ class ScanActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if(chosenScanner!=null) {
-            chosenScanner.stopMonitoringDeviceStatus()
+        if(viewModel.chosenScanner!=null) {
+            viewModel.chosenScanner.stopMonitoringDeviceStatus()
         }
     }
 }

@@ -110,4 +110,5 @@
     <string name="REASON_SCAN_RESULT_WRITE_ERROR">Unable to write on the destiny file</string>
     <string name="REASON_UNKNOWN">Unknown</string>
     <string name="fragScanCapabilitiesErrorLabel">Error getting scanner capabilities</string>
+    <string name="ScannerLost">Scanner disconected</string>
 </resources>

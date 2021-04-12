@@ -2,7 +2,6 @@ package com.example.movil
 
 import com.example.movil.scanActivity.*
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,8 +9,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.hp.mobile.scan.sdk.Scanner
 import com.hp.mobile.scan.sdk.browsing.ScannersBrowser
 import com.hp.mobile.scan.sdk.browsing.ScannersBrowser.ScannerAvailabilityListener
@@ -29,7 +28,7 @@ class ScannerSearchFragment : Fragment() {
     private var isSearching = false
     private lateinit var scannerBrowser : ScannersBrowser
     private lateinit var progressBar : ProgressBar
-    var scannerNumber = 0 //Debug
+    private lateinit var viewModel : ScanActivityViewModel
 
 
     private val scannerBrowserListener: ScannerAvailabilityListener =
@@ -54,6 +53,8 @@ class ScannerSearchFragment : Fragment() {
         super.onCreateView(inflater, container, savedInstanceState)
 
         val theView = inflater.inflate(R.layout.fragment_scanner_search, container, false)
+
+        viewModel = ViewModelProvider(this).get(ScanActivityViewModel::class.java)
 
         scannerListView = theView.findViewById(R.id.act_scanner_search_deviceListView)
         scannerSearchButton = theView.findViewById(R.id.act_scanner_search_searchScannerButton)
@@ -84,7 +85,7 @@ class ScannerSearchFragment : Fragment() {
         scannerListView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, _ -> //Stop searching
                 stopSearching()
-                (activity as ScanActivity).chosenScanner = parent?.adapter?.getItem(position) as Scanner
+                viewModel.chosenScanner = parent?.adapter?.getItem(position) as Scanner
                 //Show popup menu
                 if (view != null) {
                     showPopupChooseTicket(view)
@@ -113,36 +114,26 @@ class ScannerSearchFragment : Fragment() {
                         R.id.scan_popup_photo -> {
                             //Create photo ScanTicket
                             Log.d(tag, "Scan photo chosen")
-                            (activity as ScanActivity).chosenTicket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
-                            //Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            //startScanning()
+                            viewModel.chosenTicket = ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_PHOTO)
                             openScanFrag()
-
                             return true
                         }
                         R.id.scan_popup_document -> {
                             //Create document with images ScanTicket
                             Log.d(tag, "Scan document chosen")
 
-                            (activity as ScanActivity).chosenTicket =
+                            viewModel.chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_AND_IMAGES)
-                            //Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            //startScanning()
                             openScanFrag()
-
                             return true
                         }
-
                         R.id.scan_popup_text -> {
                             //Create only text ScanTicket
                             Log.d(tag, "Scan text chosen")
 
-                            (activity as ScanActivity).chosenTicket =
+                            viewModel.chosenTicket =
                                 ScanTicket.createWithPreset(ScanTicket.SCAN_PRESET_TEXT_DOCUMENT)
-                            //Log.d(tag, "Ticket ${chosenTicket!!.name}")
-                            //startScanning()
                             openScanFrag()
-
                             return true
                         }
                         else -> return false

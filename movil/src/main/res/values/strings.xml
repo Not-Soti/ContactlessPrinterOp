@@ -137,5 +137,6 @@
     <string name="REASON_SCAN_RESULT_WRITE_ERROR">No se puede escribir en el archivo de destino</string>
     <string name="REASON_UNKNOWN">Desconocido</string>
     <string name="fragScanCapabilitiesErrorLabel">No se han podido obtener las características del escáner</string>
+    <string name="ScannerLost">Se ha perdido la conexión con el escáner</string>
 
 </resources>

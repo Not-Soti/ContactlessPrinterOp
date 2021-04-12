@@ -288,6 +288,9 @@ class ScanOptFragment : Fragment() {
      * Sets source available settings on the UI
      */
     private fun updateSettings(){
+        resolutionAdapter.clear()
+        colorAdapter.clear()
+        formatAdapter.clear()
 
         //Resolution
         viewModel.resolutionList.forEach{

@@ -54,7 +54,7 @@ class ScannerSearchFragment : Fragment() {
 
         val theView = inflater.inflate(R.layout.fragment_scanner_search, container, false)
 
-        viewModel = ViewModelProvider(this).get(ScanActivityViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity()).get(ScanActivityViewModel::class.java)
 
         scannerListView = theView.findViewById(R.id.act_scanner_search_deviceListView)
         scannerSearchButton = theView.findViewById(R.id.act_scanner_search_searchScannerButton)

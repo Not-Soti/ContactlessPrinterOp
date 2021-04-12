@@ -60,7 +60,7 @@ class ScanOptFragment : Fragment() {
 
         val theView = inflater.inflate(R.layout.fragment_scan_options, container, false)
 
-        viewModel = ViewModelProvider(this).get(ScanActivityViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity()).get(ScanActivityViewModel::class.java)
 
         /*viewModel.chosenScanner = (activity as ScanActivity).chosenScanner
         viewModel.chosenTicket = (activity as ScanActivity).chosenTicket*/

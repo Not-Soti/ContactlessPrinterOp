@@ -160,7 +160,7 @@ class ScanOptFragment : Fragment() {
                     DeviceStatusMonitor.SCANNER_STATUS_UNKNOWN -> getString(R.string.SCANNER_STATUS_UNKNOWN)
                     else ->  getString(R.string.SCANNER_STATUS_UNKNOWN)
                 }
-                val adfStr = getAdfStatusFromInt(adfSta)
+                val adfStr = getAdfStatusFromInt(adfSta) //TODO mirar si no hay adf
                 deviceStatusTv.text = scannerStr
                 adfStatusTv.text = adfStr
             }

@@ -1,7 +1,6 @@
 package com.example.movil.readQrActivity
 
 import android.Manifest
-import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
 import android.net.wifi.WifiConfiguration
@@ -26,7 +25,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.movil.MainActivity
-import com.example.movil.PermissionHelper
 import com.example.movil.R
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
@@ -115,8 +113,8 @@ class ReadQrActivity : AppCompatActivity() {
                             connectToWifi(infoWifi)
 
                         }else{
-                            //muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_readQrFailed), Toast.LENGTH_LONG)
-                            qrCodeRead = false
+                            //show dialog and in order to continue reading
+                            showWrongCodeDialog()
                         }
                     }
                 }
@@ -203,7 +201,7 @@ class ReadQrActivity : AppCompatActivity() {
         if(status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS){
             Log.d(tag, "Error adding network suggestion")
         }else{
-            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_checkNotifications), Toast.LENGTH_LONG)
+            showToast(this@ReadQrActivity.getString(R.string.ReadQrAct_checkNotifications), Toast.LENGTH_LONG)
         }
 
         // Optional (Wait for post connection broadcast to one of your suggestions)
@@ -217,53 +215,6 @@ class ReadQrActivity : AppCompatActivity() {
             }
         }
         applicationContext.registerReceiver(broadcastReceiver, intentFilter);
-
-        //Checking if Wifi is enabled
-        //It should already be enabled by the user
-        /*if(!wifiManager.isWifiEnabled){
-            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_powerOnWifi), Toast.LENGTH_LONG)
-        }*/
-
-        /*muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_checkNotifications), Toast.LENGTH_LONG)
-
-        val permissionHelper = PermissionHelper(this@ReadQrActivity,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            accessFineLocationPermissionCode,
-            this@ReadQrActivity.getString(R.string.permission_fineLocDeniedTitle),
-            this@ReadQrActivity.getString(R.string.permission_fineLocDeniedMsg)
-        ).checkAndAskForPermission()
-
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            wifiManager.addSuggestionConnectionStatusListener(mainExecutor,
-                (WifiManager.SuggestionConnectionStatusListener { wifiNetworkSuggestion, failureReason ->
-                    Log.d(tag, "Unable to connect to the provided network")
-                    muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableToConnect), Toast.LENGTH_LONG)
-                    wifiManager.removeNetworkSuggestions(wifiList)
-                })
-            )
-        }
-
-        val status = wifiManager.addNetworkSuggestions(wifiList)
-        if(status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS){
-            Log.d(tag, "Unable to connect to the provided network")
-            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableToConnect), Toast.LENGTH_LONG)
-            //qrCodeRead = false //So another one can be read
-            wifiManager.removeNetworkSuggestions(wifiList)
-        }
-
-        //Wait for post connection broadcast to one of your suggestions)
-        val intentFilter = IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
-
-        val broadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (!intent.action.equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
-                    return;
-                }
-                // do post connect processing here
-            }
-        };
-        this@ReadQrActivity.registerReceiver(broadcastReceiver, intentFilter);*/
     }
 
     /**
@@ -309,7 +260,7 @@ class ReadQrActivity : AppCompatActivity() {
         }
 
         if (!wifiManager.disconnect()) {
-            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableDisconnectNet), Toast.LENGTH_LONG)
+            showToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableDisconnectNet), Toast.LENGTH_LONG)
             //return false
         }
 
@@ -329,7 +280,7 @@ class ReadQrActivity : AppCompatActivity() {
             //var conectado = wifiManager.reconnect()
             return true;
         } else {
-            muestraToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableToConnect), Toast.LENGTH_SHORT)
+            showToast(this@ReadQrActivity.getString(R.string.ReadQrAct_unableToConnect), Toast.LENGTH_SHORT)
             Log.d(tag, "Fallo en wifiManager.reconnect()")
             return false
         }
@@ -349,7 +300,7 @@ class ReadQrActivity : AppCompatActivity() {
     /**
      * Funcion usada para mostrar Toasts
      */
-    private fun muestraToast(mensaje: String, duracion: Int) {
+    private fun showToast(mensaje: String, duracion: Int) {
         runOnUiThread { Toast.makeText(this@ReadQrActivity, mensaje, duracion).show() }
     }
 
@@ -422,5 +373,26 @@ class ReadQrActivity : AppCompatActivity() {
             .setPositiveButton(android.R.string.ok){ _, _ ->
                 startActivity(Intent(applicationContext, MainActivity::class.java))
             }.show()
+    }
+
+    private fun showWrongCodeDialog(){
+        runOnUiThread {
+            val alertDialog: AlertDialog = this.let {
+                val builder = AlertDialog.Builder(this@ReadQrActivity)
+                builder.apply {
+                    setTitle(getString(R.string.ReadQrAct_readQrFailed))
+                    setMessage(getString(R.string.ReadQrAct_readQrFailedMsg))
+                    setNeutralButton(
+                        R.string.accept
+                    ) { _, _ ->
+                        qrCodeRead = false
+                    }
+                    setCancelable(false)
+                }
+                // Create the AlertDialog
+                builder.create()
+            }
+            alertDialog.show()
+        }
     }
 }

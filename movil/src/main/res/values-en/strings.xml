@@ -118,4 +118,5 @@
     <string name="ScanOption_format_label">Format:</string>
     <string name="ScanOptions_scanButton_label">Scan</string>
     <string name="ScannerLostMessage">Scanner connection lost</string>
+    <string name="ReadQrAct_readQrFailedMsg">Read code does not have the correct information in order to connect. Please, try again.</string>
 </resources>

@@ -145,5 +145,6 @@
     <string name="ScanOption_format_label">Formato:</string>
     <string name="ScanOptions_scanButton_label">Escanear</string>
     <string name="ScannerLostMessage">Se ha perdido la conexión con el escáner</string>
+    <string name="ReadQrAct_readQrFailedMsg">El código leído no contiene la información correcta para conectarse. Por favor, inténtelo de nuevo.</string>
 
 </resources>

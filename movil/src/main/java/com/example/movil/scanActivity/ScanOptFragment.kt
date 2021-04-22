@@ -434,21 +434,6 @@ class ScanOptFragment : Fragment() {
                     else auto
 
 
-        //set source
-/*        chosenSource = when(source){
-            getString(R.string.ScanOption_source_adf) -> ScanOptions.ScanSource.ADF
-            getString(R.string.ScanOption_source_platen) -> ScanOptions.ScanSource.PLATEN
-            getString(R.string.ScanOption_source_camera) -> ScanOptions.ScanSource.CAMERA
-            else -> ScanOptions.ScanSource.AUTO
-        }
-
-        //set number of faces
-        chosenNFaces = when(nFaces){
-            getString(R.string.ScanOption_faces_1face) -> ScanOptions.Faces.ONE_FACE
-            getString(R.string.ScanOption_faces_2face) -> ScanOptions.Faces.TWO_FACES
-            else -> ScanOptions.Faces.ONE_FACE
-        }*/
-
         if(source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_1face)){
             viewModel.chosenSource = ScanOptions.ScanSource.ADF_SIMPLEX
             viewModel.chosenNFaces = ScanOptions.Faces.ONE_FACE

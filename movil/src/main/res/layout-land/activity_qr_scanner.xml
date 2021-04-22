@@ -13,12 +13,13 @@
         android:id="@+id/act_readQR_help_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
         android:rotation="-360"
         android:rotationX="-360"
         android:rotationY="-360"
-        app:layout_constraintBottom_toTopOf="@+id/act_readQR_connectManuallyButton"
-        app:layout_constraintEnd_toEndOf="@+id/act_readQR_connectManuallyButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_help" />
 
     <LinearLayout

@@ -168,8 +168,8 @@ import kotlin.collections.ArrayList
 
     private fun previewImage(uri : Uri){
         //TODO Jugar con las visibility de las previewspdf y de imagen
-        imagePreview.visibility = View.VISIBLE
         pdfView.visibility = View.GONE
+        imagePreview.visibility = View.VISIBLE
         val file = File(uri.path!!)
         imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         imagePreview.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))

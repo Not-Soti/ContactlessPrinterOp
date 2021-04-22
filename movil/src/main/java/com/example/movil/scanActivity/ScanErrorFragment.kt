@@ -28,6 +28,16 @@ class ScanErrorFragment : DialogFragment() {
         reasonTv = theView.findViewById(R.id.frag_scan_error_reason)
 
         button.setOnClickListener { closeDialog() }
+
+        var reason = resources.getString(R.string.REASON_UNKNOWN)
+
+        val bundle = arguments;
+        if(bundle != null){
+            reason = bundle.getString("reason", resources.getString(R.string.REASON_UNKNOWN))
+        }
+
+        reasonTv.text = reason
+
         return theView
     }
 
@@ -36,8 +46,5 @@ class ScanErrorFragment : DialogFragment() {
         parentAct.supportFragmentManager.beginTransaction().remove(this@ScanErrorFragment).commit()
     }
 
-    fun setReason(reason : String){
-        val aux = getString(R.string.reason) + reason
-        reasonTv.text = aux
-    }
+
 }

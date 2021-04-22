@@ -41,14 +41,6 @@ class ScanOptFragment : Fragment() {
     private lateinit var resolutionAdapter : ArrayAdapter<String>
     private lateinit var formatAdapter : ArrayAdapter<String>
 
-    /*private lateinit var chosenSource : ScanOptions.ScanSource
-    private lateinit var chosenNFaces : ScanOptions.Faces
-    private lateinit var chosenColorMode : ScanOptions.ColorMode
-    private lateinit var chosenFormat : ScanOptions.Format
-    private lateinit var chosenRes : Resolution*/
-    //private lateinit var resolutionList : List<Resolution> //List of res given by the scannerCapabilities
-    //private var isResSelected = false //Control when a resolution is selected
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -389,17 +381,19 @@ class ScanOptFragment : Fragment() {
 
                         scanningFragment.dismiss()
                         val scanErrorFragment = ScanErrorFragment()
+                        val bundle = Bundle();
+                        bundle.putString("reason", getReasonFromException(theException))
+                        scanErrorFragment.arguments = bundle;
                         fragmentTransaction = fragmentManager.beginTransaction()
-                        scanErrorFragment.setReason(getReasonFromException(theException))
-                        scanErrorFragment.show(fragmentTransaction, "scanErrorFragment")
+                        scanErrorFragment.show(childFragmentManager, "scanErrorFragment")
 
                     } catch (e: AdfException) {
-                        Log.d(tag, "AdfException\n Status: ${e.adfStatus}")
+                        Log.d(tag, "AdfException\n Status: ${e.message}")
 
                     } catch (e: ScannerException) {
-                        Log.d(tag, "ScannerException\n Reason: ${e.reason}")
+                        Log.d(tag, "ScannerException\n Reason: ${e.message}")
                     } catch (e: Exception){
-                        Log.d(tag, "Excepcion no controlada")
+                        Log.d(tag, "Excepcion no controlada: ${e.message}")
                     }
                 }
             })

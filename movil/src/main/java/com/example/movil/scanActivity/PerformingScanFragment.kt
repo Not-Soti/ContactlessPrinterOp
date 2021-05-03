@@ -40,7 +40,7 @@ class PerformingScanFragment : DialogFragment() {
     }
 
     private fun stopScanning(){
-        val parentAct = activity as ScanActivity
+        val parentAct = activity as ScanAct
         viewModel.chosenScanner!!.cancelScanning()
         parentAct.supportFragmentManager.beginTransaction().remove(this).commit()
     }

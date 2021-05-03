@@ -1,6 +1,6 @@
 package com.example.movil.scanActivity
 
-class ScanOptions {
+class ScanSettingsHelper {
 
     enum class ScanSource{
         ADF_DUPLEX,

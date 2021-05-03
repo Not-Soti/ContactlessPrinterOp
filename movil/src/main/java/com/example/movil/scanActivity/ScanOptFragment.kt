@@ -77,11 +77,11 @@ class ScanOptFragment : Fragment() {
         formatSpinner = theView.findViewById(R.id.frag_scan_op_formatSpinner)
 
         //Adapters for each spinner
-        sourceAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
-        facesAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
-        colorAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
-        resolutionAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
-        formatAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        sourceAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
+        facesAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
+        colorAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
+        resolutionAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
+        formatAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
 
         sourceAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
         facesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
@@ -117,21 +117,21 @@ class ScanOptFragment : Fragment() {
                     val nFaces = facesSpinner.selectedItem.toString()
 
                     if(source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_1face)){
-                        viewModel.setSource(ScanOptions.ScanSource.ADF_SIMPLEX)
-                        viewModel.chosenNFaces = ScanOptions.Faces.ONE_FACE
+                        viewModel.setSource(ScanSettingsHelper.ScanSource.ADF_SIMPLEX)
+                        viewModel.chosenNFaces = ScanSettingsHelper.Faces.ONE_FACE
                         facesSpinner.isFocusable = true
                     }else if (source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_2face)){
-                        viewModel.setSource(ScanOptions.ScanSource.ADF_DUPLEX)
-                        viewModel.chosenNFaces = ScanOptions.Faces.TWO_FACES
+                        viewModel.setSource(ScanSettingsHelper.ScanSource.ADF_DUPLEX)
+                        viewModel.chosenNFaces = ScanSettingsHelper.Faces.TWO_FACES
                         facesSpinner.isFocusable = true
                     }else if(source == getString(R.string.ScanOption_source_platen)){
-                        viewModel.setSource(ScanOptions.ScanSource.PLATEN)
+                        viewModel.setSource(ScanSettingsHelper.ScanSource.PLATEN)
                         facesSpinner.isFocusable = false
                     }else if(source == getString(R.string.ScanOption_source_camera)){
-                        viewModel.setSource(ScanOptions.ScanSource.CAMERA)
+                        viewModel.setSource(ScanSettingsHelper.ScanSource.CAMERA)
                         facesSpinner.isFocusable = false
                     }else {
-                        viewModel.chosenSource = ScanOptions.ScanSource.AUTO
+                        viewModel.chosenSource = ScanSettingsHelper.ScanSource.AUTO
                         facesSpinner.isFocusable = false
                     }
                     updateSettings()
@@ -199,7 +199,7 @@ class ScanOptFragment : Fragment() {
                     facesAdapter.notifyDataSetChanged()
 
                     if(!isSettingsSet){
-                        viewModel.setSource(ScanOptions.ScanSource.ADF_SIMPLEX)
+                        viewModel.setSource(ScanSettingsHelper.ScanSource.ADF_SIMPLEX)
                         updateSettings()
                         isSettingsSet = true
                     }
@@ -214,7 +214,7 @@ class ScanOptFragment : Fragment() {
                     facesAdapter.notifyDataSetChanged()
 
                     if(!isSettingsSet){
-                        viewModel.setSource(ScanOptions.ScanSource.ADF_DUPLEX)
+                        viewModel.setSource(ScanSettingsHelper.ScanSource.ADF_DUPLEX)
                         updateSettings()
                         isSettingsSet = true
                     }
@@ -225,7 +225,7 @@ class ScanOptFragment : Fragment() {
                     sourceAdapter.notifyDataSetChanged()
 
                     if(!isSettingsSet){
-                        viewModel.setSource(ScanOptions.ScanSource.PLATEN)
+                        viewModel.setSource(ScanSettingsHelper.ScanSource.PLATEN)
                         updateSettings()
                         isSettingsSet = true
                     }
@@ -237,7 +237,7 @@ class ScanOptFragment : Fragment() {
                     sourceAdapter.notifyDataSetChanged()
 
                     if(!isSettingsSet){
-                        viewModel.setSource(ScanOptions.ScanSource.CAMERA)
+                        viewModel.setSource(ScanSettingsHelper.ScanSource.CAMERA)
                         updateSettings()
                         isSettingsSet = true
                     }
@@ -245,7 +245,7 @@ class ScanOptFragment : Fragment() {
 
                 //Scanner returned 0 sources
                 if(!isSettingsSet){
-                    viewModel.setSource(ScanOptions.ScanSource.AUTO)
+                    viewModel.setSource(ScanSettingsHelper.ScanSource.AUTO)
                     updateSettings()
                 }
 
@@ -264,7 +264,7 @@ class ScanOptFragment : Fragment() {
                         setTitle(getString(R.string.fragScanCapabilitiesErrorLabel))
                         setMessage(message)
                         setNeutralButton(R.string.accept) { _, _ ->
-                            startActivity(Intent(context, ScanActivity::class.java))
+                            startActivity(Intent(context, ScanAct::class.java))
                         }
                         setCancelable(false)
                     }
@@ -367,7 +367,7 @@ class ScanOptFragment : Fragment() {
                 override fun onScanningComplete() {
                     Log.d(tag, "Scanning completed")
 
-                    val i = Intent(activity?.applicationContext, ScanPreview::class.java)
+                    val i = Intent(activity?.applicationContext, ScanPreviewAct::class.java)
                     i.putParcelableArrayListExtra("tempUris", scanResultUris)
                     i.putExtra("chosenFormat", viewModel.chosenFormat)
 
@@ -432,34 +432,34 @@ class ScanOptFragment : Fragment() {
 
 
         if(source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_1face)){
-            viewModel.chosenSource = ScanOptions.ScanSource.ADF_SIMPLEX
-            viewModel.chosenNFaces = ScanOptions.Faces.ONE_FACE
+            viewModel.chosenSource = ScanSettingsHelper.ScanSource.ADF_SIMPLEX
+            viewModel.chosenNFaces = ScanSettingsHelper.Faces.ONE_FACE
         }else if (source == getString(R.string.ScanOption_source_adf) && nFaces == getString(R.string.ScanOption_faces_2face)){
-            viewModel.chosenSource = ScanOptions.ScanSource.ADF_DUPLEX
-            viewModel.chosenNFaces = ScanOptions.Faces.TWO_FACES
+            viewModel.chosenSource = ScanSettingsHelper.ScanSource.ADF_DUPLEX
+            viewModel.chosenNFaces = ScanSettingsHelper.Faces.TWO_FACES
         }else if(source == getString(R.string.ScanOption_source_platen)){
-            viewModel.chosenSource = ScanOptions.ScanSource.PLATEN
+            viewModel.chosenSource = ScanSettingsHelper.ScanSource.PLATEN
 
         }else if(source == getString(R.string.ScanOption_source_camera)){
-            viewModel.chosenSource = ScanOptions.ScanSource.CAMERA
+            viewModel.chosenSource = ScanSettingsHelper.ScanSource.CAMERA
         }else {
-            viewModel.chosenSource = ScanOptions.ScanSource.AUTO
+            viewModel.chosenSource = ScanSettingsHelper.ScanSource.AUTO
         }
 
         //set color
         when(color){
-            getString(R.string.ScanOption_colorMode_BW) -> viewModel.chosenColorMode = ScanOptions.ColorMode.BW
-            getString(R.string.ScanOption_colorMode_grey8) -> viewModel.chosenColorMode = ScanOptions.ColorMode.GREY_8
-            getString(R.string.ScanOption_colorMode_grey16) -> viewModel.chosenColorMode = ScanOptions.ColorMode.GREY_16
-            getString(R.string.ScanOption_colorMode_color24) -> viewModel.chosenColorMode = ScanOptions.ColorMode.COLOR_24
-            getString(R.string.ScanOption_colorMode_color48) -> viewModel.chosenColorMode = ScanOptions.ColorMode.COLOR_48
+            getString(R.string.ScanOption_colorMode_BW) -> viewModel.chosenColorMode = ScanSettingsHelper.ColorMode.BW
+            getString(R.string.ScanOption_colorMode_grey8) -> viewModel.chosenColorMode = ScanSettingsHelper.ColorMode.GREY_8
+            getString(R.string.ScanOption_colorMode_grey16) -> viewModel.chosenColorMode = ScanSettingsHelper.ColorMode.GREY_16
+            getString(R.string.ScanOption_colorMode_color24) -> viewModel.chosenColorMode = ScanSettingsHelper.ColorMode.COLOR_24
+            getString(R.string.ScanOption_colorMode_color48) -> viewModel.chosenColorMode = ScanSettingsHelper.ColorMode.COLOR_48
         }
 
         //set format
         when(format){
-            getString(R.string.ScanOption_format_PDF) -> viewModel.chosenFormat = ScanOptions.Format.PDF
-            getString(R.string.ScanOption_format_JPEG) -> viewModel.chosenFormat = ScanOptions.Format.JPEG
-            getString(R.string.ScanOption_format_RAW) -> viewModel.chosenFormat = ScanOptions.Format.RAW
+            getString(R.string.ScanOption_format_PDF) -> viewModel.chosenFormat = ScanSettingsHelper.Format.PDF
+            getString(R.string.ScanOption_format_JPEG) -> viewModel.chosenFormat = ScanSettingsHelper.Format.JPEG
+            getString(R.string.ScanOption_format_RAW) -> viewModel.chosenFormat = ScanSettingsHelper.Format.RAW
         }
 
         //set resolution

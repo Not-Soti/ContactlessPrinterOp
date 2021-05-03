@@ -4,9 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
@@ -22,7 +20,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.movil.*
-import com.example.movil.printActivity.PrintActViewModel
 import com.github.barteksc.pdfviewer.PDFView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hbisoft.pickit.PickiT
@@ -31,7 +28,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
- class ScanPreview : AppCompatActivity() {
+ class ScanPreviewAct : AppCompatActivity() {
 
     private val tag = "ScanPreview"
     private val requestExternalStoragePermissionCode = 0
@@ -42,7 +39,7 @@ import kotlin.collections.ArrayList
     private lateinit var shareButton : FloatingActionButton
     private lateinit var discardButton: Button
     private lateinit var pdfView : PDFView
-    private lateinit var chosenFormat : ScanOptions.Format
+    private lateinit var chosenFormat : ScanSettingsHelper.Format
 
     private lateinit var scanResultUris : Queue<Uri>
     private lateinit var pickit : PickiT
@@ -96,7 +93,7 @@ import kotlin.collections.ArrayList
         if (bundle != null) {
             val uriList = bundle.getParcelableArrayList<Uri>("tempUris") as ArrayList<Uri>
             scanResultUris = LinkedList(uriList)
-            chosenFormat = bundle.getSerializable("chosenFormat") as ScanOptions.Format
+            chosenFormat = bundle.getSerializable("chosenFormat") as ScanSettingsHelper.Format
         }
 
         saveButton.setOnClickListener { askPermissions() }
@@ -143,7 +140,7 @@ import kotlin.collections.ArrayList
          }else {
              //Check format in order to render it
              when (chosenFormat) {
-                 ScanOptions.Format.PDF -> {
+                 ScanSettingsHelper.Format.PDF -> {
                      val currentUri = scanResultUris.peek()
                      if (currentUri != null) {
                          previewPdf(currentUri)
@@ -151,7 +148,7 @@ import kotlin.collections.ArrayList
                          showNoFilesDialog()
                      }
                  }
-                 ScanOptions.Format.JPEG -> {
+                 ScanSettingsHelper.Format.JPEG -> {
                      val currentUri = scanResultUris.peek()
                      if (currentUri != null) {
                          previewImage(currentUri)
@@ -159,7 +156,7 @@ import kotlin.collections.ArrayList
                          showNoFilesDialog()
                      }
                  }
-                 ScanOptions.Format.RAW -> {
+                 ScanSettingsHelper.Format.RAW -> {
                      Toast.makeText(this, "Formato RAW", Toast.LENGTH_SHORT).show()
                  }
              }
@@ -167,7 +164,6 @@ import kotlin.collections.ArrayList
      }
 
     private fun previewImage(uri : Uri){
-        //TODO Jugar con las visibility de las previewspdf y de imagen
         pdfView.visibility = View.GONE
         imagePreview.visibility = View.VISIBLE
         val file = File(uri.path!!)
@@ -232,9 +228,9 @@ import kotlin.collections.ArrayList
 
     private fun askDirectory(){
         val ext = when(chosenFormat){
-            ScanOptions.Format.RAW -> "application/octet-stream"
-            ScanOptions.Format.PDF -> "application/pdf"
-            ScanOptions.Format.JPEG -> "image/jpeg"
+            ScanSettingsHelper.Format.RAW -> "application/octet-stream"
+            ScanSettingsHelper.Format.PDF -> "application/pdf"
+            ScanSettingsHelper.Format.JPEG -> "image/jpeg"
         }
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -320,7 +316,6 @@ import kotlin.collections.ArrayList
     override fun onBackPressed() {
         super.onBackPressed()
         discardAllFiles()
-        startActivity(Intent(applicationContext, ScanActivity::class.java))
     }
 
     /**
@@ -338,7 +333,7 @@ import kotlin.collections.ArrayList
                 setPositiveButton(R.string.accept
                 ) { _, _ ->
                     discardAllFiles()
-                    startActivity(Intent(context, ScanActivity::class.java))
+                    startActivity(Intent(context, ScanAct::class.java))
                 }
             }
             // Create the AlertDialog

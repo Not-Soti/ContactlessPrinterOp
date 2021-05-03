@@ -9,7 +9,7 @@ import com.example.movil.MainActivity
 import com.example.movil.R
 import com.example.movil.ScannerSearchFragment
 
-class ScanActivity : AppCompatActivity() {
+class ScanAct : AppCompatActivity() {
 
     private val TAG = "--- ScanActivity ---"
     private lateinit var viewModel : ScanActivityViewModel

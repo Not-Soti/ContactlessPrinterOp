@@ -147,7 +147,7 @@ class ScannerSearchFragment : Fragment() {
     }
 
     private fun openScanFrag(){
-        (activity as ScanActivity).replaceSearchWithScan()
+        (activity as ScanAct).replaceSearchWithScan()
     }
 
 

@@ -306,24 +306,6 @@ class PrintActivity : AppCompatActivity() {
      * Fun that opens the intent to pick a file
      */
     private fun getFile(){
-        /*//Check permission
-        if(ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-            PackageManager.PERMISSION_DENIED){
-            val permissionHelper = PermissionHelper(
-                this@PrintActivity,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                requestExternalStoragePermissionCode,
-                getString(R.string.permission_extStorageDeniedTitle),
-                getString(R.string.permission_extStorageDeniedMsg)
-            )
-            permissionHelper.checkAndAskForPermission()
-        }else{
-            //Seleccionar archivo
-            val intent = Intent(Intent.ACTION_GET_CONTENT)*/
-            //intent.type = "*/*"
-           /* startActivityForResult(intent, chooseFileActRequestCode)
-        }*/
-
         when {
             ContextCompat.checkSelfPermission(
                 applicationContext,
@@ -368,7 +350,6 @@ class PrintActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         removeTempFiles()
-        startActivity(Intent(this, MainActivity::class.java))
     }
 
     override fun onDestroy() {

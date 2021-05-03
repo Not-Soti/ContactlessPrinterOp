@@ -44,12 +44,12 @@ class ScanActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         when(screenStatus){
-            0 -> startActivity(Intent(this, MainActivity::class.java))
-            1 -> startActivity(Intent(this, MainActivity::class.java))
+            //0 -> startActivity(Intent(this, MainActivity::class.java))
+            //1 -> startActivity(Intent(this, MainActivity::class.java))
             2 -> {
                 //Replace scanOptionsFragment with searchScannerFragment
                 if (viewModel.chosenScanner != null) {
-                    viewModel.chosenScanner.stopMonitoringDeviceStatus()
+                    viewModel.chosenScanner!!.stopMonitoringDeviceStatus()
                 }
                 screenStatus = 1
                 val scanFrag = ScannerSearchFragment()
@@ -66,7 +66,7 @@ class ScanActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if(viewModel.chosenScanner!=null) {
-            viewModel.chosenScanner.stopMonitoringDeviceStatus()
+            viewModel.chosenScanner!!.stopMonitoringDeviceStatus()
         }
     }
 }

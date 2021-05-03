@@ -95,7 +95,7 @@ class ScanOptFragment : Fragment() {
         resolutionSpinner.adapter = resolutionAdapter
         formatSpinner.adapter = formatAdapter
 
-        nameTv.text = viewModel.chosenScanner.humanReadableName
+        nameTv.text = viewModel.chosenScanner!!.humanReadableName
 
         scanButton.setOnClickListener{
             setChosenSettings()
@@ -141,7 +141,7 @@ class ScanOptFragment : Fragment() {
             }
         }
 
-        viewModel.chosenScanner.monitorDeviceStatus(DeviceStatusMonitor.DEFAULT_MONITORING_PERIOD, object: DeviceStatusMonitor.ScannerStatusListener{
+        viewModel.chosenScanner!!.monitorDeviceStatus(DeviceStatusMonitor.DEFAULT_MONITORING_PERIOD, object: DeviceStatusMonitor.ScannerStatusListener{
             override fun onStatusChanged(scannerSta: Int, adfSta: Int) {
                 val scannerStr = when(scannerSta){
                     DeviceStatusMonitor.SCANNER_STATUS_IDLE -> getString(R.string.SCANNER_STATUS_IDLE)
@@ -172,7 +172,7 @@ class ScanOptFragment : Fragment() {
      * them on the screen options
      */
     private fun getScannerCapabilities(){
-        viewModel.chosenScanner.fetchCapabilities(object :
+        viewModel.chosenScanner!!.fetchCapabilities(object :
             ScannerCapabilitiesFetcher.ScannerCapabilitiesListener {
             override fun onFetchCapabilities(cap: ScannerCapabilities?) {
 
@@ -310,7 +310,7 @@ class ScanOptFragment : Fragment() {
      * Fun that validates chosen options with the scanner
      */
     private fun validateTicket(){
-        viewModel.chosenScanner.validateTicket(viewModel.chosenTicket, object : ScanTicketValidator.ScanTicketValidationListener{
+        viewModel.chosenScanner!!.validateTicket(viewModel.chosenTicket, object : ScanTicketValidator.ScanTicketValidationListener{
             override fun onScanTicketValidationComplete(p0: ScanTicket?) {
                 startScanning()
             }
@@ -353,7 +353,7 @@ class ScanOptFragment : Fragment() {
         val tempFolder = activity?.getExternalFilesDir(tempScanFolder)!!
         val scanResultUris = arrayListOf<Uri>()
 
-        viewModel.chosenScanner.scan(
+        viewModel.chosenScanner!!.scan(
             tempFolder.absolutePath,
             viewModel.chosenTicket,
             object : ScanCapture.ScanningProgressListener {
@@ -370,22 +370,19 @@ class ScanOptFragment : Fragment() {
                     val i = Intent(activity?.applicationContext, ScanPreview::class.java)
                     i.putParcelableArrayListExtra("tempUris", scanResultUris)
                     i.putExtra("chosenFormat", viewModel.chosenFormat)
+
+                    scanningFragment.dismiss()
+
                     startActivity(i)
                 }
 
                 override fun onScanningError(theException: ScannerException?) {
                     try {
 
-                        viewModel.chosenScanner.cancelScanning()
+                        viewModel.chosenScanner!!.cancelScanning()
                         deleteTempFiles(tempFolder)
 
-                        scanningFragment.dismiss()
-                        val scanErrorFragment = ScanErrorFragment()
-                        val bundle = Bundle();
-                        bundle.putString("reason", getReasonFromException(theException))
-                        scanErrorFragment.arguments = bundle;
-                        fragmentTransaction = fragmentManager.beginTransaction()
-                        scanErrorFragment.show(childFragmentManager, "scanErrorFragment")
+                        scanningFragment.showException(getReasonFromException(theException))
 
                     } catch (e: AdfException) {
                         Log.d(tag, "AdfException\n Status: ${e.message}")

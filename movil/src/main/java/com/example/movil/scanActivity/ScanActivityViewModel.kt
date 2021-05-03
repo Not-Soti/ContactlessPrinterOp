@@ -6,8 +6,9 @@ import com.hp.mobile.scan.sdk.model.*
 
 class ScanActivityViewModel : ViewModel() {
 
-    lateinit var chosenTicket : ScanTicket
-    lateinit var chosenScanner : Scanner
+
+    var chosenTicket : ScanTicket? = null
+    var chosenScanner : Scanner? = null
 
     var adfSimplex: MutableMap<String, Any>? = null
     var adfDuplex: MutableMap<String, Any>? = null
@@ -38,13 +39,13 @@ class ScanActivityViewModel : ViewModel() {
 
         if(theSource == null){
             //Source == AUTO
-            val theRes : Resolution = chosenTicket.getSetting(ScanTicket.SCAN_SETTING_RESOLUTION) as Resolution
+            val theRes : Resolution = chosenTicket!!.getSetting(ScanTicket.SCAN_SETTING_RESOLUTION) as Resolution
             resolutionList = listOf(theRes)
 
-            val theFormat : Int = chosenTicket.getSetting(ScanTicket.SCAN_SETTING_FORMAT) as Int
+            val theFormat : Int = chosenTicket!!.getSetting(ScanTicket.SCAN_SETTING_FORMAT) as Int
             resultFormats = listOf(theFormat)
 
-            val theColor : Int = chosenTicket.getSetting(ScanTicket.SCAN_SETTING_COLOR_MODE) as Int
+            val theColor : Int = chosenTicket!!.getSetting(ScanTicket.SCAN_SETTING_COLOR_MODE) as Int
             colorModes = listOf(theColor)
         }else{
 
@@ -61,37 +62,37 @@ class ScanActivityViewModel : ViewModel() {
     fun setTicketOptions(){
         //Source
         when(chosenSource){
-            ScanOptions.ScanSource.ADF_SIMPLEX -> { chosenTicket.inputSource = ScanValues.INPUT_SOURCE_ADF }
-            ScanOptions.ScanSource.ADF_DUPLEX -> { chosenTicket.inputSource = ScanValues.INPUT_SOURCE_ADF }
-            ScanOptions.ScanSource.PLATEN -> { chosenTicket.inputSource = ScanValues.INPUT_SOURCE_PLATEN }
-            ScanOptions.ScanSource.CAMERA -> { chosenTicket.inputSource = ScanValues.INPUT_SOURCE_CAMERA }
-            ScanOptions.ScanSource.AUTO -> { chosenTicket.inputSource = ScanValues.INPUT_SOURCE_AUTO }
+            ScanOptions.ScanSource.ADF_SIMPLEX -> { chosenTicket!!.inputSource = ScanValues.INPUT_SOURCE_ADF }
+            ScanOptions.ScanSource.ADF_DUPLEX -> { chosenTicket!!.inputSource = ScanValues.INPUT_SOURCE_ADF }
+            ScanOptions.ScanSource.PLATEN -> { chosenTicket!!.inputSource = ScanValues.INPUT_SOURCE_PLATEN }
+            ScanOptions.ScanSource.CAMERA -> { chosenTicket!!.inputSource = ScanValues.INPUT_SOURCE_CAMERA }
+            ScanOptions.ScanSource.AUTO -> { chosenTicket!!.inputSource = ScanValues.INPUT_SOURCE_AUTO }
         }
 
         //Sheet faces
         if ((chosenSource == ScanOptions.ScanSource.ADF_DUPLEX) || (chosenSource == ScanOptions.ScanSource.ADF_SIMPLEX)) {
             when(chosenNFaces){
-                ScanOptions.Faces.ONE_FACE -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, false)
-                ScanOptions.Faces.TWO_FACES -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, true)
+                ScanOptions.Faces.ONE_FACE -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, false)
+                ScanOptions.Faces.TWO_FACES -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_DUPLEX, true)
             }
         }
         //Color mode
         when(chosenColorMode){
-            ScanOptions.ColorMode.BW -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_BLACK_AND_WHITE)
-            ScanOptions.ColorMode.GREY_8 -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_GRAYSCALE_8)
-            ScanOptions.ColorMode.GREY_16 -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_GRAYSCALE_16)
-            ScanOptions.ColorMode.COLOR_24 -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_RGB_24)
-            ScanOptions.ColorMode.COLOR_48 -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_RGB_48)
+            ScanOptions.ColorMode.BW -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_BLACK_AND_WHITE)
+            ScanOptions.ColorMode.GREY_8 -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_GRAYSCALE_8)
+            ScanOptions.ColorMode.GREY_16 -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_GRAYSCALE_16)
+            ScanOptions.ColorMode.COLOR_24 -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_RGB_24)
+            ScanOptions.ColorMode.COLOR_48 -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_COLOR_MODE, ScanValues.COLOR_MODE_RGB_48)
         }
         //File format
         when(chosenFormat){
-            ScanOptions.Format.JPEG -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_JPEG)
-            ScanOptions.Format.PDF -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_PDF)
-            ScanOptions.Format.RAW -> chosenTicket.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_RAW)
+            ScanOptions.Format.JPEG -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_JPEG)
+            ScanOptions.Format.PDF -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_PDF)
+            ScanOptions.Format.RAW -> chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_FORMAT, ScanValues.DOCUMENT_FORMAT_RAW)
         }
         //Resolution
         if(isResSelected){ //A resolution was selected
-            chosenTicket.setSetting(ScanTicket.SCAN_SETTING_RESOLUTION, chosenRes)
+            chosenTicket!!.setSetting(ScanTicket.SCAN_SETTING_RESOLUTION, chosenRes)
         }
     }
 

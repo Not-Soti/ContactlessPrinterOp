@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.widget.LinearLayout
 import com.example.movil.printActivity.PrintActivity
 import com.example.movil.readQrActivity.ReadQrActivity
+import com.example.movil.scanActivity.PerformingScanFragment
 import com.example.movil.scanActivity.ScanActivity
 import kotlin.system.exitProcess
 
@@ -43,9 +44,4 @@ class MainActivity : AppCompatActivity(){
 
     }
 
-
-    //Se cierra la app
-    override fun onBackPressed() {
-        exitProcess(0)
-    }
 }

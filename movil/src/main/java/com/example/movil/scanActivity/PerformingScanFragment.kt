@@ -20,6 +20,8 @@ class PerformingScanFragment : DialogFragment() {
     private lateinit var viewModel : ScanActivityViewModel
     private lateinit var progressBar : ProgressBar
 
+    private var isException = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,7 +36,13 @@ class PerformingScanFragment : DialogFragment() {
         statusTv = theView.findViewById(R.id.frag_performing_scan_status)
         exceptionTv = theView.findViewById(R.id.frag_performing_scan_error)
         progressBar = theView.findViewById(R.id.frag_performing_scan_progressBar)
-        button.setOnClickListener { stopScanning() }
+        button.setOnClickListener {
+            if(!isException){
+                stopScanning()
+            }else{
+                this.dismiss()
+            }
+        }
 
         return theView
     }
@@ -46,9 +54,10 @@ class PerformingScanFragment : DialogFragment() {
     }
 
     fun showException(reason: String) {
+        isException=true
         progressBar.visibility = View.INVISIBLE
         statusTv.text = getString(R.string.SCANNER_STATUS_STOPPED)
-        exceptionTv.text = reason;
+        exceptionTv.text = reason
     }
 
 }

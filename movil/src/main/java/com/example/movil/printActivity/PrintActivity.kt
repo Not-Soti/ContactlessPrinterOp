@@ -342,7 +342,7 @@ class PrintActivity : AppCompatActivity() {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.permission_ExtStorageDenied_endAct))
             .setPositiveButton(android.R.string.ok){ _, _ ->
-                startActivity(Intent(applicationContext, MainActivity::class.java))
+                this.finish()
             }.show()
     }
 

@@ -48,9 +48,8 @@ class PerformingScanFragment : DialogFragment() {
     }
 
     private fun stopScanning(){
-        val parentAct = activity as ScanAct
         viewModel.chosenScanner!!.cancelScanning()
-        parentAct.supportFragmentManager.beginTransaction().remove(this).commit()
+        this.dismiss()
     }
 
     fun showException(reason: String) {

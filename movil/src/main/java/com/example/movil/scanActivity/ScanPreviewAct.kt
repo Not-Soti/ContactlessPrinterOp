@@ -296,7 +296,8 @@ import kotlin.collections.ArrayList
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok){ _, _ ->
                 discardAllFiles()
-                startActivity(Intent(applicationContext, MainActivity::class.java))
+                //startActivity(Intent(applicationContext, MainActivity::class.java))
+                this@ScanPreviewAct.finish()//TODO volver atras asi?
             }.show()
     }
 
@@ -333,7 +334,8 @@ import kotlin.collections.ArrayList
                 setPositiveButton(R.string.accept
                 ) { _, _ ->
                     discardAllFiles()
-                    startActivity(Intent(context, ScanAct::class.java))
+                    //startActivity(Intent(context, ScanAct::class.java))
+                    finish() //TODO Volver atras asi?
                 }
             }
             // Create the AlertDialog

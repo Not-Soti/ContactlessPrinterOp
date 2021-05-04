@@ -176,7 +176,7 @@ class ScanOptFragment : Fragment() {
             ScannerCapabilitiesFetcher.ScannerCapabilitiesListener {
             override fun onFetchCapabilities(cap: ScannerCapabilities?) {
 
-                if(cap == null){
+                if (cap == null) {
                     //TODO
                     Log.d(TAG, "Scanner Capabilities == null")
                     return
@@ -188,9 +188,10 @@ class ScanOptFragment : Fragment() {
 
 
                 //Get sources
-                if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_SIMPLEX)){
-                    viewModel.adfSimplex = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_SIMPLEX] as MutableMap<String, Any>
-                    if(!hasADF) {
+                if (capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_SIMPLEX)) {
+                    viewModel.adfSimplex =
+                        capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_SIMPLEX] as MutableMap<String, Any>
+                    if (!hasADF) {
                         hasADF = true
                         sourceAdapter.add(getString(R.string.ScanOption_source_adf))
                         sourceAdapter.notifyDataSetChanged()
@@ -198,45 +199,48 @@ class ScanOptFragment : Fragment() {
                     facesAdapter.add(getString(R.string.ScanOption_faces_1face))
                     facesAdapter.notifyDataSetChanged()
 
-                    if(!isSettingsSet){
+                    if (!isSettingsSet) {
                         viewModel.setSource(ScanSettingsHelper.ScanSource.ADF_SIMPLEX)
                         updateSettings()
                         isSettingsSet = true
                     }
                 }
-                if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX)){
-                    viewModel.adfDuplex = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX] as MutableMap<String, Any>
-                    if(!hasADF) {
+                if (capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX)) {
+                    viewModel.adfDuplex =
+                        capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_ADF_DUPLEX] as MutableMap<String, Any>
+                    if (!hasADF) {
                         sourceAdapter.add(getString(R.string.ScanOption_source_adf))
                         sourceAdapter.notifyDataSetChanged()
                     }
                     facesAdapter.add(getString(R.string.ScanOption_faces_2face))
                     facesAdapter.notifyDataSetChanged()
 
-                    if(!isSettingsSet){
+                    if (!isSettingsSet) {
                         viewModel.setSource(ScanSettingsHelper.ScanSource.ADF_DUPLEX)
                         updateSettings()
                         isSettingsSet = true
                     }
                 }
-                if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_PLATEN)){
-                    viewModel.platen = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_PLATEN] as MutableMap<String, Any>
+                if (capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_PLATEN)) {
+                    viewModel.platen =
+                        capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_PLATEN] as MutableMap<String, Any>
                     sourceAdapter.add(getString(R.string.ScanOption_source_platen))
                     sourceAdapter.notifyDataSetChanged()
 
-                    if(!isSettingsSet){
+                    if (!isSettingsSet) {
                         viewModel.setSource(ScanSettingsHelper.ScanSource.PLATEN)
                         updateSettings()
                         isSettingsSet = true
                     }
                 }
 
-                if(capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA)){
-                    viewModel.camera = capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA] as MutableMap<String, Any>
+                if (capabilities.containsKey(ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA)) {
+                    viewModel.camera =
+                        capabilities[ScannerCapabilities.SCANNER_CAPABILITY_IS_CAMERA] as MutableMap<String, Any>
                     sourceAdapter.add(getString(R.string.ScanOption_source_camera))
                     sourceAdapter.notifyDataSetChanged()
 
-                    if(!isSettingsSet){
+                    if (!isSettingsSet) {
                         viewModel.setSource(ScanSettingsHelper.ScanSource.CAMERA)
                         updateSettings()
                         isSettingsSet = true
@@ -244,7 +248,7 @@ class ScanOptFragment : Fragment() {
                 }
 
                 //Scanner returned 0 sources
-                if(!isSettingsSet){
+                if (!isSettingsSet) {
                     viewModel.setSource(ScanSettingsHelper.ScanSource.AUTO)
                     updateSettings()
                 }
@@ -255,23 +259,26 @@ class ScanOptFragment : Fragment() {
                 Log.d(TAG, "Error obteniendo las caracteristicas del escaner")
                 Log.e(TAG, exception?.message!!)
 
-                val alertDialog: AlertDialog = this.let {
-                    val builder = AlertDialog.Builder(activity!!)
-                    builder.apply {
+                if (isAdded) {
+                    val alertDialog: AlertDialog = this.let {
+                        val builder = AlertDialog.Builder(activity!!)
+                        builder.apply {
 
-                        val message = getReasonFromException(exception)
+                            val message = getReasonFromException(exception)
 
-                        setTitle(getString(R.string.fragScanCapabilitiesErrorLabel))
-                        setMessage(message)
-                        setNeutralButton(R.string.accept) { _, _ ->
-                            startActivity(Intent(context, ScanAct::class.java))
+                            setTitle(getString(R.string.fragScanCapabilitiesErrorLabel))
+                            setMessage(message)
+                            setNeutralButton(R.string.accept) { _, _ ->
+                                //startActivity(Intent(context, ScanAct::class.java))
+                                activity!!.supportFragmentManager.popBackStack()//TODO Volver atras
+                            }
+                            setCancelable(false)
                         }
-                        setCancelable(false)
+                        // Create the AlertDialog
+                        builder.create()
                     }
-                    // Create the AlertDialog
-                    builder.create()
+                    alertDialog.show()
                 }
-                alertDialog.show()
             }
         })
     }
@@ -359,7 +366,7 @@ class ScanOptFragment : Fragment() {
             object : ScanCapture.ScanningProgressListener {
                 override fun onScanningPageDone(p0: ScanPage?) {
                     Log.d(tag, "Page scanned")
-                    if(p0 != null) {
+                    if (p0 != null) {
                         scanResultUris.add(p0.uri!!)
                     }
                 }
@@ -382,14 +389,21 @@ class ScanOptFragment : Fragment() {
                         viewModel.chosenScanner!!.cancelScanning()
                         deleteTempFiles(tempFolder)
 
-                        scanningFragment.showException(getReasonFromException(theException))
 
+                        if (theException != null) {
+                            if (theException.reason != ScannerException.REASON_CANCELED_BY_USER) {
+                                //Si el usuario lo cancela se crea una excepcion de este tipo
+                                scanningFragment.showException(getReasonFromException(theException))
+                            }
+                        } else {
+                            scanningFragment.dismiss()
+                        }
                     } catch (e: AdfException) {
                         Log.d(tag, "AdfException\n Status: ${e.message}")
 
                     } catch (e: ScannerException) {
                         Log.d(tag, "ScannerException\n Reason: ${e.message}")
-                    } catch (e: Exception){
+                    } catch (e: Exception) {
                         Log.d(tag, "Excepcion no controlada: ${e.message}")
                     }
                 }

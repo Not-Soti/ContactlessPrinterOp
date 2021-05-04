@@ -154,7 +154,7 @@ class ReadQrActivity : AppCompatActivity() {
                 val snackbar = Snackbar.make(rootLayout, "Enciende el wifi", Snackbar.LENGTH_LONG)
                     .setAction("Encender", View.OnClickListener {
                         startActivity(Intent(Settings.Panel.ACTION_WIFI))
-                        //startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+
                     }).show()
 
             } else {
@@ -286,12 +286,6 @@ class ReadQrActivity : AppCompatActivity() {
         }
     }
 
-    //On back pressed go to main activity
-    override fun onBackPressed() {
-        super.onBackPressed()
-        startActivity(Intent(this, MainActivity::class.java))
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         cameraSource.release()
@@ -371,7 +365,7 @@ class ReadQrActivity : AppCompatActivity() {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.permission_camDenied_endAct))
             .setPositiveButton(android.R.string.ok){ _, _ ->
-                startActivity(Intent(applicationContext, MainActivity::class.java))
+                this.finish()
             }.show()
     }
 

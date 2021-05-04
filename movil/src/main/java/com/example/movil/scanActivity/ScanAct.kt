@@ -14,9 +14,6 @@ class ScanAct : AppCompatActivity() {
     private val TAG = "--- ScanActivity ---"
     private lateinit var viewModel : ScanActivityViewModel
 
-    var screenStatus = 0 //Check what to do on onBackPressed
-                         //0 activity, 1 scannerSearchFragment, 2 ScanOptFragment
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -24,44 +21,24 @@ class ScanAct : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(ScanActivityViewModel::class.java)
 
-        screenStatus = 1
-        supportFragmentManager.beginTransaction().add(R.id.act_scan_root, ScannerSearchFragment::class.java, null).commit()
+        val trans = supportFragmentManager.beginTransaction()
+        trans.add(R.id.act_scan_root, ScannerSearchFragment::class.java, null)
+        trans.addToBackStack("frag_search_scanner")//Añadir para volver aqui al pulsar atras
+        trans.commit()
     }
 
     /**
      * Replaces the search scanner fragment with the scanning proccess fragment
      */
     fun replaceSearchWithScan(){
-        screenStatus = 2
         val scanFrag = ScanOptFragment()
         val trans = supportFragmentManager.beginTransaction()
 
-        trans.replace(R.id.act_scan_root, scanFrag)
-        trans.addToBackStack(null)
+        trans.add(R.id.act_scan_root, scanFrag)
+        //trans.addToBackStack(null) //no se añade a la pila para no volver
         trans.commit()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        when(screenStatus){
-            //0 -> startActivity(Intent(this, MainActivity::class.java))
-            //1 -> startActivity(Intent(this, MainActivity::class.java))
-            2 -> {
-                //Replace scanOptionsFragment with searchScannerFragment
-                if (viewModel.chosenScanner != null) {
-                    viewModel.chosenScanner!!.stopMonitoringDeviceStatus()
-                }
-                screenStatus = 1
-                val scanFrag = ScannerSearchFragment()
-                val trans = supportFragmentManager.beginTransaction()
-
-                trans.replace(R.id.act_scan_root, scanFrag)
-                trans.addToBackStack(null)
-                trans.commit()
-                Log.d(TAG, "back 2")
-            }
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()

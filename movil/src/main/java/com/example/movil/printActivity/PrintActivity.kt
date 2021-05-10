@@ -9,9 +9,11 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.webkit.WebResourceRequest
@@ -26,7 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.print.PrintHelper
-import com.example.movil.MainActivity
+import com.example.movil.BuildConfig
 import com.example.movil.R
 import com.example.movil.ZoomLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -120,6 +122,9 @@ class PrintActivity : AppCompatActivity() {
         webPreview.visibility = View.INVISIBLE
         imagePreview.visibility = View.INVISIBLE
 
+        //Ask permissions for android 11+
+        askAccessAllFilesPermission()
+
         //Pinch gesture for zoom is set on the root layout
         imageViewOrigX = imagePreview.x
         imageViewOrigY = imagePreview.y
@@ -127,7 +132,7 @@ class PrintActivity : AppCompatActivity() {
         rootLayout.setImageView(imagePreview)
 
         //ChooseFile button listener
-        buttonChooseFile.setOnClickListener { getFile() }
+        buttonChooseFile.setOnClickListener { askPermissions() }
 
         //Share button listener
         buttonShare.setOnClickListener {
@@ -290,10 +295,7 @@ class PrintActivity : AppCompatActivity() {
         when(requestCode){
             requestExternalStoragePermissionCode -> {
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    //Pick the file
-                    val intent = Intent(Intent.ACTION_GET_CONTENT)
-                    intent.type = "*/*"
-                    startActivityForResult(intent, chooseFileActRequestCode)
+                    pickFile()
                 }else{
                     endActivityNoPermission()
                 }
@@ -301,39 +303,63 @@ class PrintActivity : AppCompatActivity() {
         }
     }
 
+    private fun pickFile(){
+        //Pick the file
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "*/*"
+        startActivityForResult(intent, chooseFileActRequestCode)
+    }
+
 
     /**
      * Fun that opens the intent to pick a file
      */
-    private fun getFile(){
-        when {
-            ContextCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                // You can use the API that requires the permission.
-                //Seleccionar archivo
-                val intent = Intent(Intent.ACTION_GET_CONTENT)
-                intent.type = "*/*"
-                startActivityForResult(intent, chooseFileActRequestCode)
+    private fun askPermissions(){
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            //In android 11 manage all files permission is needed
+            if(Environment.isExternalStorageManager()){
+                pickFile()
+            }else {
+                askAccessAllFilesPermission()
             }
-            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) -> {
-                //Show explanatory message
-                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                builder.setTitle(getString(R.string.permission_extStorageDeniedTitle)).setMessage(getString(R.string.permission_extStorageDeniedMsg))
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        ActivityCompat.requestPermissions(this,
-                            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                            requestExternalStoragePermissionCode) }
-                    .setNegativeButton(android.R.string.cancel) { _, _ ->
-                        endActivityNoPermission() }
-                builder.create().show()
-            }
-            else -> {
-                // You can directly ask for the permission.
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    requestExternalStoragePermissionCode)
+        }else {
+
+            when {
+                ContextCompat.checkSelfPermission(
+                    applicationContext,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    pickFile()
+                }
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) -> {
+                    //Show explanatory message
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                    builder.setTitle(getString(R.string.permission_extStorageDeniedTitle))
+                        .setMessage(getString(R.string.permission_extStorageDeniedMsg))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            ActivityCompat.requestPermissions(
+                                this,
+                                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                                requestExternalStoragePermissionCode
+                            )
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            endActivityNoPermission()
+                        }
+                    builder.create().show()
+                }
+                else -> {
+                    // You can directly ask for the permission.
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        requestExternalStoragePermissionCode
+                    )
+                }
             }
         }
     }
@@ -402,6 +428,15 @@ class PrintActivity : AppCompatActivity() {
         viewModel.setUri(null)
         viewModel.setPath(null)
         viewModel.setType(ResourceTypeEnum.NOT_DEFINED)
+    }
+
+    private fun askAccessAllFilesPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                val uri = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+                startActivity(Intent( Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri))
+            }
+        }
     }
 
 }

@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.widget.LinearLayout
 import com.example.movil.printActivity.PrintActivity
 import com.example.movil.readQrActivity.ReadQrActivity
-import com.example.movil.scanActivity.ScanAct
+import com.example.movil.scanActivity.ScanActivity
 
 
 class MainActivity : AppCompatActivity(){
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(){
         }
 
         linLayScan.setOnClickListener {
-            startActivity(Intent(this@MainActivity, ScanAct::class.java))
+            startActivity(Intent(this@MainActivity, ScanActivity::class.java))
         }
 
     }

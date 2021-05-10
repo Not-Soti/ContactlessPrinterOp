@@ -18,10 +18,13 @@ import java.io.File
 import java.lang.Exception
 
 
-class ScanOptFragment : Fragment() {
+class ScanOptionsFragment : Fragment() {
 
     private val tempScanFolder = "TempScan"
     private val TAG = "--- ScanOptFragment ---"
+
+    private val previewActivityRequestCode = 1
+    private val previewActivityResultOK = 1
 
     private lateinit var viewModel : ScanActivityViewModel
 
@@ -66,6 +69,9 @@ class ScanOptFragment : Fragment() {
             }
         }
 
+        //Setear el backPressedStatus
+        (activity as ScanActivity).backPressedStatus = 1
+
         scanButton = theView.findViewById(R.id.frag_scan_op_button)
         nameTv = theView.findViewById(R.id.frag_scan_op_deviceName)
         deviceStatusTv = theView.findViewById(R.id.frag_scan_op_deviceStatus)
@@ -77,11 +83,11 @@ class ScanOptFragment : Fragment() {
         formatSpinner = theView.findViewById(R.id.frag_scan_op_formatSpinner)
 
         //Adapters for each spinner
-        sourceAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
-        facesAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
-        colorAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
-        resolutionAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
-        formatAdapter = ArrayAdapter<String>(activity as ScanAct, R.layout.support_simple_spinner_dropdown_item)
+        sourceAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        facesAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        colorAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        resolutionAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
+        formatAdapter = ArrayAdapter<String>(activity as ScanActivity, R.layout.support_simple_spinner_dropdown_item)
 
         sourceAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
         facesAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
@@ -374,13 +380,13 @@ class ScanOptFragment : Fragment() {
                 override fun onScanningComplete() {
                     Log.d(tag, "Scanning completed")
 
-                    val i = Intent(activity?.applicationContext, ScanPreviewAct::class.java)
+                    val i = Intent(activity?.applicationContext, ScanPreviewActivity::class.java)
                     i.putParcelableArrayListExtra("tempUris", scanResultUris)
                     i.putExtra("chosenFormat", viewModel.chosenFormat)
 
                     scanningFragment.dismiss()
 
-                    startActivity(i)
+                    startActivityForResult(i, previewActivityRequestCode)
                 }
 
                 override fun onScanningError(theException: ScannerException?) {
@@ -556,5 +562,19 @@ class ScanOptFragment : Fragment() {
             builder.create()
         }
         alertDialog.show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        //Si se acabó la actividad de previsualización
+        if(requestCode == previewActivityRequestCode){
+            if(resultCode == previewActivityResultOK){
+
+                //Se acabo la historia de usuario de escanear
+                (activity as ScanActivity).backPressedStatus = 2
+                (activity as ScanActivity).onBackPressed()
+            }
+        }
     }
 }

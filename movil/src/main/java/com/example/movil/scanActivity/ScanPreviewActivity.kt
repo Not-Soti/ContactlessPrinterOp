@@ -28,11 +28,13 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
- class ScanPreviewAct : AppCompatActivity() {
+ class ScanPreviewActivity : AppCompatActivity() {
 
     private val tag = "ScanPreview"
     private val requestExternalStoragePermissionCode = 0
     private val createDocumentActCode = 1
+
+     private val activityResultOK = 1
 
     private lateinit var imagePreview : ImageView
     private lateinit var saveButton : FloatingActionButton
@@ -297,7 +299,7 @@ import kotlin.collections.ArrayList
             .setPositiveButton(android.R.string.ok){ _, _ ->
                 discardAllFiles()
                 //startActivity(Intent(applicationContext, MainActivity::class.java))
-                this@ScanPreviewAct.finish()//TODO volver atras asi?
+                this@ScanPreviewActivity.finish()
             }.show()
     }
 
@@ -335,6 +337,7 @@ import kotlin.collections.ArrayList
                 ) { _, _ ->
                     discardAllFiles()
                     //startActivity(Intent(context, ScanAct::class.java))
+                    setResult(activityResultOK)
                     finish() //TODO Volver atras asi?
                 }
             }

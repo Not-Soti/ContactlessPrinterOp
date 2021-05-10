@@ -92,6 +92,9 @@ class ScannerSearchFragment : Fragment() {
                 }
             }
 
+        //Setear el backPressedStatus
+        (activity as ScanActivity).backPressedStatus = 0
+
         return theView
     }
 
@@ -147,7 +150,7 @@ class ScannerSearchFragment : Fragment() {
     }
 
     private fun openScanFrag(){
-        (activity as ScanAct).replaceSearchWithScan()
+        (activity as ScanActivity).replaceSearchWithScan()
     }
 
 

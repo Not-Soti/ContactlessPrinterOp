@@ -16,6 +16,9 @@ import com.hp.mobile.scan.sdk.browsing.ScannersBrowser
 import com.hp.mobile.scan.sdk.browsing.ScannersBrowser.ScannerAvailabilityListener
 import com.hp.mobile.scan.sdk.model.ScanTicket
 
+/**
+ * Fragment that searchs for scanners in the current network and lists them
+ */
 class ScannerSearchFragment : Fragment() {
 
 
@@ -30,16 +33,15 @@ class ScannerSearchFragment : Fragment() {
     private lateinit var progressBar : ProgressBar
     private lateinit var viewModel : ScanActivityViewModel
 
-
+    //Listener called when a scanner is detected or lost
     private val scannerBrowserListener: ScannerAvailabilityListener =
         object : ScannerAvailabilityListener {
             override fun onScannerFound(aScanner: Scanner) {
-                Log.d(tag, "Scanner found")
+                //Log.d(tag, "Scanner found")
                 scannerListAdapter.add(aScanner)
             }
-
             override fun onScannerLost(aScanner: Scanner) {
-                Log.d(tag, "Scanner lost")
+                //Log.d(tag, "Scanner lost")
                 scannerListAdapter.remove(aScanner)
             }
         }
@@ -64,7 +66,11 @@ class ScannerSearchFragment : Fragment() {
         scannerListAdapter = ScannerListAdapter(requireContext())
         scannerListView.adapter = scannerListAdapter
 
+        //When the scanner search button if clicked
         scannerSearchButton.setOnClickListener {
+
+            //If the device was not already searching, clears the previuous scanner list adapter
+            // and starts searching for scanners
             if (!isSearching) {
                 //Start searching
                 scannerListAdapter.clear()
@@ -82,6 +88,8 @@ class ScannerSearchFragment : Fragment() {
             }
         }
 
+        //Upong clicng on a scanner from the list, shows a popup in order
+        //to choose a standard scanTicket containing standard scan settings
         scannerListView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, _ -> //Stop searching
                 stopSearching()
@@ -92,15 +100,15 @@ class ScannerSearchFragment : Fragment() {
                 }
             }
 
-        //Setear el backPressedStatus
+        //Sets the backPressedStatus son the ScanActivity can act accordingly
         (activity as ScanActivity).backPressedStatus = 0
 
         return theView
     }
 
     /**
-     * Creates the popup menu when clicking on a scanner from the list, and returns
-     * the ScanTicket based on the user's selection
+     * Creates the popup menu when clicking on a scanner from the list, sets the chosen
+     * scan ticket and opens the ScanSettingsFragment.
      */
     //private fun showPopupAndPrint(view: View, scanner: Scanner) {
     private fun showPopupChooseTicket(view: View) {
@@ -149,12 +157,17 @@ class ScannerSearchFragment : Fragment() {
         menu.show()
     }
 
+    /**
+     * Method that tells the activity to show the ScanSettings fragment
+     */
     private fun openScanFrag(){
         (activity as ScanActivity).replaceSearchWithScan()
     }
 
 
-    //Stops the scanner searching over the network
+    /**
+     * Method called when the scanner search is required to stop
+     */
     private fun stopSearching(){
         if(isSearching) {
             Log.d(tag, "Stopping scanner search")

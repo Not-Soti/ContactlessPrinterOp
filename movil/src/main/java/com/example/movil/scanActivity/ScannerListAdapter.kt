@@ -10,7 +10,9 @@ import android.widget.TextView
 import com.example.movil.R
 import com.hp.mobile.scan.sdk.Scanner
 
-
+/**
+ * Adapter class for the scanner list
+ */
 class ScannerListAdapter() : BaseAdapter() {
 
     private var scannerList = mutableListOf<Scanner>()

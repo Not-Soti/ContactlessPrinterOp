@@ -32,29 +32,31 @@ import kotlin.collections.ArrayList
 
     private val tag = "ScanPreview"
     private val requestExternalStoragePermissionCode = 0
-    private val createDocumentActCode = 1
+    private val createDocumentActCode = 1 //Code used to get the Creating document activity response code
 
-     private val activityResultOK = 1
+    private val activityResultOK = 1 /*Code used to finish the activity and tell the ScanSettingsFragment
+                                       that the scan proccess is finished, and the app needs to
+                                       roll back to the main activity */
 
     private lateinit var imagePreview : ImageView
     private lateinit var saveButton : FloatingActionButton
     private lateinit var shareButton : FloatingActionButton
     private lateinit var discardButton: Button
     private lateinit var pdfView : PDFView
-    private lateinit var chosenFormat : ScanSettingsHelper.Format
+    private lateinit var chosenFormat : ScanSettingsHelper.Format //Tells the scan result format (pdf, image)
 
-    private lateinit var scanResultUris : Queue<Uri>
-    private lateinit var pickit : PickiT
+    private lateinit var scanResultUris : Queue<Uri> //List cointaining the scanning results' URIs
+
+    private lateinit var pickit : PickiT //Object that gets files real path from their URI
     private val pickitListener = object: PickiTCallbacks {
         override fun PickiTonUriReturned() {
             //Used when the file is picked from the Cloud
-            Log.d(tag, "Pickit on uri returned (Descargando archivo)")
         }
         override fun PickiTonStartListener() {
-            Log.d(tag, "Pickit on start listener (Creando archivo de descarga)")
+            //Called when the selected file is not local, and the file creation starts
         }
         override fun PickiTonProgressUpdate(progress: Int) {
-            Log.d(tag, "Pickit on progress update (Progreso de descarga $progress")
+            //Called when the file is not local, updating the download progress
         }
 
         override fun PickiTonCompleteListener(
@@ -64,12 +66,14 @@ import kotlin.collections.ArrayList
             wasSuccessful: Boolean,
             Reason: String?
         ) {
+            //Called when the path is got. If the file is local, this is called directly
+            //Sets the path and renders the image preview
             Log.d(tag, "Pickit on complete listener Ruta: $path")
             if(path == null){
                 Log.d(tag, "No se ha podido obtener la ruta")
                 //TODO excepcion
             }else {
-                copyTempToPath(File(path))
+                copyTempToPath(File(path)) //Copies the scanning result to the created one
             }
         }
     }
@@ -84,7 +88,10 @@ import kotlin.collections.ArrayList
         shareButton = findViewById(R.id.act_scan_preview_shareFab)
         discardButton = findViewById(R.id.act_scan_preview_dicardButton)
 
+        //If the device is Android 11+, checks if the special permission for accessing
+        //files is granted
         askAccessAllFilesPermission()
+
         pickit = PickiT(this, pickitListener, this)
 
         //Pinch gesture for zoom is set on the root layout
@@ -93,19 +100,24 @@ import kotlin.collections.ArrayList
 
         val bundle = intent.extras
         if (bundle != null) {
+            //Gets the list of URIs from the bundle
             val uriList = bundle.getParcelableArrayList<Uri>("tempUris") as ArrayList<Uri>
             scanResultUris = LinkedList(uriList)
+            //Gets the scanning result chosen format (pdf, jpg...)
             chosenFormat = bundle.getSerializable("chosenFormat") as ScanSettingsHelper.Format
         }
 
-        saveButton.setOnClickListener { askPermissions() }
+        saveButton.setOnClickListener {
+            askPermissions() //Asks for file write permissions
+        }
 
         discardButton.setOnClickListener{
             val discard = scanResultUris.poll()
             if(discard != null) {
-                discardFile(discard)
-                useNextFile()
+                discardFile(discard) //Deletes the temp file
+                useNextFile() //If more files were scanned, use the next one
             }else{
+                //If no more files are aviable, shows a dialog that ends the activity
                 showNoFilesDialog()
             }
         }
@@ -130,6 +142,8 @@ import kotlin.collections.ArrayList
                 startActivity(Intent.createChooser(emailIntent, "Enviar"))
             }
         }
+
+        //Use the first file got
         useNextFile()
     }
 
@@ -138,7 +152,7 @@ import kotlin.collections.ArrayList
       */
      private fun useNextFile(){
          if (scanResultUris.isEmpty()){
-             showNoFilesDialog()
+             showNoFilesDialog() //If no more files are aviable, shows a dialog that ends the activity
          }else {
              //Check format in order to render it
              when (chosenFormat) {
@@ -160,51 +174,69 @@ import kotlin.collections.ArrayList
                  }
                  ScanSettingsHelper.Format.RAW -> {
                      Toast.makeText(this, "Formato RAW", Toast.LENGTH_SHORT).show()
+                     //TODO
                  }
              }
          }
      }
 
+     /**
+      * Method that previews an image
+      */
     private fun previewImage(uri : Uri){
-        pdfView.visibility = View.GONE
+        pdfView.visibility = View.GONE //Hide the pdfView and show the imageView
         imagePreview.visibility = View.VISIBLE
+
+        //Creates a bitmap from the file path and shows it
         val file = File(uri.path!!)
         imagePreview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         imagePreview.setImageBitmap(BitmapFactory.decodeFile(file.absolutePath))
     }
 
+     /**
+      * Method that previews a PDF
+      */
     private fun previewPdf(uri : Uri){
+        //Hides the imageView, shows the pdfView and shows the pdf
         imagePreview.visibility = View.GONE
         pdfView.visibility = View.VISIBLE
         pdfView.fromUri(uri).load()
     }
 
+     /**
+      * Ask for file aces permission
+      */
     private fun askPermissions(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-            //In android 11 manage all files permission is needed
+            //In android 11 manage all files special permission is needed
             if(Environment.isExternalStorageManager()){
+                //If granted, creates the file
                 askDirectory()
             }else {
+                //If not granted, asks for the permission
                 askAccessAllFilesPermission()
             }
         }else {
-            //Android >11 permissions
+            //Android <11 permissions only ask for write storage permission
             when {
                 ContextCompat.checkSelfPermission(
                     applicationContext,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) == PackageManager.PERMISSION_GRANTED -> {
-                    // You can use the API that requires the permission.
+                    // If granted, creates the file
                     askDirectory()
                 }
                 ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) -> {
-                    //Show explanatory message
+                    //Show explanatory message about asking for permissionsif the system decides to
                     val builder: AlertDialog.Builder = AlertDialog.Builder(this)
                     builder.setTitle(getString(R.string.permission_extStorageDeniedTitle)).setMessage(getString(R.string.permission_extStorageDeniedMsg))
+
+                        //If the user accepts, asks for the permissino
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             ActivityCompat.requestPermissions(this,
                                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                                 requestExternalStoragePermissionCode) }
+                        //If the user doesn't accept, shows a dialog that finishes the activity
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
                             endActivityNoPermission() }
                     builder.create().show()
@@ -219,6 +251,9 @@ import kotlin.collections.ArrayList
         }
     }
 
+     /**
+      * Method that asks for the acces files special permission on Android 11+
+      */
     private fun askAccessAllFilesPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
@@ -228,6 +263,9 @@ import kotlin.collections.ArrayList
         }
     }
 
+     /**
+      * Method that makes the user select a directory in order to save the scan result
+      */
     private fun askDirectory(){
         val ext = when(chosenFormat){
             ScanSettingsHelper.Format.RAW -> "application/octet-stream"
@@ -237,7 +275,6 @@ import kotlin.collections.ArrayList
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply{
             addCategory(Intent.CATEGORY_OPENABLE)
             type = ext
-            //putExtra(Intent.EXTRA_TITLE, "") //file suggested name
         }
         startActivityForResult(intent, createDocumentActCode)
     }
@@ -260,6 +297,9 @@ import kotlin.collections.ArrayList
         }
     }
 
+     /**
+      * Method called when a file is created in order to save the scan result in it
+      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -267,7 +307,7 @@ import kotlin.collections.ArrayList
             createDocumentActCode ->{
                 if(resultCode == Activity.RESULT_OK) {
                     val newDocUri = data?.data
-                    Log.d(tag, "Uri del nuevo archivo: $newDocUri")
+                    //If the file was corretly created, gets it's path from PickiT
                     pickit.getPath(newDocUri, Build.VERSION.SDK_INT)
                 }else{
                     Log.d(tag, "Create document canceled")
@@ -292,17 +332,24 @@ import kotlin.collections.ArrayList
         useNextFile()
     }
 
+     /**
+      * Method that shows a dialog explaining that permissions are needed
+      * in order to continue using the app and finishes the activity
+      */
     private fun endActivityNoPermission(){
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.permission_ExtStorageDenied_endAct))
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok){ _, _ ->
-                discardAllFiles()
-                //startActivity(Intent(applicationContext, MainActivity::class.java))
-                this@ScanPreviewActivity.finish()
+                discardAllFiles() //Deletes the temporal files before closing
+                this@ScanPreviewActivity.finish() //Finishes the activity
             }.show()
     }
 
+     /**
+      * Method that deletes the desired file from the devide
+      * @param uri: URI of the file that is going to be deleted.
+      */
     private fun discardFile(uri : Uri){
         val tempFile = File(uri.path!!)
         if(tempFile.exists()) {
@@ -310,6 +357,9 @@ import kotlin.collections.ArrayList
         }
     }
 
+     /**
+      * Method that calls discardFile(uri) for every file left in the result list
+      */
     private fun discardAllFiles(){
         scanResultUris.forEach{
             discardFile(it)
@@ -336,9 +386,10 @@ import kotlin.collections.ArrayList
                 setPositiveButton(R.string.accept
                 ) { _, _ ->
                     discardAllFiles()
-                    //startActivity(Intent(context, ScanAct::class.java))
-                    setResult(activityResultOK)
-                    finish() //TODO Volver atras asi?
+                    setResult(activityResultOK) /*Tells the ScanOptionsFragment that the
+                                                scanning process is finished, so it can finish
+                                                and go back to the main activity*/
+                    finish()
                 }
             }
             // Create the AlertDialog

@@ -11,6 +11,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.movil.R
 
+/**
+ * Fragment that shows a progress bar while scanning, and an explanatory message
+ * if an error happened while scanning
+ */
 class PerformingScanFragment : DialogFragment() {
 
     private val TAG = "---ScanningFragment---"
@@ -36,10 +40,13 @@ class PerformingScanFragment : DialogFragment() {
         statusTv = theView.findViewById(R.id.frag_performing_scan_status)
         exceptionTv = theView.findViewById(R.id.frag_performing_scan_error)
         progressBar = theView.findViewById(R.id.frag_performing_scan_progressBar)
+
         button.setOnClickListener {
             if(!isException){
+                //If pressed while scanning correctly, stops the scan
                 stopScanning()
             }else{
+                //If pressed when an exception occured, just dismisses the dialog
                 this.dismiss()
             }
         }
@@ -48,15 +55,18 @@ class PerformingScanFragment : DialogFragment() {
     }
 
     private fun stopScanning(){
-        viewModel.chosenScanner!!.cancelScanning()
-        this.dismiss()
+        viewModel.chosenScanner!!.cancelScanning() //tells the scanner to stop
+        this.dismiss() //Close the dialog
     }
 
+    /**
+     * Method that shows the exception on the screen
+     */
     fun showException(reason: String) {
-        isException=true
-        progressBar.visibility = View.INVISIBLE
+        isException=true //sets the flag to true
+        progressBar.visibility = View.INVISIBLE //Hides the progress bar
         statusTv.text = getString(R.string.SCANNER_STATUS_STOPPED)
-        exceptionTv.text = reason
+        exceptionTv.text = reason //Sets the exception reason to the provided one
     }
 
 }

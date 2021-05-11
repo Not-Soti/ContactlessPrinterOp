@@ -11,6 +11,10 @@ import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 
+/**
+ * Layout class that has an ImageView, and detects gestures
+ * that allow to zoom in or out that ImageView
+ */
 @SuppressLint("ClickableViewAccessibility")
 class ZoomLayout(
     context: Context,
@@ -19,14 +23,14 @@ class ZoomLayout(
 
     lateinit var imagePreview : ImageView
     val tag = "--- ZoomLayout ---"
-    var firstFingerY1 = 0F
-    var secondFingerY1 = 0F
-    var fingerDistanceY = 0F
-    var isZooming = false
-    var scale = 1F
+
     private val myGestureListener = MyGestureListener()
     private val myTouchListener = MyTouchListener(context, myGestureListener)
 
+    /**
+     * Method that sets the ImageView in the layout, and saves
+     * it's screen coordinates in the Gesture Listener
+     */
     fun setImageView(im : ImageView){
         imagePreview = im
         myGestureListener.imagePreview = im
@@ -59,7 +63,7 @@ class ZoomLayout(
 
             when (event!!.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    //First finger pressed
+                    //First finger pressed -> save the coordinates
                     //Log.d(tag, "Action down")
                     firstFingerY1 = event.y
                     firstFingerX1 = event.x

@@ -4,8 +4,15 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 
 class PrintActViewModel(
-    private var resourceUri: Uri? = null, //selected resource uri
-    private var resourcePath : String? = null, //using the uri does not work when trying to print documents
+
+    //selected resource uri
+    private var resourceUri: Uri? = null,
+
+    //using the uri does not work when trying to print documents
+    //so the path is needed to
+    private var resourcePath : String? = null,
+
+    //variable used to save the chosen file type from none, image, pdf or html
     private var resourceType: ResourceTypeEnum = ResourceTypeEnum.NOT_DEFINED
 ) : ViewModel() {
 
@@ -14,8 +21,7 @@ class PrintActViewModel(
         NOT_DEFINED,
         IMAGE,
         PDF,
-        HTML,
-        DOC
+        HTML
     }
 
 

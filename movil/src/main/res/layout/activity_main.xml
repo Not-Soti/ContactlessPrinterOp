@@ -19,7 +19,8 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:elevation="@dimen/main_act_button_elevation">
 
         <ImageView
             android:id="@+id/act_main_print_icon"
@@ -67,7 +68,9 @@
         app:layout_constraintBottom_toTopOf="@+id/act_main_readQr_LinLay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_main_print_LinLay">
+        app:layout_constraintTop_toBottomOf="@+id/act_main_print_LinLay"
+        android:elevation="@dimen/main_act_button_elevation">
+
 
         <ImageView
             android:id="@+id/act_main_scan_icon"
@@ -115,7 +118,9 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/act_main_scan_LinLay"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:elevation="@dimen/main_act_button_elevation">
+
 
         <ImageView
             android:id="@+id/act_main_readQr_icon"

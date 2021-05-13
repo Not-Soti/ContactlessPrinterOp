@@ -120,4 +120,6 @@
     <string name="ScannerLostMessage">Scanner connection lost</string>
     <string name="ReadQrAct_readQrFailedMsg">Read code does not have the correct information in order to connect. Please, try again.</string>
     <string name="fragScanValidateTicketError">The scanner does not supper chosen settings</string>
+    <string name="PrintAct_shareFab_tooltipText">Share selected file</string>
+    <string name="PrintAct_printFab_tooltipText">Choose a printer</string>
 </resources>

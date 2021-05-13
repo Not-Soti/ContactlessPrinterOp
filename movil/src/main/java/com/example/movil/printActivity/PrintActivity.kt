@@ -231,7 +231,26 @@ class PrintActivity : AppCompatActivity() {
                 }//HTML
             }
         }//Print button listener
-    }
+
+        /*If the activity was launched from another app through an intent-filter
+        *The file's URI is got and we start this activity's flow from the point where
+        the user has just picked a file*/
+        Log.d(tag, "Entrando")
+        val bundle = intent.extras
+        if(bundle != null){
+            Log.d(tag, "Entramos y lo intentamos")
+
+
+            val uri : Uri = Uri.parse(bundle.get(Intent.EXTRA_STREAM).toString())
+
+            //Remove a image from the imagePreview if there was any
+            imagePreview.setImageDrawable(null)
+            webPreview.loadUrl("about:blank")
+
+            //If the file is correctly chosen, calls pickit in order to get it's real path
+            pickit.getPath(uri, Build.VERSION.SDK_INT)
+        }
+    }//OnCreate
 
     /**
      * Method used to get the chosen file and show it

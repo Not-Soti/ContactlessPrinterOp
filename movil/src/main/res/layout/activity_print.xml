@@ -72,7 +72,8 @@
         app:srcCompat="@android:drawable/ic_menu_share"
         app:maxImageSize="@dimen/print_act_fab_icon_size"
         android:contentDescription="@string/PrintAct_shareFab_cd"
-        android:focusable="true" />
+        android:focusable="true"
+        android:tooltipText="@string/PrintAct_shareFab_tooltipText"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/act_print_printFab"
@@ -86,5 +87,6 @@
         app:srcCompat="@drawable/icon_printer_mini_black"
         app:maxImageSize="@dimen/print_act_fab_icon_size"
         android:contentDescription="@string/PrintAct_printFab_cd"
-        android:focusable="true" />
+        android:focusable="true"
+        android:tooltipText="@string/PrintAct_printFab_tooltipText"/>
 </com.example.movil.ZoomLayout>

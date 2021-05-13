@@ -8,6 +8,6 @@
     <color name="white">#ffffff</color>
 
     <color name="blueHP">#77bae8</color>
-    <color name="scannerListBg">#e0e0e0</color>
+    <color name="scannerListBg">#ffffff</color>
 
 </resources>

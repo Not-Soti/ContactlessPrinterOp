@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.movil.R
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hp.mobile.scan.sdk.*
 import com.hp.mobile.scan.sdk.model.*
 import java.io.File
@@ -31,7 +32,7 @@ class ScanSettingsFragment : Fragment() {
     private lateinit var nameTv : TextView
     private lateinit var deviceStatusTv : TextView
     private lateinit var adfStatusTv : TextView
-    private lateinit var scanButton : Button
+    private lateinit var scanButton : FloatingActionButton
     private lateinit var sourceSpinner : Spinner
     private lateinit var facesSpinner : Spinner
     private lateinit var colorSpinner : Spinner

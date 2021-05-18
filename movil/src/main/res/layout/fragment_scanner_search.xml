@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
     </FrameLayout>
 
-    <Button
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/act_scanner_search_searchScannerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:text="@string/ScanAct_startSearchButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/scan_act_button_bg"/>
+        android:background="@drawable/extentended_fab_bg"/>
 
     <LinearLayout
         android:id="@+id/act_scanner_search_searchingLL"

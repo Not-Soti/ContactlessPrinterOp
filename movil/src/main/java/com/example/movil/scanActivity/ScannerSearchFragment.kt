@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.hp.mobile.scan.sdk.Scanner
 import com.hp.mobile.scan.sdk.browsing.ScannersBrowser
 import com.hp.mobile.scan.sdk.browsing.ScannersBrowser.ScannerAvailabilityListener
@@ -26,7 +27,7 @@ class ScannerSearchFragment : Fragment() {
     private val TAG = "--- ScannerSearchActivity ---"
     private lateinit var scannerListAdapter : ScannerListAdapter
     private lateinit var scannerListView : ListView
-    private lateinit var scannerSearchButton : Button
+    private lateinit var scannerSearchButton : ExtendedFloatingActionButton
     private lateinit var auxText : TextView
     private var isSearching = false
     private lateinit var scannerBrowser : ScannersBrowser

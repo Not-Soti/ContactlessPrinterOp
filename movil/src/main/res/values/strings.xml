@@ -149,5 +149,6 @@
     <string name="PrintAct_shareFab_tooltipText">Compartir el archivo seleccionado</string>
     <string name="PrintAct_printFab_tooltipText">Seleccionar impresora</string>
     <string name="ScanOption_scan_button">Escanear</string>
+    <string name="act_scan_preview_discardButtonLabel">Descartar</string>
 
 </resources>

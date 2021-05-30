@@ -6,12 +6,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/act_print_chooseFileButton"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
         android:text="@string/PrintAct_chooseFileButton"
+        android:textAllCaps="true"
+        android:textSize="20sp"
+        app:icon="@android:drawable/ic_menu_search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,7 +26,9 @@
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="4dp"
         android:gravity="center"
         android:text="@string/PrintAct_previewLabel"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,27 +39,32 @@
         android:id="@+id/act_print_imagePreview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:contentDescription="@string/PrintAct_imagePreview_cd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        android:contentDescription="@string/PrintAct_imagePreview_cd" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <WebView
         android:id="@+id/act_print_webPreview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
-    </WebView>
+        app:layout_constraintTop_toBottomOf="@+id/textView"></WebView>
 
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/act_print_PDFView"
         android:layout_width="match_parent"
         android:layout_height="590dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,13 +80,13 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@+id/act_print_printFab"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_share"
-        app:maxImageSize="@dimen/print_act_fab_icon_size"
         android:contentDescription="@string/PrintAct_shareFab_cd"
         android:focusable="true"
-        android:tooltipText="@string/PrintAct_shareFab_tooltipText"/>
+        android:tooltipText="@string/PrintAct_shareFab_tooltipText"
+        app:layout_constraintBottom_toTopOf="@+id/act_print_printFab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:maxImageSize="@dimen/print_act_fab_icon_size"
+        app:srcCompat="@android:drawable/ic_menu_share" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/act_print_printFab"
@@ -82,11 +95,11 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/icon_printer_mini_black"
-        app:maxImageSize="@dimen/print_act_fab_icon_size"
         android:contentDescription="@string/PrintAct_printFab_cd"
         android:focusable="true"
-        android:tooltipText="@string/PrintAct_printFab_tooltipText"/>
+        android:tooltipText="@string/PrintAct_printFab_tooltipText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:maxImageSize="@dimen/print_act_fab_icon_size"
+        app:srcCompat="@drawable/icon_printer_mini_black" />
 </com.example.movil.ZoomLayout>

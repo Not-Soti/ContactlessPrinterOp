@@ -16,7 +16,7 @@
     <string name="ReadQrAct_unableToConnect">Unable to connect to the net</string>
     <string name="ReadQrAct_checkNotifications">Accept conection in notifications bar</string>
     <string name="ScanAct_startSearchButton">Search scanners</string>
-    <string name="ScanAct_stopSearchButton">Stop search</string>
+    <string name="ScanAct_stopSearchButton">Stop searching</string>
     <string name="ScanAct_searchingLabel">Searching scanners</string>
     <string name="ScanAct_stoppedLabel">Search stopped</string>
     <string name="PrintAct_chooseFileButton">Choose a file</string>
@@ -122,4 +122,5 @@
     <string name="PrintAct_shareFab_tooltipText">Share selected file</string>
     <string name="PrintAct_printFab_tooltipText">Choose a printer</string>
     <string name="ScanOption_scan_button">Scan</string>
+    <string name="act_scan_preview_discardButtonLabel">Discard</string>
 </resources>

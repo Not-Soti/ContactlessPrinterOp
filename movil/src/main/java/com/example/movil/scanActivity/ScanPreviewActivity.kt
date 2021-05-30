@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.movil.*
 import com.github.barteksc.pdfviewer.PDFView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hbisoft.pickit.PickiT
 import com.hbisoft.pickit.PickiTCallbacks
@@ -41,7 +42,7 @@ import kotlin.collections.ArrayList
     private lateinit var imagePreview : ImageView
     private lateinit var saveButton : FloatingActionButton
     private lateinit var shareButton : FloatingActionButton
-    private lateinit var discardButton: Button
+    private lateinit var discardButton: ExtendedFloatingActionButton
     private lateinit var pdfView : PDFView
     private lateinit var chosenFormat : ScanSettingsHelper.Format //Tells the scan result format (pdf, image)
 

@@ -22,7 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+<!--    <TextView
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -33,45 +33,43 @@
         android:text="@string/PrintAct_previewLabel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_print_chooseFileButton" />
+        app:layout_constraintTop_toBottomOf="@+id/act_print_chooseFileButton" />-->
 
     <ImageView
         android:id="@+id/act_print_imagePreview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
         android:contentDescription="@string/PrintAct_imagePreview_cd"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/act_print_chooseFileButton" />
 
     <WebView
         android:id="@+id/act_print_webPreview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"></WebView>
+        app:layout_constraintTop_toBottomOf="@+id/act_print_chooseFileButton"></WebView>
 
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/act_print_PDFView"
         android:layout_width="match_parent"
-        android:layout_height="590dp"
+        android:layout_height="0dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/act_print_chooseFileButton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/act_scan_preview_shareFab"

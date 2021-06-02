@@ -235,11 +235,9 @@ class PrintActivity : AppCompatActivity() {
         /*If the activity was launched from another app through an intent-filter
         *The file's URI is got and we start this activity's flow from the point where
         the user has just picked a file*/
-        Log.d(tag, "Entrando")
+
         val bundle = intent.extras
         if(bundle != null){
-            Log.d(tag, "Entramos y lo intentamos")
-
 
             val uri : Uri = Uri.parse(bundle.get(Intent.EXTRA_STREAM).toString())
 

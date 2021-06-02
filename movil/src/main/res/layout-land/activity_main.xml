@@ -12,10 +12,10 @@
         android:id="@+id/act_main_print_LinLay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="65dp"
         android:background="@drawable/main_button_bg"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/act_main_scan_LinLay"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -30,7 +30,6 @@
             android:id="@+id/act_main_print_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:gravity="center"
             android:text="@string/MainAct_print_title"
             android:textColor="@color/blueHP" />
@@ -41,13 +40,11 @@
         android:id="@+id/act_main_scan_LinLay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
         android:background="@drawable/main_button_bg"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/act_main_readQr_LinLay"
-        app:layout_constraintStart_toEndOf="@+id/act_main_print_LinLay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -71,11 +68,11 @@
         android:id="@+id/act_main_readQr_LinLay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="65dp"
         android:background="@drawable/main_button_bg"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/act_main_scan_LinLay"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView

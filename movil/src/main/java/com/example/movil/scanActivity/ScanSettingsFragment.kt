@@ -54,7 +54,7 @@ class ScanSettingsFragment : Fragment() {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        val theView = inflater.inflate(R.layout.fragment_scan_options, container, false)
+        val theView = inflater.inflate(R.layout.fragment_scan_settings, container, false)
 
         viewModel = ViewModelProvider(requireActivity()).get(ScanActivityViewModel::class.java)
 

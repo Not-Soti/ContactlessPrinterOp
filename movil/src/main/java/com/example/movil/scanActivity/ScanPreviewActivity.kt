@@ -174,8 +174,12 @@ import kotlin.collections.ArrayList
                      }
                  }
                  ScanSettingsHelper.Format.RAW -> {
-                     Toast.makeText(this, "Formato RAW", Toast.LENGTH_SHORT).show()
-                     //TODO
+                     val currentUri = scanResultUris.peek()
+                     if (currentUri != null) {
+                         previewImage(currentUri)
+                     } else {
+                         showNoFilesDialog()
+                     }
                  }
              }
          }

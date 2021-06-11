@@ -8,4 +8,7 @@
     <dimen name="print_act_fab_size">64dp</dimen>
     <dimen name="print_act_fab_icon_size">48dp</dimen>
 
+    <dimen name="frag_scan_settings_setting_space">20dp</dimen>
+    <dimen name="frag_scan_settings_label_spinner_margin">5dp</dimen>
+
 </resources>

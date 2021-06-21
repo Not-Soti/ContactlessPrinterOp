@@ -1,3 +1,24 @@
+# Arquitectura de la aplicación
+
+El código de la aplicación se ha agrupado siguiendo los principales componentes de la aplicación, por lo que hay un paquete donde se agrupan las clases relacionadas para la funcionalidad de imprimir, otro para las relacionadas con la función de escanear y otro para las relacionadas con la conexión a la red a través del código QR.
+
+
+## Lectura QR
+
+Formado por la clase ReadQrActivity.kt. Utiliza el detector de de codigos de barras de Google ([link](https://developers.google.com/ml-kit/vision/barcode-scanning)). Además, la conexion a la red es distinta dependiendo de si el dispositivo ya que a partir de Android 10 es diferente.
+
+
+## Imprimir archivos
+
+La clase principal es PrintActivity.kt que infla el fragmento. Se utiliza un layout propio ZoomLayout.kt que detecta gestos para hacer zoom siempre que el archivo elegido sea una imagen (si es pdf se usa una libreria externa). Dispone de un listener de la librería PickiT que edvuelve la ruta de un archivo cuando se selecciona desde el explorador de archivos.
+
+
+## Escanear archivos
+
+Sobre la clase ScanActivity.ky se inflan 2 fragmentos. El primero es ScannerSearchFragment.kt, con el cual se buscan escáneres en la red y se listan. Al seleccionar uno se infla el segundo fragmento ScanSettingsFragment, donde se obtienen las características del escáner utilizando la librería Mobile Scan SDK de HP. Al seleccionar las opciones, se validan contra el escaner y se escanea, guardando los resultados en una carpeta temporal. Cuando se completa, los resultados se muestran en la actividad ScanActivity.kt, y se pueden guardar definitivamente o descartarlos eliminando los temporales.
+
+<br>
+
 # Manual de usuario
 
 ## Nociones básicas

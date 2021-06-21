@@ -5,7 +5,7 @@ Al iniciar la aplicación, se muestra la pantalla principal. En ella se muestran
 Al utilizar cada una de ellas, se pedirán algunos permisos al usuario, como puede ser el acceso a la cámara o a los archivos guardados. Si los permisos se rechazan un número determinado de veces fijado por la versión de Android que se utilice, tendrán que ser concedidos a través del gestor de permisos del sistema. Además, al rechazar los permisos, la aplicación volverá a ésta pantalla principal automáticamente.
  
 
-![Main_activity](readme_images/main_menu.jpg)
+<img src="readme_images/main_menu.jpg" width="200">
 
 
 
@@ -20,7 +20,7 @@ Al leerlo, dependiendo de la versión, se conectará directamente a la red en di
 Por último, debido a que la conexión a la red puede no ser instantánea como se ha explicado con las versiones más modernas de Android, se podrá pulsar el botón determinado para conectarse manualmente, el cual lleva a la pantalla de configuración del Wifi del dispositivo.
  
 
-![Print_file](readme_images/readQR.jpg)
+<img src="readme_images/readQR.jpg" width="200">
 
 
 ## Impresión de archivos
@@ -32,7 +32,8 @@ Cuando se tenga el archivo preparado y se pulse el botón de imprimir, se abrir�
  
 Finalmente, mientras dure la impresión, el sistema muestra el progreso en la barra de notificaciones del dispositivo.
  
-![Print_file](readme_images/print.jpg)
+
+<img src="readme_images/print.jpg" width="200">
 
 
 ## Escaneo de archivos
@@ -40,7 +41,7 @@ Al pulsar sobre el botón de escaneo, se abrirá una nueva pantalla con un botó
 Al seleccionar un escáner, se abre un menú con tres opciones: Escanear documento, imagen o texto. Esto crea ajustes preestablecidos que favorecen el tipo de escaneo que quiere realizarse, de forma que escanear imagen favorece escanear una hoja con una foto, escanear texto favorece una hoja con solo texto, y escanear documento faciliza escanear hojas donde hay texto e imágenes combinados.
 
 
-![Search_scanner](readme_images/searchScanner.jpg)
+<img src="readme_images/searchScanner.jpg" width="200">
 
 
 Una vez seleccionado el tipo de escaneo que quiere realizarse, se abre una pantalla con las características del escáner.
@@ -49,10 +50,11 @@ En la parte superior, se muestra el nombre del escáner, su estado, y el estado 
 Una vez seleccionadas las opciones preferidas se ha de pulsar el botón de escanear. En este momento, la aplicación valida las opciones con el escáner, y si no son válidas, se muestra un mensaje de advertencia y se permite cambiarlas. Si son correctas, se muestra un diálogo de carga mientras se muestre el escaneo, mostrado también la causa de un error en caso de que alguno ocurra. Además, se puede detener el escaneo borrando todos los archivos temporales que se hayan podido crear en el proceso.
 
 
-![Scanner_settings](readme_images/scannerSettings.jpg)
+<img src="readme_images/scannerSettings.jpg" width="200">
 
 
 Cuando se hayan escaneado todas las hojas, se mostrará una pantalla previsualizando el resultado. En este momento los archivos son todavía temporales, por lo que se permiten descartarse, guardarse definitivamente o compartirse por email según se requiera. Tras guardarse o descartarse, si hay mas archivos que previsualizar, se mostrarán automáticamente. Si no, se muestra un diálogo indicando que no hay más y la aplicación vuelve a la pantalla principal.
 
 
-![Scan_result](readme_images/scanResult.jpg)
+<img src="readme_images/scanResult.jpg" width="200">
+

@@ -1,6 +1,6 @@
-## Manual de usuario
+# Manual de usuario
 
-#Nociones básicas
+## Nociones básicas
 Al iniciar la aplicación, se muestra la pantalla principal. En ella se muestran 3 botones correspondientes a las 3 principales funcionalidades de la aplicación.
 Al utilizar cada una de ellas, se pedirán algunos permisos al usuario, como puede ser el acceso a la cámara o a los archivos guardados. Si los permisos se rechazan un número determinado de veces fijado por la versión de Android que se utilice, tendrán que ser concedidos a través del gestor de permisos del sistema. Además, al rechazar los permisos, la aplicación volverá a ésta pantalla principal automáticamente.
  
@@ -9,7 +9,7 @@ Al utilizar cada una de ellas, se pedirán algunos permisos al usuario, como pue
 
 
 
-#Conexión a la red escaneando un código QR
+## Conexión a la red escaneando un código QR
 Pulsando sobre este botón, se abrirá una pantalla y directamente se piden los permisos de acceso a la cámara. 
  
 Una vez se otorguen, se mostrará por la pantalla lo que se esté percibiendo con la cámara.
@@ -23,7 +23,7 @@ Por último, debido a que la conexión a la red puede no ser instantánea como s
 ![Print_file](readme_images/readQR.jpg)
 
 
-#Impresión de archivos
+## Impresión de archivos
 Pulsando el botón de imprimir un archivo abre una pantalla con tres botones, uno para seleccionar un archivo, otro para compartir el archivo seleccionado, y otro para mandarlo a una cola de impresión. Si se pulsan los dos últimos botones sin haber elegido un archivo, aparecerá un diálogo indicando que ha de seleccionarse uno. Una vez seleccionado, se previsualiza, permitiendo hacer zoom sobre él.
  
 Si se selecciona un archivo con un formato que la aplicación no soporta, se muestra un diálogo indicándolo y explicando cuales son los formatos posibles.
@@ -35,7 +35,7 @@ Finalmente, mientras dure la impresión, el sistema muestra el progreso en la ba
 ![Print_file](readme_images/print.jpg)
 
 
-#Escaneo de archivos
+## Escaneo de archivos
 Al pulsar sobre el botón de escaneo, se abrirá una nueva pantalla con un botón de buscar escáneres, y al encontraros se mostrarán en una lista. Es obligatorio que el escáner y el teléfono estén conectados a la misma red Wifi.
 Al seleccionar un escáner, se abre un menú con tres opciones: Escanear documento, imagen o texto. Esto crea ajustes preestablecidos que favorecen el tipo de escaneo que quiere realizarse, de forma que escanear imagen favorece escanear una hoja con una foto, escanear texto favorece una hoja con solo texto, y escanear documento faciliza escanear hojas donde hay texto e imágenes combinados.
 
